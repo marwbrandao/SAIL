@@ -94,8 +94,23 @@ runSA(double Tstart, /* [in] starting temperature */
   
       change_unit(clusters, units, k, n);
 
-      printf("i = %d em %d--------------\n", i, steps);
-      for (int i = 0; i < k; i++)
+      // printf("i = %d em %d --------------\n", i, steps);
+      // for (int i = 0; i < k; i++)
+      // {
+      //   int pop_cluster = 0;
+      //     printf("Cluster %d with size %d: ", i, clusters[i].size);
+      //     for (int j = 0; j < clusters[i].size; j++)
+      //     {
+      //         printf("%d ", clusters[i].units[j]->code);
+      //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+      //     }
+      //     // printf("\n                       with POPULATION %d ", pop_cluster);
+      //     printf("\n");
+      // }
+      printf("max: %d\n", max);
+      if(max > energy(units, clusters, m, k, n)){
+         printf("i = %d em %d--------------\n", i, steps);
+        for (int i = 0; i < k; i++)
       {
         int pop_cluster = 0;
           printf("Cluster %d with size %d: ", i, clusters[i].size);
@@ -107,26 +122,11 @@ runSA(double Tstart, /* [in] starting temperature */
           printf("with population %d ", pop_cluster);
           printf("\n");
       }
-      //printf("max: %d\n", max);
-      // if(max > energy(units, clusters, m, k, n)){
-      //    printf("i = %d em %d--------------\n", i, steps);
-      //   for (int i = 0; i < k; i++)
-      // {
-      //   int pop_cluster = 0;
-      //     printf("Cluster %d with size %d: ", i, clusters[i].size);
-      //     for (int j = 0; j < clusters[i].size; j++)
-      //     {
-      //         printf("%d ", clusters[i].units[j]->code);
-      //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-      //     }
-      //     printf("with population %d ", pop_cluster);
-      //     printf("\n");
-      // }
-      //   max = energy(units, clusters, m, k, n);
-      //   printf("\n MAX MAS MAX max: %d\n\n", max);
-      //   Cluster* stored_state = storeState(clusters, k, n);
+        max = energy(units, clusters, m, k, n);
+        printf("\n MAX MAS MAX max: %d\n\n", max);
+        Cluster* stored_state = storeState(clusters, k, n);
 
-      // }
+      }
 
     T += Td;
   }

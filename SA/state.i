@@ -2675,29 +2675,31 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
 
 
 void change_unit(Cluster *clusters, TU **units, int k, int n) {
-    srand(time(
-# 243 "state.c" 3 4
-              ((void *)0)
-# 243 "state.c"
-                  ));
+
     int cluster_idx = rand() % k;
     Cluster *cluster = &clusters[cluster_idx];
 
-    if (cluster->size == 1) {
-        return;
+
+    while (cluster->size == 1) {
+
+
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+
+
     }
 
     int unit_idx = rand() % cluster->size;
     TU *unit = cluster->units[unit_idx];
 
     
-# 254 "state.c" 3 4
+# 260 "state.c" 3 4
    _Bool 
-# 254 "state.c"
+# 260 "state.c"
         is_contiguous = 
-# 254 "state.c" 3 4
+# 260 "state.c" 3 4
                         0
-# 254 "state.c"
+# 260 "state.c"
                              ;
     int new_cluster_idx = -1;
 
@@ -2706,6 +2708,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
     int *shuffled_indices = malloc(num_neighbors * sizeof(int));
     for (int i = 0; i < num_neighbors; i++) {
         shuffled_indices[i] = i;
+
     }
     for (int i = num_neighbors - 1; i > 0; i--) {
         int j = rand() % (i + 1);
@@ -2716,9 +2719,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
 
     for (int i = 0; i < num_neighbors; i++) {
         TU *neighbor = 
-# 271 "state.c" 3 4
+# 278 "state.c" 3 4
                       ((void *)0)
-# 271 "state.c"
+# 278 "state.c"
                           ;
         for (int j = 0; j < n; j++) {
             if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
@@ -2731,9 +2734,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         int other_cluster_idx = neighbor->cluster_id;
         if (other_cluster_idx != cluster_idx) {
             is_contiguous = 
-# 282 "state.c" 3 4
+# 289 "state.c" 3 4
                            1
-# 282 "state.c"
+# 289 "state.c"
                                ;
             new_cluster_idx = other_cluster_idx;
             break;
@@ -2762,9 +2765,9 @@ Cluster** transitionBound(int ell , TU **units, int k, int n, FILE *fp_out)
 {
     int neighbor;
     srand(time(
-# 309 "state.c" 3 4
+# 316 "state.c" 3 4
               ((void *)0)
-# 309 "state.c"
+# 316 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
 

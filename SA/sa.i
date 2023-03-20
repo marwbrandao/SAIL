@@ -4030,9 +4030,11 @@ runSA(double Tstart,
 
 
       change_unit(clusters, units, k, n);
-
-      printf("i = %d em %d--------------\n", i, steps);
-      for (int i = 0; i < k; i++)
+# 110 "sa.c"
+      printf("max: %d\n", max);
+      if(max > energy(units, clusters, m, k, n)){
+         printf("i = %d em %d--------------\n", i, steps);
+        for (int i = 0; i < k; i++)
       {
         int pop_cluster = 0;
           printf("Cluster %d with size %d: ", i, clusters[i].size);
@@ -4044,7 +4046,12 @@ runSA(double Tstart,
           printf("with population %d ", pop_cluster);
           printf("\n");
       }
-# 131 "sa.c"
+        max = energy(units, clusters, m, k, n);
+        printf("\n MAX MAS MAX max: %d\n\n", max);
+        Cluster* stored_state = storeState(clusters, k, n);
+
+      }
+
     T += Td;
   }
 

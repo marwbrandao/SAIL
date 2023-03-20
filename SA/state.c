@@ -240,12 +240,18 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
 
 
 void change_unit(Cluster *clusters, TU **units, int k, int n) {
-    srand(time(NULL));
+    
     int cluster_idx = rand() % k;
     Cluster *cluster = &clusters[cluster_idx];
+    //printf("aaawhat cluster %d is size: %d\n", cluster_idx, cluster->size);
     // printf("cluster %d: %d\n",cluster_idx, cluster[0].units[0]->voters);
-    if (cluster->size == 1) {
-        return;
+    while (cluster->size == 1) {
+        
+        //printf("what cluster %d is size: %d\n", cluster_idx, cluster->size);
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+        //printf("new what cluster %d is size: %d\n", cluster_idx, cluster->size);
+        // return;
     }
 
     int unit_idx = rand() % cluster->size;
@@ -259,6 +265,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
     int *shuffled_indices = malloc(num_neighbors * sizeof(int));
     for (int i = 0; i < num_neighbors; i++) {
         shuffled_indices[i] = i;
+
     }
     for (int i = num_neighbors - 1; i > 0; i--) {
         int j = rand() % (i + 1);
