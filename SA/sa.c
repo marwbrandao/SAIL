@@ -94,19 +94,26 @@ runSA(double Tstart, /* [in] starting temperature */
   
       change_unit(clusters, units, k, n);
 
-      // printf("i = %d em %d --------------\n", i, steps);
-      // for (int i = 0; i < k; i++)
-      // {
-      //   int pop_cluster = 0;
-      //     printf("Cluster %d with size %d: ", i, clusters[i].size);
-      //     for (int j = 0; j < clusters[i].size; j++)
-      //     {
-      //         printf("%d ", clusters[i].units[j]->code);
-      //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-      //     }
-      //     // printf("\n                       with POPULATION %d ", pop_cluster);
-      //     printf("\n");
-      // }
+      printf("i = %d em %d --------------\n", i, steps);
+      for (int i = 0; i < k; i++)
+      {
+        int pop_cluster = 0;
+          printf("Cluster %d with size %d: ", i, clusters[i].size);
+          for (int j = 0; j < clusters[i].size; j++)
+          {
+              printf("%d ", clusters[i].units[j]->code);
+              pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+          }
+          // printf("\n                       with POPULATION %d ", pop_cluster);
+          printf("\n");
+      }
+
+      int energy__population = 0; 
+      int energy__compactness = 0;
+
+      energy__population = energy_population(units,clusters, m, k, n);
+      energy__compactness = energy_compactness(clusters, k);
+      printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
       printf("max: %d\n", max);
       if(max > energy(units, clusters, m, k, n)){
          printf("i = %d em %d--------------\n", i, steps);

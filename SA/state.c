@@ -27,8 +27,10 @@ int compactness(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
         TU *unit = cluster->units[i];
+        //printf("shared borders = %d\n",cluster->size);
         for (int j = 0; j < unit->num_neighbors; j++) {
             for (int k = 0; k < cluster->size; k++) {
+                
                 if (unit->neighbor_codes[j] == cluster->units[k]->code) {
                     shared_borders += unit->border_sizes[j];
                     break;
@@ -36,6 +38,7 @@ int compactness(Cluster *cluster) {
             }
         }
     }
+    printf("shared borders of here = %d\n", shared_borders);
     return shared_borders;
 }
 
@@ -47,7 +50,7 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
     
     for (int i = 0; i < k; i++) {
         int pop_cluster = 0;
-
+        //printf("%d\n",cluster[i].size);
         for (int j = 0; j < cluster[i].size; j++) {
             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
         }
@@ -65,10 +68,11 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
 
 int energy_compactness(Cluster *clusters, int k) {
     int total_shared_borders = 0;
-
+    
     for (int i = 0; i < k; i++) {
         total_shared_borders += compactness(&clusters[i]);
     }
+    printf("shared borders = %d\n", total_shared_borders);
 
     return total_shared_borders;
 }
@@ -305,6 +309,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
             cluster->units[i] = cluster->units[i+1];
         }
         cluster->size--;
+    }
+    else {
+        printf("is here?\n");
     }
     // printf("first unit, %d\n", cluster[0].units[0]->voters);
 }

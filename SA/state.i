@@ -2426,8 +2426,10 @@ int compactness(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
         TU *unit = cluster->units[i];
+
         for (int j = 0; j < unit->num_neighbors; j++) {
             for (int k = 0; k < cluster->size; k++) {
+
                 if (unit->neighbor_codes[j] == cluster->units[k]->code) {
                     shared_borders += unit->border_sizes[j];
                     break;
@@ -2435,6 +2437,7 @@ int compactness(Cluster *cluster) {
             }
         }
     }
+    printf("shared borders of here = %d\n", shared_borders);
     return shared_borders;
 }
 
@@ -2468,6 +2471,7 @@ int energy_compactness(Cluster *clusters, int k) {
     for (int i = 0; i < k; i++) {
         total_shared_borders += compactness(&clusters[i]);
     }
+    printf("shared borders = %d\n", total_shared_borders);
 
     return total_shared_borders;
 }
@@ -2530,9 +2534,9 @@ int is_neighbor (TU *unit1, TU *unit2) {
 
 Cluster** first_cluster(TU **units, int k, int n) {
     srand(time(
-# 133 "state.c" 3 4
+# 137 "state.c" 3 4
               ((void *)0)
-# 133 "state.c"
+# 137 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
     for (int i = 0; i < k; i++)
@@ -2549,14 +2553,14 @@ Cluster** first_cluster(TU **units, int k, int n) {
         do {
             unit_num = rand() % n;
             if (units[unit_num]->assigned == 
-# 148 "state.c" 3 4
+# 152 "state.c" 3 4
                                             0
-# 148 "state.c"
+# 152 "state.c"
                                                  ) {
                 units[unit_num]->assigned = 
-# 149 "state.c" 3 4
+# 153 "state.c" 3 4
                                            1
-# 149 "state.c"
+# 153 "state.c"
                                                ;
                 units[unit_num]->cluster_id = i;
                 clusters[i].units[0] = malloc(sizeof(TU));
@@ -2567,9 +2571,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
                 clusters[i].size = 0;
             }
         } while(units[unit_num]->assigned == 
-# 158 "state.c" 3 4
+# 162 "state.c" 3 4
                                             0 
-# 158 "state.c"
+# 162 "state.c"
                                                   || clusters[i].size == 0);
     }
 
@@ -2581,9 +2585,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
 
         units[unit_num]->assigned = 
-# 168 "state.c" 3 4
+# 172 "state.c" 3 4
                                    1
-# 168 "state.c"
+# 172 "state.c"
                                        ;
         int cluster_id = rand() % k;
         int j = 0;
@@ -2599,9 +2603,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
         if (j == clusters[cluster_id].size) {
             units[unit_num]->assigned = 
-# 182 "state.c" 3 4
+# 186 "state.c" 3 4
                                        0
-# 182 "state.c"
+# 186 "state.c"
                                             ;
             i--;
         }
@@ -2627,13 +2631,13 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
 
 
     
-# 206 "state.c" 3 4
+# 210 "state.c" 3 4
    _Bool 
-# 206 "state.c"
+# 210 "state.c"
         is_contiguous = 
-# 206 "state.c" 3 4
+# 210 "state.c" 3 4
                         0
-# 206 "state.c"
+# 210 "state.c"
                              ;
     int new_cluster_idx = -1;
     for (int i = 0; i < k; i++) {
@@ -2645,9 +2649,9 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
             TU *other_unit = other_cluster->units[j];
             if (is_neighbor(unit, other_unit)) {
                 is_contiguous = 
-# 216 "state.c" 3 4
+# 220 "state.c" 3 4
                                1
-# 216 "state.c"
+# 220 "state.c"
                                    ;
                 new_cluster_idx = i;
                 break;
@@ -2693,13 +2697,13 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
     TU *unit = cluster->units[unit_idx];
 
     
-# 260 "state.c" 3 4
+# 264 "state.c" 3 4
    _Bool 
-# 260 "state.c"
+# 264 "state.c"
         is_contiguous = 
-# 260 "state.c" 3 4
+# 264 "state.c" 3 4
                         0
-# 260 "state.c"
+# 264 "state.c"
                              ;
     int new_cluster_idx = -1;
 
@@ -2719,9 +2723,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
 
     for (int i = 0; i < num_neighbors; i++) {
         TU *neighbor = 
-# 278 "state.c" 3 4
+# 282 "state.c" 3 4
                       ((void *)0)
-# 278 "state.c"
+# 282 "state.c"
                           ;
         for (int j = 0; j < n; j++) {
             if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
@@ -2734,9 +2738,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         int other_cluster_idx = neighbor->cluster_id;
         if (other_cluster_idx != cluster_idx) {
             is_contiguous = 
-# 289 "state.c" 3 4
+# 293 "state.c" 3 4
                            1
-# 289 "state.c"
+# 293 "state.c"
                                ;
             new_cluster_idx = other_cluster_idx;
             break;
@@ -2757,6 +2761,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         }
         cluster->size--;
     }
+    else {
+        printf("is here?\n");
+    }
 
 }
 
@@ -2765,9 +2772,9 @@ Cluster** transitionBound(int ell , TU **units, int k, int n, FILE *fp_out)
 {
     int neighbor;
     srand(time(
-# 316 "state.c" 3 4
+# 323 "state.c" 3 4
               ((void *)0)
-# 316 "state.c"
+# 323 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
 
