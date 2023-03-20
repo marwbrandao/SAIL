@@ -1,0 +1,12 @@
+ // free(units);
+ 
+    /* printf("Final state\n"); */
+    /* printf("Energy is %d\n", energy()); */
+    /* printGraph(); */
+
+    /* storeState("Solution"); */
+
+    //freeState();
+    //freeGraph(G);
+
+  //free_units(units);

@@ -1,0 +1,248 @@
+
+TU tus[1000];
+int tu_count = 0;
+
+bool is_tu_code(char* code) {
+    printf("is_tu------------------------------\n");
+    return (strlen(code) == 6 && code[0] == '0' && code[1] == '1');
+}
+
+void parse_line(char* line) {
+    char tu_code[MAX_CODE_LEN]; //ISTO PRECISA DE SER UM VETOR, onde guardamos os os codigos nos indices 
+    int frontier_tu_code, frontier_size;
+    if (sscanf(line, "'%6s': {'voters': %d", tu_code, &tus[tu_count].voters) == 2) {
+        tus[tu_count].frontier_count = 0;
+        tu_count++;
+        //printf("code :   %s\n", tu_code);
+
+        //vou ter que ter malloc 
+        sscanf(line, " '%6d': %d", &frontier_tu_code, &frontier_size); // ver como e que ignoro os primeiros caracteres da string
+        //if (is_tu_code(tu_code) && is_tu_code(line + 2)) {
+        int i=0;
+        int tu_index = tu_count - 1;
+        int frontier_index = tus[tu_index].frontier_count;
+        //tus[tu_index].index[i] = tu_code;
+        //printf("\nihs here????\n\n");
+        printf("\n  code fronteiras-----------------  %d, tamanho fronteiras      %d", frontier_tu_code, frontier_size);
+        tus[tu_index].frontier_tus[frontier_index] = frontier_tu_code;
+        tus[tu_index].frontier_sizes[frontier_index] = frontier_size;
+        tus[tu_index].frontier_count++;
+        i++;
+        //}
+    }
+    }
+
+
+#define MAX_LINE_LEN 256
+#define MAX_DIST_CODES 1000
+
+typedef struct {
+    int num_dist; // numero do distrito
+    int k; //num de clusters
+    int n; //num de unidades territoriais
+    int m; //margem
+    char* codes; // unidades territoriais que fazem parte do distrito
+    int* voters; //voters in each district
+    int* num_neighbors; //numero de vizinhos de cada unidade territorial
+    int** neighbors; //vizinhos de cada distrito 
+} District;
+
+
+
+void loadGraph(FILE* f) {
+    //printf("\nhere:\n");
+    if (f == NULL) {
+        printf("Error opening file\n");
+    }
+    char line[256];
+    while (fgets(line, 256, f) != NULL) {
+        int i = 0;
+        printf("\nline:    %s\n", line);
+        while (line[i] != ':') {
+            i++;
+        }
+         parse_line(line);
+        //printf("i=%d\n", i);
+
+    }
+    fclose(f);
+
+    for (int i = 0; i < tu_count; i++) {
+        printf("TU %d:\n", tus[i].frontier_tus[0]);
+        printf("  Voters: %d\n", tus[i].voters);
+        printf("  Frontier TUs:\n");
+        for (int j = 0; j < tus[i].frontier_count; j++) {
+            printf("    %d (%d)\n", tus[i].frontier_tus[j], tus[i].frontier_sizes[j]);
+        }
+    }
+    
+}
+
+
+
+// Read the contents of the file into a buffer
+    //fseek(f, 0, SEEK_END);
+    //long fsize = ftell(f);
+    //fseek(f, 0, SEEK_SET);
+    //char* buffer = malloc(fsize + 1);
+    //fread(buffer, fsize, 1, f);
+    //buffer[fsize] = '\0';
+
+    // Parse the contents of the buffer using strtok
+    //District dist;
+    //char* token = strtok(buffer, "d");
+    //dist.num_dist = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.k = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.n = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.m = atof(token);
+    
+    // Clean up
+    //free(buffer);
+
+
+
+
+    #include <time.h>
+#include <math.h>
+#include <assert.h>
+#include <bsd/stdlib.h>
+
+#include "sa.h"
+//#include "state.h"
+#include "graph.h"
+#include "timer.h"
+
+static int 
+myRandom(void) 
+{ 
+  return random();
+ } 
+
+/* Used for defining calibration values */
+double
+getTemperature(double cp, /* complement probability */
+               int ell /* Energy delta limit. -0.5 done internally */
+               )
+{
+  assert(0 >= ell &&
+	 "Invalid d to define T.");
+  assert(0.5 > cp &&
+	 "Invalid complement probability to define T.");
+
+  double res = cp;
+  res /= 1.0 - cp;
+  res = log2(res);
+  res /= ((double)ell) - 0.5;
+
+  return res;
+}
+
+int // Energy delta
+getEll(double T, /* [in] the temperature */
+       unsigned int *pR /* [out] the random number that was obtained */
+       )
+{
+  double c = 1.0;
+
+  //*pR = arc4random();
+  *pR = myRandom(); //randvariavel 
+  unsigned int R = *pR;
+
+  if(0 != R){
+    c = log2(-R);
+    c -= log2(R);
+    c /= T;
+    c = round(c);
+  }
+
+  return (int) c;
+}
+
+int
+runSA(double Tstart, /* [in] starting temperature */
+      double Tstop, /* [in] stopping temperature */
+      int batch, /* [in] number of iterations in a batch */
+      int steps, /* [in] number of steps to execute */
+      TU** units
+      )
+{
+  //printf("SA: unit: %d, %d \n", units[0]->code, units[4]->code);
+  int max = 0;
+  double T = Tstart;
+  double Td = Tstop-Tstart;
+  Td /= steps;
+
+  int ell = 1; /* Default value for greedy */
+  unsigned int R;
+
+  //printf("# ");
+  //printf("V-Energy\t");
+  //printf("V-MaxEnergy\t");
+  //printf("Total_Time\t");
+  //printf("Total_Iterations\t");
+  //printf("Total_Steps\t");
+  //printf("Temperature\t");
+  //printf("\n");
+
+  for(int i = 0; i < steps; i++){
+
+    //printf("%d\t", graphVertexNr(G)-energy());
+    //printf("%d\t", graphVertexNr(G)-max);
+    //printf("%e\t", getTime());
+    //printf("%d\t", i);
+    //printf("%lld\t", (long long int)i*(long long int)batch);
+    //printf("%f\t", T);
+    //printf("\n");
+
+    for(int j = 0; j < batch; j++){
+      ell = getEll(T, &R);
+
+      //transitionBound(ell); /* Calls change state function */
+
+      //if(max < energy())
+	  //max = energy();
+    }
+    T += Td;
+  }
+
+  //printf("# drift = %e\n", fabs(Tstop-T));
+
+  printf("\n");
+  printf("\n");
+
+  return max;
+}
+
+
+//printf("hi");
+  // if(1 >= argc){
+  //   printf("Usage: ./project fileName stepsExp2 batchExp2 ts_Cprob ts_d te_Cprob te_d\n");
+  //   printf("\n");
+  //   printf("The fileName is mandatory\n");
+  //   printf("Any number of arguments can be omitted. The first values will be considered.\n");
+  //   printf("\n");
+  //   printf("The prefix ts represents starting temperature.\n");
+  //   printf("The prefix te represents ending temperature.\n");
+  //   printf("The Cprob is the complementar probability\n");
+  //   printf("The d is the delta, so usually parameterized as negative.\n");
+  //   printf("\n");
+  //   printf("stepsExp2 is the power of 2 exponent for the number of steps\n");
+  //   printf("batchExp2 is the power of 2 exponent for the batch size\n");
+  //   printf("\n");
+  //   printf("Defaults:\n");
+  //   printf("\n");
+  //   printf("stepsExp2 = %d\n", sp);
+  //   printf("batchExp2 = %d\n", bp);
+  //   printf("ts_Cprob = %.3f\n", cp_start);
+  //   printf("ts_d = %d\n", d_start);
+  //   printf("te_Cprob = %.3f\n", cp_end);
+  //   printf("te_d = %d\n", d_end);
+  //   printf("\n");
+  //   printf("./project fname %d %d %.3f %d %.3f %d\n", sp, bp,
+	//    cp_start, d_start, cp_end, d_end);
+  //   printf("\n");
+  //   return 0;
+  // } else {
