@@ -46,10 +46,6 @@ population_bounds:
 	.cfi_endproc
 .LFE40:
 	.size	population_bounds, .-population_bounds
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.LC0:
-	.string	"shared borders of here = %d\n"
-	.text
 	.p2align 4
 	.globl	compactness
 	.type	compactness, @function
@@ -57,31 +53,29 @@ compactness:
 .LFB41:
 	.cfi_startproc
 	endbr64
-	pushq	%r12
-	.cfi_def_cfa_offset 16
-	.cfi_offset 12, -16
-	pushq	%rbx
-	.cfi_def_cfa_offset 24
-	.cfi_offset 3, -24
-	subq	$8, %rsp
-	.cfi_def_cfa_offset 32
 	movl	8(%rdi), %edx
 	testl	%edx, %edx
 	jle	.L15
-	movq	(%rdi), %r10
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	leal	-1(%rdx), %eax
-	xorl	%r12d, %r12d
+	xorl	%r11d, %r11d
+	pushq	%rbx
+	.cfi_def_cfa_offset 24
+	.cfi_offset 3, -24
+	movq	(%rdi), %r10
 	leaq	8(%r10,%rax,8), %rsi
-	movq	%r10, %rbx
+	movq	%r10, %rbp
 	.p2align 4,,10
 	.p2align 3
 .L14:
-	movq	(%rbx), %r11
-	movl	12(%r11), %eax
+	movq	0(%rbp), %rbx
+	movl	12(%rbx), %eax
 	testl	%eax, %eax
 	jle	.L9
 	subl	$1, %eax
-	movq	16(%r11), %r9
+	movq	16(%rbx), %r9
 	xorl	%edi, %edi
 	leaq	4(,%rax,4), %r8
 	.p2align 4,,10
@@ -94,7 +88,7 @@ compactness:
 .L12:
 	movq	(%rax), %rdx
 	cmpl	(%rdx), %ecx
-	je	.L20
+	je	.L23
 	addq	$8, %rax
 	cmpq	%rsi, %rax
 	jne	.L12
@@ -102,44 +96,36 @@ compactness:
 	cmpq	%r8, %rdi
 	jne	.L13
 .L9:
-	addq	$8, %rbx
-	cmpq	%rsi, %rbx
+	addq	$8, %rbp
+	cmpq	%rsi, %rbp
 	jne	.L14
-.L8:
-	movl	%r12d, %edx
-	leaq	.LC0(%rip), %rsi
-	movl	$1, %edi
-	xorl	%eax, %eax
-	call	__printf_chk@PLT
-	addq	$8, %rsp
-	.cfi_remember_state
-	.cfi_def_cfa_offset 24
-	movl	%r12d, %eax
+	movl	%r11d, %eax
 	popq	%rbx
+	.cfi_remember_state
 	.cfi_def_cfa_offset 16
-	popq	%r12
+	popq	%rbp
 	.cfi_def_cfa_offset 8
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L20:
+.L23:
 	.cfi_restore_state
-	movq	24(%r11), %rax
-	addl	(%rax,%rdi), %r12d
+	movq	24(%rbx), %rax
+	addl	(%rax,%rdi), %r11d
 	addq	$4, %rdi
 	cmpq	%r8, %rdi
 	jne	.L13
 	jmp	.L9
 .L15:
-	xorl	%r12d, %r12d
-	jmp	.L8
+	.cfi_def_cfa_offset 8
+	.cfi_restore 3
+	.cfi_restore 6
+	xorl	%r11d, %r11d
+	movl	%r11d, %eax
+	ret
 	.cfi_endproc
 .LFE41:
 	.size	compactness, .-compactness
-	.section	.rodata.str1.1
-.LC1:
-	.string	"-- total difference: %d\n"
-	.text
 	.p2align 4
 	.globl	energy_population
 	.type	energy_population, @function
@@ -147,71 +133,68 @@ energy_population:
 .LFB42:
 	.cfi_startproc
 	endbr64
-	pushq	%r12
-	.cfi_def_cfa_offset 16
-	.cfi_offset 12, -16
+	movl	%edx, %r10d
 	testl	%r8d, %r8d
-	jle	.L29
+	jle	.L32
 	leal	-1(%r8), %eax
 	movq	%rdi, %r9
-	movl	%edx, %r10d
 	leaq	(%rdi,%rax,8), %rdi
 	xorl	%eax, %eax
 	.p2align 4,,10
 	.p2align 3
-.L23:
+.L26:
 	movq	(%r9), %rdx
 	addl	8(%rdx), %eax
 	movq	%r9, %rdx
 	addq	$8, %r9
 	cmpq	%rdx, %rdi
-	jne	.L23
+	jne	.L26
 	cltd
 	idivl	%ecx
 	movl	%r10d, %edx
 	imull	%eax, %edx
-	movl	%eax, %r8d
+	movl	%eax, %r9d
 	movslq	%edx, %rdi
 	sarl	$31, %edx
 	imulq	$1374389535, %rdi, %rdi
 	sarq	$37, %rdi
 	subl	%edx, %edi
-	subl	%edi, %r8d
+	subl	%edi, %r9d
 	addl	%eax, %edi
 	testl	%ecx, %ecx
-	jle	.L30
-.L35:
+	jle	.L33
+.L37:
 	leal	-1(%rcx), %eax
-	xorl	%r12d, %r12d
+	xorl	%r8d, %r8d
 	salq	$4, %rax
-	leaq	16(%rsi,%rax), %r9
+	leaq	16(%rsi,%rax), %r10
 	.p2align 4,,10
 	.p2align 3
-.L25:
+.L28:
 	movl	8(%rsi), %eax
 	xorl	%edx, %edx
 	testl	%eax, %eax
-	jle	.L28
+	jle	.L31
 	movq	(%rsi), %rcx
 	leal	-1(%rax), %edx
 	leaq	8(%rcx), %rax
-	leaq	(%rax,%rdx,8), %r10
+	leaq	(%rax,%rdx,8), %r11
 	xorl	%edx, %edx
-	jmp	.L26
+	jmp	.L29
 	.p2align 4,,10
 	.p2align 3
-.L34:
+.L36:
 	addq	$8, %rax
-.L26:
+.L29:
 	movq	(%rcx), %rcx
 	addl	8(%rcx), %edx
 	movq	%rax, %rcx
-	cmpq	%rax, %r10
-	jne	.L34
-.L28:
+	cmpq	%rax, %r11
+	jne	.L36
+.L31:
 	movl	%edx, %eax
 	subl	%edi, %edx
-	subl	%r8d, %eax
+	subl	%r9d, %eax
 	movl	%eax, %ecx
 	sarl	$31, %ecx
 	xorl	%ecx, %eax
@@ -223,36 +206,23 @@ energy_population:
 	cmpl	%edx, %eax
 	cmovle	%eax, %edx
 	addq	$16, %rsi
-	addl	%edx, %r12d
-	cmpq	%rsi, %r9
-	jne	.L25
-.L24:
-	movl	%r12d, %edx
-	leaq	.LC1(%rip), %rsi
-	movl	$1, %edi
-	xorl	%eax, %eax
-	call	__printf_chk@PLT
-	movl	%r12d, %eax
-	popq	%r12
-	.cfi_remember_state
-	.cfi_def_cfa_offset 8
+	addl	%edx, %r8d
+	cmpq	%rsi, %r10
+	jne	.L28
+	movl	%r8d, %eax
 	ret
-.L29:
-	.cfi_restore_state
+.L32:
 	xorl	%edi, %edi
-	xorl	%r8d, %r8d
+	xorl	%r9d, %r9d
 	testl	%ecx, %ecx
-	jg	.L35
-.L30:
-	xorl	%r12d, %r12d
-	jmp	.L24
+	jg	.L37
+.L33:
+	xorl	%r8d, %r8d
+	movl	%r8d, %eax
+	ret
 	.cfi_endproc
 .LFE42:
 	.size	energy_population, .-energy_population
-	.section	.rodata.str1.1
-.LC2:
-	.string	"shared borders = %d\n"
-	.text
 	.p2align 4
 	.globl	energy_compactness
 	.type	energy_compactness, @function
@@ -276,76 +246,64 @@ energy_compactness:
 	.cfi_def_cfa_offset 48
 	.cfi_offset 3, -48
 	testl	%esi, %esi
-	jle	.L46
+	jle	.L48
 	leal	-1(%rsi), %eax
-	movq	%rdi, %rbx
 	xorl	%r12d, %r12d
 	salq	$4, %rax
 	leaq	16(%rdi,%rax), %rbp
 	.p2align 4,,10
 	.p2align 3
-.L45:
-	movl	8(%rbx), %eax
+.L47:
+	movl	8(%rdi), %eax
 	testl	%eax, %eax
-	jle	.L47
-	movq	(%rbx), %rdi
+	jle	.L40
+	movq	(%rdi), %r9
 	subl	$1, %eax
 	xorl	%r8d, %r8d
-	leaq	8(%rdi,%rax,8), %r9
-	movq	%rdi, %rcx
+	leaq	8(%r9,%rax,8), %r10
+	movq	%r9, %rcx
 	.p2align 4,,10
 	.p2align 3
-.L44:
+.L46:
 	movq	(%rcx), %rsi
 	movl	12(%rsi), %eax
 	testl	%eax, %eax
-	jle	.L39
+	jle	.L41
 	subl	$1, %eax
-	movq	16(%rsi), %r10
-	leaq	4(,%rax,4), %r11
+	movq	16(%rsi), %r11
+	leaq	4(,%rax,4), %rbx
 	xorl	%eax, %eax
 	.p2align 4,,10
 	.p2align 3
-.L40:
-	movl	(%r10,%rax), %r13d
-	movq	%rdi, %rdx
-	jmp	.L43
+.L42:
+	movl	(%r11,%rax), %r13d
+	movq	%r9, %rdx
+	jmp	.L45
 	.p2align 4,,10
 	.p2align 3
-.L41:
-	addq	$8, %rdx
-	cmpq	%rdx, %r9
-	je	.L42
 .L43:
+	addq	$8, %rdx
+	cmpq	%rdx, %r10
+	je	.L44
+.L45:
 	movq	(%rdx), %r14
 	cmpl	(%r14), %r13d
-	jne	.L41
+	jne	.L43
 	movq	24(%rsi), %rdx
 	addl	(%rdx,%rax), %r8d
-.L42:
+.L44:
 	addq	$4, %rax
-	cmpq	%r11, %rax
-	jne	.L40
-.L39:
+	cmpq	%rbx, %rax
+	jne	.L42
+.L41:
 	addq	$8, %rcx
-	cmpq	%rcx, %r9
-	jne	.L44
+	cmpq	%rcx, %r10
+	jne	.L46
 	addl	%r8d, %r12d
-.L38:
-	movl	%r8d, %edx
-	leaq	.LC0(%rip), %rsi
-	xorl	%eax, %eax
-	addq	$16, %rbx
-	movl	$1, %edi
-	call	__printf_chk@PLT
-	cmpq	%rbp, %rbx
-	jne	.L45
-.L37:
-	movl	%r12d, %edx
-	leaq	.LC2(%rip), %rsi
-	movl	$1, %edi
-	xorl	%eax, %eax
-	call	__printf_chk@PLT
+.L40:
+	addq	$16, %rdi
+	cmpq	%rbp, %rdi
+	jne	.L47
 	popq	%rbx
 	.cfi_remember_state
 	.cfi_def_cfa_offset 40
@@ -361,15 +319,21 @@ energy_compactness:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L47:
+.L48:
 	.cfi_restore_state
-	xorl	%r8d, %r8d
-	jmp	.L38
-	.p2align 4,,10
-	.p2align 3
-.L46:
 	xorl	%r12d, %r12d
-	jmp	.L37
+	popq	%rbx
+	.cfi_def_cfa_offset 40
+	popq	%rbp
+	.cfi_def_cfa_offset 32
+	movl	%r12d, %eax
+	popq	%r12
+	.cfi_def_cfa_offset 24
+	popq	%r13
+	.cfi_def_cfa_offset 16
+	popq	%r14
+	.cfi_def_cfa_offset 8
+	ret
 	.cfi_endproc
 .LFE43:
 	.size	energy_compactness, .-energy_compactness
@@ -381,7 +345,7 @@ energy:
 	.cfi_startproc
 	endbr64
 	testl	%ecx, %ecx
-	jle	.L58
+	jle	.L59
 	leal	-1(%rcx), %eax
 	movq	%rsi, %rdi
 	xorl	%r8d, %r8d
@@ -389,40 +353,40 @@ energy:
 	leaq	16(%rsi,%rax), %r9
 	.p2align 4,,10
 	.p2align 3
-.L54:
+.L55:
 	movl	8(%rdi), %eax
 	movl	$80306, %edx
 	testl	%eax, %eax
-	jle	.L57
+	jle	.L58
 	movq	(%rdi), %rcx
 	leal	-1(%rax), %edx
 	leaq	8(%rcx), %rax
 	leaq	(%rax,%rdx,8), %rsi
 	xorl	%edx, %edx
-	jmp	.L55
+	jmp	.L56
 	.p2align 4,,10
 	.p2align 3
-.L61:
+.L62:
 	addq	$8, %rax
-.L55:
+.L56:
 	movq	(%rcx), %rcx
 	addl	8(%rcx), %edx
 	movq	%rax, %rcx
 	cmpq	%rax, %rsi
-	jne	.L61
+	jne	.L62
 	subl	$80306, %edx
 	movl	%edx, %eax
 	sarl	$31, %eax
 	xorl	%eax, %edx
 	subl	%eax, %edx
-.L57:
+.L58:
 	addq	$16, %rdi
 	addl	%edx, %r8d
 	cmpq	%rdi, %r9
-	jne	.L54
+	jne	.L55
 	movl	%r8d, %eax
 	ret
-.L58:
+.L59:
 	xorl	%r8d, %r8d
 	movl	%r8d, %eax
 	ret
@@ -438,19 +402,19 @@ energy2:
 	endbr64
 	movl	%edx, %r9d
 	testl	%r8d, %r8d
-	jle	.L70
+	jle	.L71
 	leal	-1(%r8), %eax
 	leaq	(%rdi,%rax,8), %r8
 	xorl	%eax, %eax
 	.p2align 4,,10
 	.p2align 3
-.L64:
+.L65:
 	movq	(%rdi), %rdx
 	addl	8(%rdx), %eax
 	movq	%rdi, %rdx
 	addq	$8, %rdi
 	cmpq	%rdx, %r8
-	jne	.L64
+	jne	.L65
 	cltd
 	movl	%r9d, %edi
 	idivl	%ecx
@@ -463,52 +427,52 @@ energy2:
 	subl	%edi, %edx
 	subl	%edx, %r9d
 	addl	%edx, %eax
-.L63:
+.L64:
 	testl	%ecx, %ecx
-	jle	.L73
+	jle	.L74
 	leal	-1(%rcx), %edx
 	xorl	%ecx, %ecx
 	salq	$4, %rdx
 	leaq	16(%rsi,%rdx), %r10
-.L66:
+.L67:
 	movl	8(%rsi), %edx
 	testl	%edx, %edx
-	jle	.L69
+	jle	.L70
 	movq	(%rsi), %rdi
 	leal	-1(%rdx), %r8d
 	leaq	8(%rdi), %rdx
 	leaq	(%rdx,%r8,8), %r8
-	jmp	.L67
+	jmp	.L68
 	.p2align 4,,10
 	.p2align 3
-.L76:
+.L77:
 	addq	$8, %rdx
-.L67:
+.L68:
 	movq	(%rdi), %rdi
 	addl	8(%rdi), %ecx
 	movq	%rdx, %rdi
 	cmpq	%rdx, %r8
-	jne	.L76
-.L69:
+	jne	.L77
+.L70:
 	cmpl	%r9d, %ecx
-	jl	.L72
+	jl	.L73
 	cmpl	%eax, %ecx
-	jg	.L72
+	jg	.L73
 	addq	$16, %rsi
 	cmpq	%rsi, %r10
-	jne	.L66
-.L73:
+	jne	.L67
+.L74:
 	movl	$1, %eax
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L72:
+.L73:
 	xorl	%eax, %eax
 	ret
-.L70:
+.L71:
 	xorl	%eax, %eax
 	xorl	%r9d, %r9d
-	jmp	.L63
+	jmp	.L64
 	.cfi_endproc
 .LFE45:
 	.size	energy2, .-energy2
@@ -521,26 +485,26 @@ is_neighbor:
 	endbr64
 	movl	12(%rdi), %ecx
 	testl	%ecx, %ecx
-	jle	.L80
+	jle	.L81
 	movq	16(%rdi), %rax
 	subl	$1, %ecx
 	movl	(%rsi), %edx
 	leaq	4(%rax,%rcx,4), %rcx
-	jmp	.L79
+	jmp	.L80
 	.p2align 4,,10
 	.p2align 3
-.L83:
+.L84:
 	addq	$4, %rax
 	cmpq	%rcx, %rax
-	je	.L80
-.L79:
+	je	.L81
+.L80:
 	cmpl	%edx, (%rax)
-	jne	.L83
+	jne	.L84
 	movl	$1, %eax
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L80:
+.L81:
 	xorl	%eax, %eax
 	ret
 	.cfi_endproc
@@ -587,7 +551,7 @@ first_cluster:
 	call	malloc@PLT
 	movq	%rax, 24(%rsp)
 	testl	%ebx, %ebx
-	jle	.L85
+	jle	.L86
 	subl	$1, %ebx
 	movslq	%r15d, %rbp
 	movq	%rax, %r12
@@ -597,20 +561,20 @@ first_cluster:
 	addq	%rax, %rbx
 	.p2align 4,,10
 	.p2align 3
-.L86:
+.L87:
 	movq	%rbp, %rdi
 	addq	$16, %r12
 	call	malloc@PLT
 	movl	$0, -8(%r12)
 	movq	%rax, -16(%r12)
 	cmpq	%rbx, %r12
-	jne	.L86
+	jne	.L87
 	movq	24(%rsp), %rax
 	xorl	%ebp, %ebp
 	leaq	8(%rax), %rbx
 	.p2align 4,,10
 	.p2align 3
-.L91:
+.L92:
 	call	rand@PLT
 	cltd
 	idivl	%r15d
@@ -618,12 +582,12 @@ first_cluster:
 	leaq	(%r14,%rdx,8), %r12
 	movq	(%r12), %rax
 	cmpb	$0, 32(%rax)
-	je	.L111
+	je	.L112
 	movl	$0, (%rbx)
-	jmp	.L91
+	jmp	.L92
 	.p2align 4,,10
 	.p2align 3
-.L111:
+.L112:
 	movb	$1, 32(%rax)
 	movq	-8(%rbx), %r13
 	movl	$40, %edi
@@ -635,19 +599,19 @@ first_cluster:
 	movq	(%r12), %rax
 	movl	$1, (%rbx)
 	cmpb	$0, 32(%rax)
-	je	.L91
+	je	.L92
 	addl	$1, %ebp
 	addq	$16, %rbx
 	cmpl	%ebp, 16(%rsp)
-	jne	.L91
-.L85:
+	jne	.L92
+.L86:
 	movl	16(%rsp), %eax
 	movl	%eax, 4(%rsp)
 	cmpl	%r15d, %eax
-	jge	.L84
+	jge	.L85
 	.p2align 4,,10
 	.p2align 3
-.L92:
+.L93:
 	call	rand@PLT
 	cltd
 	idivl	%r15d
@@ -655,7 +619,7 @@ first_cluster:
 	leaq	(%r14,%rdx,8), %rbx
 	movq	(%rbx), %rax
 	cmpb	$0, 32(%rax)
-	jne	.L92
+	jne	.L93
 	movb	$1, 32(%rax)
 	call	rand@PLT
 	cltd
@@ -667,7 +631,7 @@ first_cluster:
 	movl	8(%rax), %r13d
 	movq	%rax, 8(%rsp)
 	testl	%r13d, %r13d
-	jle	.L104
+	jle	.L105
 	movq	(%rbx), %r10
 	movq	(%rax), %rbp
 	leal	-1(%r13), %r12d
@@ -677,25 +641,25 @@ first_cluster:
 	salq	$2, %r9
 	.p2align 4,,10
 	.p2align 3
-.L102:
+.L103:
 	movq	0(%rbp,%rsi,8), %rax
 	movl	%esi, %r8d
 	movl	%esi, %edi
 	testl	%r11d, %r11d
-	jle	.L96
+	jle	.L97
 	movl	(%rax), %edx
 	movq	16(%r10), %rax
 	leaq	4(%rax,%r9), %rcx
-	jmp	.L98
+	jmp	.L99
 	.p2align 4,,10
 	.p2align 3
-.L112:
+.L113:
 	addq	$4, %rax
 	cmpq	%rcx, %rax
-	je	.L96
-.L98:
+	je	.L97
+.L99:
 	cmpl	%edx, (%rax)
-	jne	.L112
+	jne	.L113
 	movslq	%r13d, %rax
 	addl	$1, %r13d
 	movq	%r10, 0(%rbp,%rax,8)
@@ -703,14 +667,14 @@ first_cluster:
 	movl	%r13d, 8(%rax)
 	movl	20(%rsp), %eax
 	movl	%eax, 36(%r10)
-.L95:
+.L96:
 	cmpl	%edi, %r13d
-	je	.L99
+	je	.L100
 	addl	$1, 4(%rsp)
 	movl	4(%rsp), %eax
 	cmpl	%eax, %r15d
-	jg	.L92
-.L84:
+	jg	.L93
+.L85:
 	movq	24(%rsp), %rax
 	addq	$40, %rsp
 	.cfi_remember_state
@@ -730,23 +694,23 @@ first_cluster:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L96:
+.L97:
 	.cfi_restore_state
 	leal	1(%r8), %edi
 	leaq	1(%rsi), %rax
 	cmpq	%r12, %rsi
-	je	.L95
+	je	.L96
 	movq	%rax, %rsi
-	jmp	.L102
-.L99:
+	jmp	.L103
+.L100:
 	movq	(%rbx), %rax
 	movb	$0, 32(%rax)
 	cmpl	4(%rsp), %r15d
-	jg	.L92
-	jmp	.L84
-.L104:
+	jg	.L93
+	jmp	.L85
+.L105:
 	xorl	%edi, %edi
-	jmp	.L95
+	jmp	.L96
 	.cfi_endproc
 .LFE47:
 	.size	first_cluster, .-first_cluster
@@ -799,15 +763,15 @@ change_unit_x:
 	movq	%rdi, 24(%rsp)
 	movq	(%rdi), %r8
 	testl	%r12d, %r12d
-	jle	.L113
+	jle	.L114
 	movq	%rbx, %r11
 	xorl	%ebx, %ebx
-.L119:
+.L120:
 	cmpl	%r13d, %ebx
-	je	.L115
+	je	.L116
 	movl	8(%r11), %r14d
 	testl	%r14d, %r14d
-	jle	.L115
+	jle	.L116
 	movl	12(%r8), %r9d
 	movq	(%r11), %r15
 	leal	-1(%r14), %eax
@@ -817,23 +781,23 @@ change_unit_x:
 	salq	$2, %rdi
 	.p2align 4,,10
 	.p2align 3
-.L122:
+.L123:
 	movq	(%rsi), %rax
 	testl	%r9d, %r9d
-	jle	.L116
+	jle	.L117
 	movl	(%rax), %edx
 	movq	16(%r8), %rax
 	leaq	4(%rdi,%rax), %rcx
-	jmp	.L118
+	jmp	.L119
 	.p2align 4,,10
 	.p2align 3
-.L127:
+.L128:
 	addq	$4, %rax
 	cmpq	%rax, %rcx
-	je	.L116
-.L118:
+	je	.L117
+.L119:
 	cmpl	%edx, (%rax)
-	jne	.L127
+	jne	.L128
 	movslq	%r14d, %rax
 	addl	$1, %r14d
 	movq	%r8, (%r15,%rax,8)
@@ -842,7 +806,7 @@ change_unit_x:
 	movl	%ebx, 36(%r8)
 	leal	-1(%rax), %ebx
 	cmpl	%ebx, 4(%rsp)
-	jge	.L121
+	jge	.L122
 	subl	$2, %eax
 	subl	4(%rsp), %eax
 	movq	16(%rsp), %rdi
@@ -851,9 +815,9 @@ change_unit_x:
 	leaq	8(%rax,%rdi), %rsi
 	movq	24(%rsp), %rdi
 	call	memmove@PLT
-.L121:
+.L122:
 	movl	%ebx, 8(%rbp)
-.L113:
+.L114:
 	addq	$40, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 56
@@ -872,16 +836,16 @@ change_unit_x:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L116:
+.L117:
 	.cfi_restore_state
 	addq	$8, %rsi
 	cmpq	%rsi, %r10
-	jne	.L122
-.L115:
+	jne	.L123
+.L116:
 	addl	$1, %ebx
 	addq	$16, %r11
 	cmpl	%ebx, %r12d
-	jne	.L119
+	jne	.L120
 	addq	$40, %rsp
 	.cfi_def_cfa_offset 56
 	popq	%rbx
@@ -900,10 +864,6 @@ change_unit_x:
 	.cfi_endproc
 .LFE48:
 	.size	change_unit_x, .-change_unit_x
-	.section	.rodata.str1.1
-.LC5:
-	.string	"is here?\n"
-	.text
 	.p2align 4
 	.globl	change_unit
 	.type	change_unit, @function
@@ -944,10 +904,10 @@ change_unit:
 	salq	$4, %rbx
 	addq	%r15, %rbx
 	cmpl	$1, 8(%rbx)
-	jne	.L129
+	jne	.L130
 	.p2align 4,,10
 	.p2align 3
-.L130:
+.L131:
 	call	rand@PLT
 	cltd
 	idivl	%r14d
@@ -956,8 +916,8 @@ change_unit:
 	salq	$4, %rbx
 	addq	16(%rsp), %rbx
 	cmpl	$1, 8(%rbx)
-	je	.L130
-.L129:
+	je	.L131
+.L130:
 	call	rand@PLT
 	cltd
 	idivl	8(%rbx)
@@ -975,54 +935,54 @@ change_unit:
 	movl	%r14d, %edi
 	movq	%rax, %r13
 	testl	%r14d, %r14d
-	jle	.L131
+	jle	.L132
 	leal	-1(%r14), %eax
 	movl	%eax, 32(%rsp)
 	cmpl	$2, %eax
-	jbe	.L145
+	jbe	.L146
 	shrl	$2, %edi
-	movdqa	.LC3(%rip), %xmm0
-	movdqa	.LC4(%rip), %xmm2
+	movdqa	.LC0(%rip), %xmm0
+	movdqa	.LC1(%rip), %xmm2
 	movq	%r13, %rax
 	movl	%edi, %edx
 	salq	$4, %rdx
 	addq	%r13, %rdx
 	.p2align 4,,10
 	.p2align 3
-.L133:
+.L134:
 	movdqa	%xmm0, %xmm1
 	addq	$16, %rax
 	paddd	%xmm2, %xmm0
 	movups	%xmm1, -16(%rax)
-	cmpq	%rax, %rdx
-	jne	.L133
+	cmpq	%rdx, %rax
+	jne	.L134
 	movl	28(%rsp), %esi
 	movl	%esi, %eax
 	andl	$-4, %eax
 	andl	$3, %esi
-	je	.L134
-.L132:
+	je	.L135
+.L133:
 	movslq	%eax, %rdx
 	movl	28(%rsp), %edi
 	movl	%eax, 0(%r13,%rdx,4)
 	leal	1(%rax), %edx
 	cmpl	%edi, %edx
-	jge	.L134
+	jge	.L135
 	movslq	%edx, %rcx
 	addl	$2, %eax
 	movl	%edx, 0(%r13,%rcx,4)
-	cmpl	%eax, %edi
-	jle	.L134
+	cmpl	%edi, %eax
+	jge	.L135
 	movslq	%eax, %rdx
 	movl	%eax, 0(%r13,%rdx,4)
-.L134:
+.L135:
 	movl	32(%rsp), %eax
 	testl	%eax, %eax
-	je	.L135
+	je	.L136
 	movslq	%eax, %r14
 	.p2align 4,,10
 	.p2align 3
-.L136:
+.L137:
 	call	rand@PLT
 	leal	1(%r14), %edi
 	movl	0(%r13,%r14,4), %esi
@@ -1035,11 +995,11 @@ change_unit:
 	subq	$1, %r14
 	movl	%esi, (%rax)
 	testl	%r14d, %r14d
-	jg	.L136
+	jg	.L137
 	movl	28(%rsp), %eax
 	testl	%eax, %eax
-	jle	.L131
-.L135:
+	jle	.L132
+.L136:
 	movl	32(%rsp), %edx
 	movq	8(%rsp), %rsi
 	movq	%r13, %rax
@@ -1048,42 +1008,38 @@ change_unit:
 	leaq	8(%rsi,%rdx,8), %rdi
 	.p2align 4,,10
 	.p2align 3
-.L137:
+.L138:
 	testl	%ebp, %ebp
-	jle	.L141
+	jle	.L142
 	movq	16(%r15), %rdx
 	movslq	(%rax), %rcx
 	movl	(%rdx,%rcx,4), %esi
 	movq	8(%rsp), %rdx
-	jmp	.L139
+	jmp	.L140
 	.p2align 4,,10
 	.p2align 3
-.L155:
+.L156:
 	addq	$8, %rdx
-	cmpq	%rdi, %rdx
-	je	.L141
-.L139:
+	cmpq	%rdx, %rdi
+	je	.L142
+.L140:
 	movq	(%rdx), %rcx
 	cmpl	%esi, (%rcx)
-	jne	.L155
+	jne	.L156
 	movl	36(%rcx), %r14d
 	cmpl	%r12d, %r14d
-	jne	.L156
-.L141:
+	jne	.L157
+.L142:
 	addq	$4, %rax
 	cmpq	%rax, %r11
-	jne	.L137
-.L131:
-	movq	%r13, %rdi
-	call	free@PLT
+	jne	.L138
+.L132:
 	addq	$56, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 56
-	movl	$1, %edi
-	xorl	%eax, %eax
+	movq	%r13, %rdi
 	popq	%rbx
 	.cfi_def_cfa_offset 48
-	leaq	.LC5(%rip), %rsi
 	popq	%rbp
 	.cfi_def_cfa_offset 40
 	popq	%r12
@@ -1094,8 +1050,8 @@ change_unit:
 	.cfi_def_cfa_offset 16
 	popq	%r15
 	.cfi_def_cfa_offset 8
-	jmp	__printf_chk@PLT
-.L156:
+	jmp	free@PLT
+.L157:
 	.cfi_restore_state
 	movq	%r13, %rdi
 	call	free@PLT
@@ -1113,7 +1069,7 @@ change_unit:
 	movl	%r14d, 36(%r15)
 	leal	-1(%rax), %ebp
 	cmpl	%ebp, 36(%rsp)
-	jge	.L143
+	jge	.L144
 	subl	$2, %eax
 	subl	36(%rsp), %eax
 	movq	(%rbx), %rdx
@@ -1123,7 +1079,7 @@ change_unit:
 	leaq	(%rdx,%rax), %rdi
 	movq	%r8, %rdx
 	call	memmove@PLT
-.L143:
+.L144:
 	movl	%ebp, 8(%rbx)
 	addq	$56, %rsp
 	.cfi_remember_state
@@ -1141,21 +1097,21 @@ change_unit:
 	popq	%r15
 	.cfi_def_cfa_offset 8
 	ret
-.L145:
+.L146:
 	.cfi_restore_state
 	xorl	%eax, %eax
-	jmp	.L132
+	jmp	.L133
 	.cfi_endproc
 .LFE49:
 	.size	change_unit, .-change_unit
-	.section	.rodata.str1.1
-.LC6:
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.LC2:
 	.string	"Cluster %d with size %d: "
-.LC7:
+.LC3:
 	.string	"%d "
-.LC8:
+.LC4:
 	.string	"\n"
-.LC9:
+.LC5:
 	.string	"--------------\n"
 	.text
 	.p2align 4
@@ -1199,7 +1155,7 @@ transitionBound:
 	salq	$4, %rdi
 	call	malloc@PLT
 	testl	%r13d, %r13d
-	jle	.L158
+	jle	.L159
 	movslq	%ebx, %rbp
 	leal	-1(%r13), %ebx
 	movq	%rax, %r14
@@ -1209,38 +1165,38 @@ transitionBound:
 	addq	%rax, %rbx
 	.p2align 4,,10
 	.p2align 3
-.L159:
+.L160:
 	movq	%rbp, %rdi
 	addq	$16, %r14
 	call	malloc@PLT
 	movl	$0, -8(%r14)
 	movq	%rax, -16(%r14)
 	cmpq	%rbx, %r14
-	jne	.L159
+	jne	.L160
 	movl	24(%rsp), %edx
 	movq	16(%rsp), %rdi
 	movl	%r13d, %esi
 	xorl	%ebp, %ebp
-	leaq	.LC7(%rip), %rbx
+	leaq	.LC3(%rip), %rbx
 	call	first_cluster
 	movq	%rax, 8(%rsp)
 	leaq	8(%rax), %r15
 	.p2align 4,,10
 	.p2align 3
-.L163:
+.L164:
 	movl	(%r15), %ecx
 	movl	%ebp, %edx
-	leaq	.LC6(%rip), %rsi
+	leaq	.LC2(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	call	__printf_chk@PLT
 	movl	(%r15), %ecx
 	testl	%ecx, %ecx
-	jle	.L161
+	jle	.L162
 	xorl	%r14d, %r14d
 	.p2align 4,,10
 	.p2align 3
-.L162:
+.L163:
 	movq	-8(%r15), %rax
 	movq	%rbx, %rsi
 	movl	$1, %edi
@@ -1250,20 +1206,20 @@ transitionBound:
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
 	cmpl	%r14d, (%r15)
-	jg	.L162
-.L161:
-	leaq	.LC8(%rip), %rsi
+	jg	.L163
+.L162:
+	leaq	.LC4(%rip), %rsi
 	xorl	%eax, %eax
 	addl	$1, %ebp
 	addq	$16, %r15
 	movl	$1, %edi
 	call	__printf_chk@PLT
 	cmpl	%ebp, %r13d
-	jne	.L163
-.L173:
+	jne	.L164
+.L174:
 	movl	$4, 28(%rsp)
-	leaq	.LC7(%rip), %rbx
-.L168:
+	leaq	.LC3(%rip), %rbx
+.L169:
 	movq	8(%rsp), %r15
 	movq	16(%rsp), %rsi
 	movl	%r13d, %edx
@@ -1272,28 +1228,28 @@ transitionBound:
 	call	change_unit
 	xorl	%eax, %eax
 	movl	$1, %edi
-	leaq	.LC9(%rip), %rsi
+	leaq	.LC5(%rip), %rsi
 	call	__printf_chk@PLT
 	testl	%r13d, %r13d
-	jle	.L164
+	jle	.L165
 	leaq	8(%r15), %r15
 	xorl	%ebp, %ebp
 	.p2align 4,,10
 	.p2align 3
-.L167:
+.L168:
 	movl	(%r15), %ecx
 	movl	%ebp, %edx
-	leaq	.LC6(%rip), %rsi
+	leaq	.LC2(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	call	__printf_chk@PLT
 	movl	(%r15), %edx
 	testl	%edx, %edx
-	jle	.L165
+	jle	.L166
 	xorl	%r14d, %r14d
 	.p2align 4,,10
 	.p2align 3
-.L166:
+.L167:
 	movq	-8(%r15), %rax
 	movq	%rbx, %rsi
 	movl	$1, %edi
@@ -1303,42 +1259,42 @@ transitionBound:
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
 	cmpl	%r14d, (%r15)
-	jg	.L166
-.L165:
-	leaq	.LC8(%rip), %rsi
+	jg	.L167
+.L166:
+	leaq	.LC4(%rip), %rsi
 	xorl	%eax, %eax
 	addl	$1, %ebp
 	addq	$16, %r15
 	movl	$1, %edi
 	call	__printf_chk@PLT
 	cmpl	%ebp, %r13d
-	jne	.L167
-.L164:
-	subl	$1, 28(%rsp)
 	jne	.L168
+.L165:
+	subl	$1, 28(%rsp)
+	jne	.L169
 	testl	%r13d, %r13d
-	jle	.L169
+	jle	.L170
 	movq	8(%rsp), %rax
 	xorl	%r15d, %r15d
-	leaq	.LC7(%rip), %rbp
+	leaq	.LC3(%rip), %rbp
 	leaq	8(%rax), %r14
 	.p2align 4,,10
 	.p2align 3
-.L172:
+.L173:
 	movl	(%r14), %r8d
 	movl	%r15d, %ecx
-	leaq	.LC6(%rip), %rdx
+	leaq	.LC2(%rip), %rdx
 	movq	%r12, %rdi
 	movl	$1, %esi
 	xorl	%eax, %eax
 	call	__fprintf_chk@PLT
 	movl	(%r14), %eax
 	testl	%eax, %eax
-	jle	.L170
+	jle	.L171
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L171:
+.L172:
 	movq	-8(%r14), %rax
 	movq	%rbp, %rdx
 	movl	$1, %esi
@@ -1349,9 +1305,9 @@ transitionBound:
 	xorl	%eax, %eax
 	call	__fprintf_chk@PLT
 	cmpl	%ebx, (%r14)
-	jg	.L171
-.L170:
-	leaq	.LC8(%rip), %rdx
+	jg	.L172
+.L171:
+	leaq	.LC4(%rip), %rdx
 	movq	%r12, %rdi
 	xorl	%eax, %eax
 	addl	$1, %r15d
@@ -1359,8 +1315,8 @@ transitionBound:
 	addq	$16, %r14
 	call	__fprintf_chk@PLT
 	cmpl	%r15d, %r13d
-	jne	.L172
-.L169:
+	jne	.L173
+.L170:
 	movq	%r12, %rdi
 	call	fclose@PLT
 	movq	8(%rsp), %rax
@@ -1380,14 +1336,14 @@ transitionBound:
 	popq	%r15
 	.cfi_def_cfa_offset 8
 	ret
-.L158:
+.L159:
 	.cfi_restore_state
 	movl	24(%rsp), %edx
 	movq	16(%rsp), %rdi
 	movl	%r13d, %esi
 	call	first_cluster
 	movq	%rax, 8(%rsp)
-	jmp	.L173
+	jmp	.L174
 	.cfi_endproc
 .LFE50:
 	.size	transitionBound, .-transitionBound
@@ -1421,7 +1377,7 @@ storeState:
 	call	malloc@PLT
 	movq	%rax, %r12
 	testl	%ebp, %ebp
-	jle	.L185
+	jle	.L186
 	leaq	8(%rax), %r13
 	leal	-1(%rbp), %eax
 	salq	$3, %rbx
@@ -1430,46 +1386,46 @@ storeState:
 	leaq	24(%r12,%rax), %rbp
 	.p2align 4,,10
 	.p2align 3
-.L193:
+.L194:
 	movq	%rbx, %rdi
 	call	malloc@PLT
 	movl	(%r14), %edi
 	movl	$0, 0(%r13)
 	movq	%rax, -8(%r13)
 	testl	%edi, %edi
-	jle	.L187
+	jle	.L188
 	movq	-8(%r14), %rcx
 	leaq	15(%rax), %rsi
 	leal	-1(%rdi), %edx
 	subq	%rcx, %rsi
 	cmpq	$30, %rsi
-	jbe	.L188
+	jbe	.L189
 	cmpl	$3, %edx
-	jbe	.L188
+	jbe	.L189
 	movl	%edi, %esi
 	xorl	%edx, %edx
 	shrl	%esi
 	salq	$4, %rsi
 	.p2align 4,,10
 	.p2align 3
-.L189:
+.L190:
 	movdqu	(%rcx,%rdx), %xmm0
 	movups	%xmm0, (%rax,%rdx)
 	addq	$16, %rdx
 	cmpq	%rsi, %rdx
-	jne	.L189
+	jne	.L190
 	movl	%edi, %edx
 	andl	$-2, %edx
 	andl	$1, %edi
-	je	.L187
+	je	.L188
 	movq	(%rcx,%rdx,8), %rcx
 	movq	%rcx, (%rax,%rdx,8)
-.L187:
+.L188:
 	addq	$16, %r13
 	addq	$16, %r14
 	cmpq	%rbp, %r13
-	jne	.L193
-.L185:
+	jne	.L194
+.L186:
 	popq	%rbx
 	.cfi_remember_state
 	.cfi_def_cfa_offset 40
@@ -1485,20 +1441,20 @@ storeState:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L188:
+.L189:
 	.cfi_restore_state
 	movl	%edx, %esi
 	xorl	%edx, %edx
 	.p2align 4,,10
 	.p2align 3
-.L191:
+.L192:
 	movq	(%rcx,%rdx,8), %rdi
 	movq	%rdi, (%rax,%rdx,8)
 	movq	%rdx, %rdi
 	addq	$1, %rdx
 	cmpq	%rdi, %rsi
-	jne	.L191
-	jmp	.L187
+	jne	.L192
+	jmp	.L188
 	.cfi_endproc
 .LFE51:
 	.size	storeState, .-storeState
@@ -1537,7 +1493,7 @@ transitionBound_old_random_clusters:
 	call	malloc@PLT
 	movq	%rax, %r13
 	testl	%r12d, %r12d
-	jle	.L209
+	jle	.L210
 	leal	-1(%r12), %ebx
 	movslq	%r14d, %rbp
 	movq	%rax, %r15
@@ -1547,18 +1503,18 @@ transitionBound_old_random_clusters:
 	addq	%rax, %rbx
 	.p2align 4,,10
 	.p2align 3
-.L208:
+.L209:
 	movq	%rbp, %rdi
 	addq	$16, %r15
 	call	malloc@PLT
 	movl	$0, -8(%r15)
 	movq	%rax, -16(%r15)
 	cmpq	%rbx, %r15
-	jne	.L208
-.L209:
+	jne	.L209
+.L210:
 	testl	%r14d, %r14d
-	jg	.L221
-.L204:
+	jg	.L222
+.L205:
 	addq	$24, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 56
@@ -1578,7 +1534,7 @@ transitionBound_old_random_clusters:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L221:
+.L222:
 	.cfi_restore_state
 	call	rand@PLT
 	movq	8(%rsp), %rsi
@@ -1595,11 +1551,11 @@ transitionBound_old_random_clusters:
 	movq	%rdi, (%rcx,%rsi,8)
 	movl	%edx, 8(%rax)
 	cmpl	$1, %r14d
-	je	.L204
+	je	.L205
 	leal	-2(%r14), %ebp
 	movl	$1, %ebx
 	addq	$2, %rbp
-.L214:
+.L215:
 	call	rand@PLT
 	cltd
 	idivl	%r12d
@@ -1610,17 +1566,17 @@ transitionBound_old_random_clusters:
 	salq	$4, %rdx
 	leaq	0(%r13,%rdx), %rsi
 	movq	(%rsi), %rdx
-	jmp	.L213
+	jmp	.L214
 	.p2align 4,,10
 	.p2align 3
-.L211:
+.L212:
 	addq	$1, %rax
 	cmpl	%eax, %ebx
-	jle	.L220
-.L213:
+	jle	.L221
+.L214:
 	cmpq	%rcx, (%rdx,%rax,8)
-	jne	.L211
-.L220:
+	jne	.L212
+.L221:
 	movslq	8(%rsi), %rdi
 	addq	$1, %rbx
 	movq	%rdi, %rax
@@ -1628,20 +1584,20 @@ transitionBound_old_random_clusters:
 	addl	$1, %eax
 	movl	%eax, 8(%rsi)
 	cmpq	%rbx, %rbp
-	je	.L204
-	jmp	.L214
+	je	.L205
+	jmp	.L215
 	.cfi_endproc
 .LFE52:
 	.size	transitionBound_old_random_clusters, .-transitionBound_old_random_clusters
 	.section	.rodata.cst16,"aM",@progbits,16
 	.align 16
-.LC3:
+.LC0:
 	.long	0
 	.long	1
 	.long	2
 	.long	3
 	.align 16
-.LC4:
+.LC1:
 	.long	4
 	.long	4
 	.long	4

@@ -3839,6 +3839,42 @@ long long strtonum(const char *nptr, long long minval, long long maxval,
 char *getbsize(int *headerlenp, long *blocksizep);
 
 # 5 "sa.c" 2
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 34 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 1 3 4
+
+
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 194 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/include/limits.h" 1 3 4
+# 26 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
+# 27 "/usr/include/limits.h" 2 3 4
+# 183 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 28 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 161 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 1 3 4
+# 38 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 3 4
+# 1 "/usr/include/linux/limits.h" 1 3 4
+# 39 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 2 3 4
+# 162 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 184 "/usr/include/limits.h" 2 3 4
+
+
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix2_lim.h" 1 3 4
+# 188 "/usr/include/limits.h" 2 3 4
+# 195 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 8 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 2 3 4
+# 35 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 6 "sa.c" 2
 
 # 1 "sa.h" 1
 
@@ -3898,7 +3934,7 @@ runSA(double Tstart,
       int steps,
       TU** units, int k, int n, int m
       );
-# 7 "sa.c" 2
+# 8 "sa.c" 2
 # 1 "state.h" 1
 
 
@@ -3924,7 +3960,7 @@ transitionBound(int ell , TU** units, int k, int n, FILE *pf_out
 
 
 Cluster** storeState(Cluster *clusters, int k, int n);
-# 8 "sa.c" 2
+# 9 "sa.c" 2
 
 # 1 "timer.h" 1
 
@@ -3935,7 +3971,10 @@ startTimer(void);
 
 double
 getTime(void);
-# 10 "sa.c" 2
+# 11 "sa.c" 2
+
+
+
 
 static int
 myRandom(void)
@@ -3950,16 +3989,16 @@ getTemperature(double cp,
                )
 {
   
-# 23 "sa.c" 3 4
+# 27 "sa.c" 3 4
  ((void) (0))
                            
-# 24 "sa.c"
+# 28 "sa.c"
                           ;
   
-# 25 "sa.c" 3 4
+# 29 "sa.c" 3 4
  ((void) (0))
                                                 
-# 26 "sa.c"
+# 30 "sa.c"
                                                ;
 
   double res = cp;
@@ -4009,10 +4048,25 @@ runSA(double Tstart,
 
   int ell = 1;
   unsigned int R;
-
+  srand(time(
+# 79 "sa.c" 3 4
+            ((void *)0)
+# 79 "sa.c"
+                ));
 
   Cluster* clusters = first_cluster(units, k, n);
   max = energy(units, clusters, m, k, n);
+  int best_energy_population = 0x7fffffff;
+  int best_energy_compactness = 
+# 84 "sa.c" 3 4
+                               (-0x7fffffff - 1)
+# 84 "sa.c"
+                                      ;
+  Cluster* stored_state = 
+# 85 "sa.c" 3 4
+                         ((void *)0)
+# 85 "sa.c"
+                             ;
   for (int i = 0; i < k; i++)
     {
         printf("Cluster %d with size %d: ", i, clusters[i].size);
@@ -4025,54 +4079,67 @@ runSA(double Tstart,
   for(int i = 0; i < steps; i++){
 
 
+
+
       ell = getEll(T, &R);
       FILE *fp_out = fopen("cluster_info.txt", "w");
 
 
       change_unit(clusters, units, k, n);
+# 120 "sa.c"
+      int energy__population = energy_population(units, clusters, m, k, n);
+      int energy__compactness = energy_compactness(clusters, k);
 
-      printf("i = %d em %d --------------\n", i, steps);
-      for (int i = 0; i < k; i++)
-      {
-        int pop_cluster = 0;
-          printf("Cluster %d with size %d: ", i, clusters[i].size);
-          for (int j = 0; j < clusters[i].size; j++)
-          {
-              printf("%d ", clusters[i].units[j]->code);
-              pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-          }
+      double accept_prob = 0.0;
 
-          printf("\n");
+      if (energy__compactness > best_energy_compactness && energy__population < best_energy_population) {
+          accept_prob = 1.0;
+
+      } else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population) {
+          accept_prob = exp(-1.0 / T);
+
+      } else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population) {
+          accept_prob = exp(-1.0 / T);
+
+      } else {
+          accept_prob = 0.0;
+
       }
 
-      int energy__population = 0;
-      int energy__compactness = 0;
+      double random_number = (double)rand() / (double)
+# 139 "sa.c" 3 4
+                                                     2147483647
+# 139 "sa.c"
+                                                             ;
 
-      energy__population = energy_population(units,clusters, m, k, n);
-      energy__compactness = energy_compactness(clusters, k);
-      printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
-      printf("max: %d\n", max);
-      if(max > energy(units, clusters, m, k, n)){
-         printf("i = %d em %d--------------\n", i, steps);
+
+      if (random_number < accept_prob) {
+        printf("accept probabilty: %f and random number: %f\n", accept_prob, random_number);
+        best_energy_compactness = energy__compactness;
+        best_energy_population = energy__population;
+        printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
+
+        printf("i = %d em %d--------------\n", i, steps);
         for (int i = 0; i < k; i++)
-      {
-        int pop_cluster = 0;
-          printf("Cluster %d with size %d: ", i, clusters[i].size);
-          for (int j = 0; j < clusters[i].size; j++)
-          {
-              printf("%d ", clusters[i].units[j]->code);
-              pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+        {
+            printf("Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++) {
+                printf("%d ", clusters[i].units[j]->code);
+            }
+            printf("\n");
+        }
+
+        if (stored_state != 
+# 158 "sa.c" 3 4
+                           ((void *)0)
+# 158 "sa.c"
+                               ) {
+
           }
-          printf("with population %d ", pop_cluster);
-          printf("\n");
+          stored_state = storeState(clusters, k, n);
       }
-        max = energy(units, clusters, m, k, n);
-        printf("\n MAX MAS MAX max: %d\n\n", max);
-        Cluster* stored_state = storeState(clusters, k, n);
-
-      }
-
-    T += Td;
+# 186 "sa.c"
+    T -= Td;
   }
 
   printf("\n");

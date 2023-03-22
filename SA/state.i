@@ -2437,7 +2437,7 @@ int compactness(Cluster *cluster) {
             }
         }
     }
-    printf("shared borders of here = %d\n", shared_borders);
+
     return shared_borders;
 }
 
@@ -2461,7 +2461,7 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
         int min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
         total_difference += min_diff;
     }
-    printf("-- total difference: %d\n", total_difference);
+
     return total_difference;
 }
 
@@ -2471,7 +2471,7 @@ int energy_compactness(Cluster *clusters, int k) {
     for (int i = 0; i < k; i++) {
         total_shared_borders += compactness(&clusters[i]);
     }
-    printf("shared borders = %d\n", total_shared_borders);
+
 
     return total_shared_borders;
 }
@@ -2762,7 +2762,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         cluster->size--;
     }
     else {
-        printf("is here?\n");
+
     }
 
 }

@@ -47,7 +47,7 @@ main:
 	movq	.LC1(%rip), %rax
 	movl	$4, 32(%rsp)
 	movq	%rax, 64(%rsp)
-	movl	$5, 36(%rsp)
+	movl	$20, 36(%rsp)
 	call	startTimer@PLT
 	leal	-3(%rbx), %edi
 	cmpl	$5, %edi
@@ -173,8 +173,8 @@ main:
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
 .LC0:
-	.long	2576980378
-	.long	1068079513
+	.long	1889785610
+	.long	1068960317
 	.align 8
 .LC1:
 	.long	1202590843

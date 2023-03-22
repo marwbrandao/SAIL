@@ -2,11 +2,15 @@
 #include <math.h>
 #include <assert.h>
 #include <bsd/stdlib.h>
+#include <limits.h>
 
 #include "sa.h"
 #include "state.h"
 #include "graph.h"
 #include "timer.h"
+
+// #define INT_MIN	-2147483648	
+// #define INT_MAX	+2147483647
 
 static int 
 myRandom(void) 
@@ -72,10 +76,13 @@ runSA(double Tstart, /* [in] starting temperature */
 
   int ell = 1; /* Default value for greedy */
   unsigned int R;
-
+  srand(time(NULL));
 
   Cluster* clusters = first_cluster(units, k, n);
   max = energy(units, clusters, m, k, n);
+  int best_energy_population = INT_MAX;
+  int best_energy_compactness = INT_MIN;
+  Cluster* stored_state = NULL;
   for (int i = 0; i < k; i++)
     {
         printf("Cluster %d with size %d: ", i, clusters[i].size);
@@ -87,6 +94,8 @@ runSA(double Tstart, /* [in] starting temperature */
     }
   for(int i = 0; i < steps; i++){
   //  for(int j = 0; j < batch; j++){
+
+      
     
       ell = getEll(T, &R); //E(s)
       FILE *fp_out = fopen("cluster_info.txt", "w");
@@ -94,48 +103,87 @@ runSA(double Tstart, /* [in] starting temperature */
   
       change_unit(clusters, units, k, n);
 
-      printf("i = %d em %d --------------\n", i, steps);
-      for (int i = 0; i < k; i++)
-      {
-        int pop_cluster = 0;
-          printf("Cluster %d with size %d: ", i, clusters[i].size);
-          for (int j = 0; j < clusters[i].size; j++)
-          {
-              printf("%d ", clusters[i].units[j]->code);
-              pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-          }
-          // printf("\n                       with POPULATION %d ", pop_cluster);
-          printf("\n");
+      // printf("i = %d em %d --------------\n", i, steps);
+      // for (int i = 0; i < k; i++)
+      // {
+      //   int pop_cluster = 0;
+      //     printf("Cluster %d with size %d: ", i, clusters[i].size);
+      //     for (int j = 0; j < clusters[i].size; j++)
+      //     {
+      //         printf("%d ", clusters[i].units[j]->code);
+      //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+      //     }
+      //     // printf("\n                       with POPULATION %d ", pop_cluster);
+      //     printf("\n");
+      // }
+
+      int energy__population = energy_population(units, clusters, m, k, n);
+      int energy__compactness = energy_compactness(clusters, k);
+      
+      double accept_prob = 0.0;
+
+      if (energy__compactness > best_energy_compactness && energy__population < best_energy_population) {
+          accept_prob = 1.0;
+          // printf("1.accept probabilty: %f \n", accept_prob);
+      } else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population) {
+          accept_prob = exp(-1.0 / T);
+          // printf("2.accept probabilty: %f \n", accept_prob);
+      } else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population) {
+          accept_prob = exp(-1.0 / T);
+          // printf("3.accept probabilty: %f \n", accept_prob);
+      } else {
+          accept_prob = 0.0; // Set the worst probability to accept
+          // printf("4.accept probabilty: %f \n", accept_prob);
       }
-
-      int energy__population = 0; 
-      int energy__compactness = 0;
-
-      energy__population = energy_population(units,clusters, m, k, n);
-      energy__compactness = energy_compactness(clusters, k);
-      printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
-      printf("max: %d\n", max);
-      if(max > energy(units, clusters, m, k, n)){
-         printf("i = %d em %d--------------\n", i, steps);
+      // accept_prob = exp(-1.0 / T);
+      double random_number = (double)rand() / (double)RAND_MAX;
+      // printf("-------accept probabilty: %f and random number: %f and Temp: %f\n", accept_prob, random_number, T);
+        // Accept the state change if the random number is less than the acceptance probability
+      if (random_number < accept_prob) { 
+        printf("accept probabilty: %f and random number: %f\n", accept_prob, random_number);
+        best_energy_compactness = energy__compactness;
+        best_energy_population = energy__population;
+        printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
+        //printf("max: %d\n", max);
+        printf("i = %d em %d--------------\n", i, steps);
         for (int i = 0; i < k; i++)
-      {
-        int pop_cluster = 0;
-          printf("Cluster %d with size %d: ", i, clusters[i].size);
-          for (int j = 0; j < clusters[i].size; j++)
-          {
-              printf("%d ", clusters[i].units[j]->code);
-              pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+        {
+            printf("Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++) {
+                printf("%d ", clusters[i].units[j]->code);
+            }         
+            printf("\n");
+        }
+        
+        if (stored_state != NULL) {
+            //freeState(stored_state, k); // Free the previously stored state
           }
-          printf("with population %d ", pop_cluster);
-          printf("\n");
-      }
-        max = energy(units, clusters, m, k, n);
-        printf("\n MAX MAS MAX max: %d\n\n", max);
-        Cluster* stored_state = storeState(clusters, k, n);
-
+          stored_state = storeState(clusters, k, n);
       }
 
-    T += Td;
+      // if(max > energy(units, clusters, m, k, n)){
+      //    printf("i = %d em %d--------------\n", i, steps);
+      //   for (int i = 0; i < k; i++)
+      // {
+      //   int pop_cluster = 0;
+      //     printf("Cluster %d with size %d: ", i, clusters[i].size);
+      //     for (int j = 0; j < clusters[i].size; j++)
+      //     {
+      //         printf("%d ", clusters[i].units[j]->code);
+      //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+      //     }
+      //     printf("with population %d ", pop_cluster);
+      //     printf("\n");
+      // }
+      //   max = energy(units, clusters, m, k, n);
+      //   printf("\n MAX MAS MAX max: %d\n\n", max);
+      //   Cluster* stored_state = storeState(clusters, k, n);
+
+        
+
+      // }
+
+    T -= Td;
   }
   
   printf("\n");

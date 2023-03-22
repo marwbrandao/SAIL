@@ -2831,12 +2831,12 @@ main(int argc,
      char **argv
      )
 {
-  double cp_start = 0.05;
+  double cp_start = 0.09;
   int d_start = -1;
   double cp_end = 0.01;
   int d_end = -1;
   int bp = 4;
-  int sp = 5;
+  int sp = 20;
 
   startTimer();
 
