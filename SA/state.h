@@ -7,7 +7,8 @@ typedef struct
     TU **units; // An array of pointers to units in the cluster
     int size;   // The number of units in the cluster
     int population;
-} Cluster;int energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+} Cluster;
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
 int energy_compactness(Cluster *clusters, int k);
 /* The energy of the current state */
 int

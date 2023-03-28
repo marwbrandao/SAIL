@@ -42,12 +42,12 @@ main:
 	xorl	%eax, %eax
 	movq	.LC0(%rip), %rax
 	movl	$-1, 24(%rsp)
-	movl	$-1, 28(%rsp)
+	movl	$-3, 28(%rsp)
 	movq	%rax, 56(%rsp)
 	movq	.LC1(%rip), %rax
-	movl	$4, 32(%rsp)
+	movl	$1, 32(%rsp)
 	movq	%rax, 64(%rsp)
-	movl	$20, 36(%rsp)
+	movl	$7, 36(%rsp)
 	call	startTimer@PLT
 	leal	-3(%rbx), %edi
 	cmpl	$5, %edi
@@ -173,8 +173,8 @@ main:
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
 .LC0:
-	.long	1889785610
-	.long	1068960317
+	.long	2370821947
+	.long	1065512599
 	.align 8
 .LC1:
 	.long	1202590843

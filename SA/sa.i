@@ -3945,7 +3945,8 @@ typedef struct
     TU **units;
     int size;
     int population;
-} Cluster;int energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+} Cluster;
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
 int energy_compactness(Cluster *clusters, int k);
 
 int
@@ -3980,26 +3981,26 @@ static int
 myRandom(void)
 {
   return random();
- }
+}
 
 
 double
 getTemperature(double cp,
                int ell
-               )
+)
 {
   
 # 27 "sa.c" 3 4
  ((void) (0))
-                           
+                                  
 # 28 "sa.c"
-                          ;
+                                 ;
   
 # 29 "sa.c" 3 4
  ((void) (0))
-                                                
+                                                       
 # 30 "sa.c"
-                                               ;
+                                                      ;
 
   double res = cp;
   res /= 1.0 - cp;
@@ -4012,7 +4013,7 @@ getTemperature(double cp,
 int
 getEll(double T,
        unsigned int *pR
-       )
+)
 {
   double c = 1.0;
 
@@ -4021,29 +4022,29 @@ getEll(double T,
 
   unsigned int R = *pR;
 
-  if(0 != R){
+  if (0 != R)
+  {
     c = log2(-R);
     c -= log2(R);
     c /= T;
     c = round(c);
   }
 
-  return (int) c;
+  return (int)c;
 }
 
-int
-runSA(double Tstart,
-      double Tstop,
-      int batch,
-      int steps,
-      TU** units, int k, int n, int m
-      )
+int runSA(double Tstart,
+          double Tstop,
+          int batch,
+          int steps,
+          TU **units, int k, int n, int m)
 {
   printf("\nSA start!\n\n");
 
+
   int max = 0;
   double T = Tstart;
-  double Td = Tstop-Tstart;
+  double Td = Tstop - Tstart;
   Td /= steps;
 
   int ell = 1;
@@ -4053,97 +4054,144 @@ runSA(double Tstart,
             ((void *)0)
 # 79 "sa.c"
                 ));
-
-  Cluster* clusters = first_cluster(units, k, n);
-  max = energy(units, clusters, m, k, n);
-  int best_energy_population = 0x7fffffff;
-  int best_energy_compactness = 
-# 84 "sa.c" 3 4
-                               (-0x7fffffff - 1)
-# 84 "sa.c"
-                                      ;
-  Cluster* stored_state = 
-# 85 "sa.c" 3 4
-                         ((void *)0)
-# 85 "sa.c"
-                             ;
+  FILE *output_file = fopen("output.txt", "w");
+  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
+  Cluster *clusters = first_cluster(units, k, n);
   for (int i = 0; i < k; i++)
-    {
-        printf("Cluster %d with size %d: ", i, clusters[i].size);
+      {
+
+        fprintf(output_file, "0,%d:", i);
         for (int j = 0; j < clusters[i].size; j++)
         {
-            printf("%d ", clusters[i].units[j]->code);
+          int unit_code = clusters[i].units[j]->code / 1;
+
+          fprintf(output_file, "%d,", unit_code);
         }
-        printf("\n");
+
+
+        fprintf(output_file, "\n");
+      }
+
+  long long best_energy_population = 0x7fffffffffffffffL;
+  int best_energy_compactness = 
+# 99 "sa.c" 3 4
+                               (-0x7fffffff - 1)
+# 99 "sa.c"
+                                      ;
+  Cluster *stored_state = 
+# 100 "sa.c" 3 4
+                         ((void *)0)
+# 100 "sa.c"
+                             ;
+  for (int i = 0; i < k; i++)
+  {
+    printf("Cluster %d with size %d: ", i, clusters[i].size);
+    for (int j = 0; j < clusters[i].size; j++)
+    {
+      printf("%d ", clusters[i].units[j]->code);
     }
-  for(int i = 0; i < steps; i++){
+    printf("\n");
+  }
+  printf("Tstart: %f, Tstop: %f, steps: %d\n", Tstart, Tstop, steps);
+  double ratio = Tstop / Tstart;
+  printf("ratio: %f\n", ratio);
+  double exponent = 1.0 / steps;
+  printf("exponent: %f\n", exponent);
+  double alpha = pow(ratio, exponent);
+  printf("alpha: %f\n", alpha);
 
 
 
+  for (int s = 1; s <= steps; s++)
+  {
 
-      ell = getEll(T, &R);
-      FILE *fp_out = fopen("cluster_info.txt", "w");
+    ell = getEll(T, &R);
+    FILE *fp_out = fopen("cluster_info.txt", "w");
+    change_unit(clusters, units, k, n);
+
+    long long energy__population = energy_population(units, clusters, m, k, n);
+    int energy__compactness = energy_compactness(clusters, k);
+
+    double accept_prob = 0.0;
+
+    if (energy__compactness > best_energy_compactness && energy__population == 0)
+    {
+      accept_prob = 1.0;
+    }
+    else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
+    {
+      accept_prob = exp(1.0 / T);
+
+      fprintf(output_file, "prob: %f compact\n", accept_prob);
+    }
+    else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population)
+    {
+      accept_prob = exp(1.0 / T);
+      fprintf(output_file, "prob: %f pop\n", accept_prob);
+    }
+    else
+    {
+      accept_prob = 0.0;
+    }
+    double random_number = (double)rand() / (double)
+# 151 "sa.c" 3 4
+                                                   2147483647
+# 151 "sa.c"
+                                                           ;
+    if (random_number < accept_prob)
+    {
+
+      best_energy_compactness = energy__compactness;
+      best_energy_population = energy__population;
 
 
-      change_unit(clusters, units, k, n);
-# 120 "sa.c"
-      int energy__population = energy_population(units, clusters, m, k, n);
-      int energy__compactness = energy_compactness(clusters, k);
+      for (int i = 0; i < k; i++)
+      {
+        int pop_cluster = 0;
 
-      double accept_prob = 0.0;
-
-      if (energy__compactness > best_energy_compactness && energy__population < best_energy_population) {
-          accept_prob = 1.0;
-
-      } else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population) {
-          accept_prob = exp(-1.0 / T);
-
-      } else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population) {
-          accept_prob = exp(-1.0 / T);
-
-      } else {
-          accept_prob = 0.0;
-
-      }
-
-      double random_number = (double)rand() / (double)
-# 139 "sa.c" 3 4
-                                                     2147483647
-# 139 "sa.c"
-                                                             ;
-
-
-      if (random_number < accept_prob) {
-        printf("accept probabilty: %f and random number: %f\n", accept_prob, random_number);
-        best_energy_compactness = energy__compactness;
-        best_energy_population = energy__population;
-        printf("max_pop: %d and  max_compact: %d\n", energy__population, energy__compactness);
-
-        printf("i = %d em %d--------------\n", i, steps);
-        for (int i = 0; i < k; i++)
+        fprintf(output_file, "%d,%d:", s, i);
+        for (int j = 0; j < clusters[i].size; j++)
         {
-            printf("Cluster %d with size %d: ", i, clusters[i].size);
-            for (int j = 0; j < clusters[i].size; j++) {
-                printf("%d ", clusters[i].units[j]->code);
-            }
-            printf("\n");
+          pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+          int unit_code = clusters[i].units[j]->code / 1;
+
+          fprintf(output_file, "%d,", unit_code);
         }
 
-        if (stored_state != 
-# 158 "sa.c" 3 4
-                           ((void *)0)
-# 158 "sa.c"
-                               ) {
-
-          }
-          stored_state = storeState(clusters, k, n);
+        fprintf(output_file, " --> população: %d", pop_cluster);
+        fprintf(output_file, "\n");
       }
-# 186 "sa.c"
-    T -= Td;
+      fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
+      fprintf(output_file, "fronteiras internas: %d\n", best_energy_compactness);
+
+
+
+
+      stored_state = storeState(clusters, k, n);
+    }
+    T *= alpha;
+
+
   }
+
+  for (int i = 0; i < k; i++)
+      {
+
+
+        for (int j = 0; j < clusters[i].size; j++)
+        {
+          int unit_code = clusters[i].units[j]->code / 1;
+
+
+        }
+
+
+        fprintf(output_file, "\n");
+      }
+  fclose(output_file);
 
   printf("\n");
   printf("SA end!\n");
 
-  return max;
+  return;
 }

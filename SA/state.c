@@ -23,15 +23,15 @@ void population_bounds(TU **units, int margin, int *lower_bound, int *upper_boun
 }
 
 
-int compactness(Cluster *cluster) {
+int compactnesss(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
         TU *unit = cluster->units[i];
         //printf("shared borders = %d\n",cluster->size);
         for (int j = 0; j < unit->num_neighbors; j++) {
             for (int k = 0; k < cluster->size; k++) {
-                
                 if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+                    //printf("unit %d, unit code %d, border sizes = %d\n", k, unit->neighbor_codes[j], unit->border_sizes[j]);
                     shared_borders += unit->border_sizes[j];
                     break;
                 }
@@ -42,27 +42,54 @@ int compactness(Cluster *cluster) {
     return shared_borders;
 }
 
-int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+int compactness(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+                    // Check if the current unit's code is smaller than the neighbor's code.
+                    // This ensures that each border is only counted once.
+                    if (unit->code < unit->neighbor_codes[j]) {
+                        //printf("unit %d, unit code %d, border sizes = %d\n", k, unit->neighbor_codes[j], unit->border_sizes[j]);
+                        shared_borders += unit->border_sizes[j];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return shared_borders;
+}
+// diferença entre as fronteiras de populaçao
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
     int lower_bound, upper_bound;
     population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
-    
-    int total_difference = 0;
-    
+    //printf ("lower and upper = [%d, %d]\n", lower_bound, upper_bound);
+    long long total_difference = 0;
+    int min_diff = 0;
+    //printf("1-- total difference: %d\n", total_difference);
     for (int i = 0; i < k; i++) {
         int pop_cluster = 0;
         //printf("%d\n",cluster[i].size);
         for (int j = 0; j < cluster[i].size; j++) {
             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
         }
+        if (pop_cluster > lower_bound && pop_cluster < upper_bound){
+            //min_diff = 0;
+            continue;
+        }
 
         int lower_diff = abs(pop_cluster - lower_bound);
         int upper_diff = abs(pop_cluster - upper_bound);
 
-        // Choose the minimum difference between lower and upper bound
-        int min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
-        total_difference += min_diff;
+        min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
+        //printf("min diff = %d and population = %d\n", min_diff, pop_cluster);
+        total_difference += (min_diff*2);
+        //printf("2-- total difference: %d\n", total_difference);
     }
-    //printf("-- total difference: %d\n", total_difference);
+    //printf("3-- total difference: %d\n", total_difference);
     return total_difference;
 }
 
@@ -70,6 +97,7 @@ int energy_compactness(Cluster *clusters, int k) {
     int total_shared_borders = 0;
     
     for (int i = 0; i < k; i++) {
+        //printf("cluster %d\n", i);
         total_shared_borders += compactness(&clusters[i]);
     }
     //rintf("shared borders = %d\n", total_shared_borders);

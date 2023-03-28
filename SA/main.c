@@ -15,12 +15,12 @@ main(int argc,
      char **argv
      )
 {
-  double cp_start = 0.09;
-  int d_start = -1;
-  double cp_end = 0.01;
+  double cp_start = 0.9;
+  int d_start = -15;
+  double cp_end = 0.001;
   int d_end = -1;
-  int bp = 4; /* Batch size power of 2   4 */
-  int sp = 20; /* Number of steps power of 2     10*/
+  int bp = 1; /* Batch size power of 2   4 */
+  int sp = 20; /* Number of steps power of 2   10*/
 
   startTimer();
 

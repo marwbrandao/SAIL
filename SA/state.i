@@ -2386,7 +2386,8 @@ typedef struct
     TU **units;
     int size;
     int population;
-} Cluster;int energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+} Cluster;
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
 int energy_compactness(Cluster *clusters, int k);
 
 int
@@ -2422,15 +2423,15 @@ void population_bounds(TU **units, int margin, int *lower_bound, int *upper_boun
 }
 
 
-int compactness(Cluster *cluster) {
+int compactnesss(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
         TU *unit = cluster->units[i];
 
         for (int j = 0; j < unit->num_neighbors; j++) {
             for (int k = 0; k < cluster->size; k++) {
-
                 if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+
                     shared_borders += unit->border_sizes[j];
                     break;
                 }
@@ -2441,11 +2442,33 @@ int compactness(Cluster *cluster) {
     return shared_borders;
 }
 
-int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+int compactness(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+
+
+                    if (unit->code < unit->neighbor_codes[j]) {
+
+                        shared_borders += unit->border_sizes[j];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return shared_borders;
+}
+
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
     int lower_bound, upper_bound;
     population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
 
-    int total_difference = 0;
+    long long total_difference = 0;
+    int min_diff = 0;
 
     for (int i = 0; i < k; i++) {
         int pop_cluster = 0;
@@ -2453,13 +2476,18 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
         for (int j = 0; j < cluster[i].size; j++) {
             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
         }
+        if (pop_cluster > lower_bound && pop_cluster < upper_bound){
+
+            continue;
+        }
 
         int lower_diff = abs(pop_cluster - lower_bound);
         int upper_diff = abs(pop_cluster - upper_bound);
 
+        min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
 
-        int min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
-        total_difference += min_diff;
+        total_difference += (min_diff*2);
+
     }
 
     return total_difference;
@@ -2469,6 +2497,7 @@ int energy_compactness(Cluster *clusters, int k) {
     int total_shared_borders = 0;
 
     for (int i = 0; i < k; i++) {
+
         total_shared_borders += compactness(&clusters[i]);
     }
 
@@ -2534,9 +2563,9 @@ int is_neighbor (TU *unit1, TU *unit2) {
 
 Cluster** first_cluster(TU **units, int k, int n) {
     srand(time(
-# 137 "state.c" 3 4
+# 165 "state.c" 3 4
               ((void *)0)
-# 137 "state.c"
+# 165 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
     for (int i = 0; i < k; i++)
@@ -2553,14 +2582,14 @@ Cluster** first_cluster(TU **units, int k, int n) {
         do {
             unit_num = rand() % n;
             if (units[unit_num]->assigned == 
-# 152 "state.c" 3 4
+# 180 "state.c" 3 4
                                             0
-# 152 "state.c"
+# 180 "state.c"
                                                  ) {
                 units[unit_num]->assigned = 
-# 153 "state.c" 3 4
+# 181 "state.c" 3 4
                                            1
-# 153 "state.c"
+# 181 "state.c"
                                                ;
                 units[unit_num]->cluster_id = i;
                 clusters[i].units[0] = malloc(sizeof(TU));
@@ -2571,9 +2600,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
                 clusters[i].size = 0;
             }
         } while(units[unit_num]->assigned == 
-# 162 "state.c" 3 4
+# 190 "state.c" 3 4
                                             0 
-# 162 "state.c"
+# 190 "state.c"
                                                   || clusters[i].size == 0);
     }
 
@@ -2585,9 +2614,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
 
         units[unit_num]->assigned = 
-# 172 "state.c" 3 4
+# 200 "state.c" 3 4
                                    1
-# 172 "state.c"
+# 200 "state.c"
                                        ;
         int cluster_id = rand() % k;
         int j = 0;
@@ -2603,9 +2632,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
         if (j == clusters[cluster_id].size) {
             units[unit_num]->assigned = 
-# 186 "state.c" 3 4
+# 214 "state.c" 3 4
                                        0
-# 186 "state.c"
+# 214 "state.c"
                                             ;
             i--;
         }
@@ -2631,13 +2660,13 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
 
 
     
-# 210 "state.c" 3 4
+# 238 "state.c" 3 4
    _Bool 
-# 210 "state.c"
+# 238 "state.c"
         is_contiguous = 
-# 210 "state.c" 3 4
+# 238 "state.c" 3 4
                         0
-# 210 "state.c"
+# 238 "state.c"
                              ;
     int new_cluster_idx = -1;
     for (int i = 0; i < k; i++) {
@@ -2649,9 +2678,9 @@ void change_unit_x(Cluster *clusters, TU **units, int k) {
             TU *other_unit = other_cluster->units[j];
             if (is_neighbor(unit, other_unit)) {
                 is_contiguous = 
-# 220 "state.c" 3 4
+# 248 "state.c" 3 4
                                1
-# 220 "state.c"
+# 248 "state.c"
                                    ;
                 new_cluster_idx = i;
                 break;
@@ -2697,13 +2726,13 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
     TU *unit = cluster->units[unit_idx];
 
     
-# 264 "state.c" 3 4
+# 292 "state.c" 3 4
    _Bool 
-# 264 "state.c"
+# 292 "state.c"
         is_contiguous = 
-# 264 "state.c" 3 4
+# 292 "state.c" 3 4
                         0
-# 264 "state.c"
+# 292 "state.c"
                              ;
     int new_cluster_idx = -1;
 
@@ -2723,9 +2752,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
 
     for (int i = 0; i < num_neighbors; i++) {
         TU *neighbor = 
-# 282 "state.c" 3 4
+# 310 "state.c" 3 4
                       ((void *)0)
-# 282 "state.c"
+# 310 "state.c"
                           ;
         for (int j = 0; j < n; j++) {
             if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
@@ -2738,9 +2767,9 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         int other_cluster_idx = neighbor->cluster_id;
         if (other_cluster_idx != cluster_idx) {
             is_contiguous = 
-# 293 "state.c" 3 4
+# 321 "state.c" 3 4
                            1
-# 293 "state.c"
+# 321 "state.c"
                                ;
             new_cluster_idx = other_cluster_idx;
             break;
@@ -2772,9 +2801,9 @@ Cluster** transitionBound(int ell , TU **units, int k, int n, FILE *fp_out)
 {
     int neighbor;
     srand(time(
-# 323 "state.c" 3 4
+# 351 "state.c" 3 4
               ((void *)0)
-# 323 "state.c"
+# 351 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
 

@@ -2798,7 +2798,8 @@ typedef struct
     TU **units;
     int size;
     int population;
-} Cluster;int energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+} Cluster;
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
 int energy_compactness(Cluster *clusters, int k);
 
 int
@@ -2831,12 +2832,12 @@ main(int argc,
      char **argv
      )
 {
-  double cp_start = 0.09;
+  double cp_start = 0.009;
   int d_start = -1;
   double cp_end = 0.01;
-  int d_end = -1;
-  int bp = 4;
-  int sp = 20;
+  int d_end = -3;
+  int bp = 1;
+  int sp = 7;
 
   startTimer();
 
