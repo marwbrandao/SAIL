@@ -1,0 +1,25 @@
+{
+ "version": "2.0.0",
+ "tasks": [
+     {
+         "label": "build",
+         "type": "shell",
+         "command": "gcc",
+         "args": [
+             "-o",
+             "your_executable_name",
+             "your_source_file.c",
+             "-I/home/mariana/tese/CPLEX_Studio201/cplex/include",
+             "-L/home/mariana/tese/CPLEX_Studio201/cplex/lib/x86-64_linux/static_pic",
+             "-lcplex",
+             "-lm",
+             "-lpthread",
+             "-ldl"
+         ],
+         "group": {
+             "kind": "build",
+             "isDefault": true
+         }
+     }
+ ]
+}

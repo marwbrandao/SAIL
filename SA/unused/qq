@@ -1,0 +1,2088 @@
+
+TU tus[1000];
+int tu_count = 0;
+
+bool is_tu_code(char* code) {
+    printf("is_tu------------------------------\n");
+    return (strlen(code) == 6 && code[0] == '0' && code[1] == '1');
+}
+
+void parse_line(char* line) {
+    char tu_code[MAX_CODE_LEN]; //ISTO PRECISA DE SER UM VETOR, onde guardamos os os codigos nos indices 
+    int frontier_tu_code, frontier_size;
+    if (sscanf(line, "'%6s': {'voters': %d", tu_code, &tus[tu_count].voters) == 2) {
+        tus[tu_count].frontier_count = 0;
+        tu_count++;
+        //printf("code :   %s\n", tu_code);
+
+        //vou ter que ter malloc 
+        sscanf(line, " '%6d': %d", &frontier_tu_code, &frontier_size); // ver como e que ignoro os primeiros caracteres da string
+        //if (is_tu_code(tu_code) && is_tu_code(line + 2)) {
+        int i=0;
+        int tu_index = tu_count - 1;
+        int frontier_index = tus[tu_index].frontier_count;
+        //tus[tu_index].index[i] = tu_code;
+        //printf("\nihs here????\n\n");
+        printf("\n  code fronteiras-----------------  %d, tamanho fronteiras      %d", frontier_tu_code, frontier_size);
+        tus[tu_index].frontier_tus[frontier_index] = frontier_tu_code;
+        tus[tu_index].frontier_sizes[frontier_index] = frontier_size;
+        tus[tu_index].frontier_count++;
+        i++;
+        //}
+    }
+    }
+
+
+#define MAX_LINE_LEN 256
+#define MAX_DIST_CODES 1000
+
+typedef struct {
+    int num_dist; // numero do distrito
+    int k; //num de clusters
+    int n; //num de unidades territoriais
+    int m; //margem
+    char* codes; // unidades territoriais que fazem parte do distrito
+    int* voters; //voters in each district
+    int* num_neighbors; //numero de vizinhos de cada unidade territorial
+    int** neighbors; //vizinhos de cada distrito 
+} District;
+
+
+
+void loadGraph(FILE* f) {
+    //printf("\nhere:\n");
+    if (f == NULL) {
+        printf("Error opening file\n");
+    }
+    char line[256];
+    while (fgets(line, 256, f) != NULL) {
+        int i = 0;
+        printf("\nline:    %s\n", line);
+        while (line[i] != ':') {
+            i++;
+        }
+         parse_line(line);
+        //printf("i=%d\n", i);
+
+    }
+    fclose(f);
+
+    for (int i = 0; i < tu_count; i++) {
+        printf("TU %d:\n", tus[i].frontier_tus[0]);
+        printf("  Voters: %d\n", tus[i].voters);
+        printf("  Frontier TUs:\n");
+        for (int j = 0; j < tus[i].frontier_count; j++) {
+            printf("    %d (%d)\n", tus[i].frontier_tus[j], tus[i].frontier_sizes[j]);
+        }
+    }
+    
+}
+
+
+
+// Read the contents of the file into a buffer
+    //fseek(f, 0, SEEK_END);
+    //long fsize = ftell(f);
+    //fseek(f, 0, SEEK_SET);
+    //char* buffer = malloc(fsize + 1);
+    //fread(buffer, fsize, 1, f);
+    //buffer[fsize] = '\0';
+
+    // Parse the contents of the buffer using strtok
+    //District dist;
+    //char* token = strtok(buffer, "d");
+    //dist.num_dist = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.k = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.n = atoi(token);
+    //token = strtok(NULL, "_");
+    //dist.m = atof(token);
+    
+    // Clean up
+    //free(buffer);
+
+
+
+
+    #include <time.h>
+#include <math.h>
+#include <assert.h>
+#include <bsd/stdlib.h>
+
+#include "sa.h"
+//#include "state.h"
+#include "graph.h"
+#include "timer.h"
+
+static int 
+myRandom(void) 
+{ 
+  return random();
+ } 
+
+/* Used for defining calibration values */
+double
+getTemperature(double cp, /* complement probability */
+               int ell /* Energy delta limit. -0.5 done internally */
+               )
+{
+  assert(0 >= ell &&
+	 "Invalid d to define T.");
+  assert(0.5 > cp &&
+	 "Invalid complement probability to define T.");
+
+  double res = cp;
+  res /= 1.0 - cp;
+  res = log2(res);
+  res /= ((double)ell) - 0.5;
+
+  return res;
+}
+
+int // Energy delta
+getEll(double T, /* [in] the temperature */
+       unsigned int *pR /* [out] the random number that was obtained */
+       )
+{
+  double c = 1.0;
+
+  //*pR = arc4random();
+  *pR = myRandom(); //randvariavel 
+  unsigned int R = *pR;
+
+  if(0 != R){
+    c = log2(-R);
+    c -= log2(R);
+    c /= T;
+    c = round(c);
+  }
+
+  return (int) c;
+}
+
+int
+runSA(double Tstart, /* [in] starting temperature */
+      double Tstop, /* [in] stopping temperature */
+      int batch, /* [in] number of iterations in a batch */
+      int steps, /* [in] number of steps to execute */
+      TU** units
+      )
+{
+  //printf("SA: unit: %d, %d \n", units[0]->code, units[4]->code);
+  int max = 0;
+  double T = Tstart;
+  double Td = Tstop-Tstart;
+  Td /= steps;
+
+  int ell = 1; /* Default value for greedy */
+  unsigned int R;
+
+  //printf("# ");
+  //printf("V-Energy\t");
+  //printf("V-MaxEnergy\t");
+  //printf("Total_Time\t");
+  //printf("Total_Iterations\t");
+  //printf("Total_Steps\t");
+  //printf("Temperature\t");
+  //printf("\n");
+
+  for(int i = 0; i < steps; i++){
+
+    //printf("%d\t", graphVertexNr(G)-energy());
+    //printf("%d\t", graphVertexNr(G)-max);
+    //printf("%e\t", getTime());
+    //printf("%d\t", i);
+    //printf("%lld\t", (long long int)i*(long long int)batch);
+    //printf("%f\t", T);
+    //printf("\n");
+
+    for(int j = 0; j < batch; j++){
+      ell = getEll(T, &R);
+
+      //transitionBound(ell); /* Calls change state function */
+
+      //if(max < energy())
+	  //max = energy();
+    }
+    T += Td;
+  }
+
+  //printf("# drift = %e\n", fabs(Tstop-T));
+
+  printf("\n");
+  printf("\n");
+
+  return max;
+}
+
+
+//printf("hi");
+  // if(1 >= argc){
+  //   printf("Usage: ./project fileName stepsExp2 batchExp2 ts_Cprob ts_d te_Cprob te_d\n");
+  //   printf("\n");
+  //   printf("The fileName is mandatory\n");
+  //   printf("Any number of arguments can be omitted. The first values will be considered.\n");
+  //   printf("\n");
+  //   printf("The prefix ts represents starting temperature.\n");
+  //   printf("The prefix te represents ending temperature.\n");
+  //   printf("The Cprob is the complementar probability\n");
+  //   printf("The d is the delta, so usually parameterized as negative.\n");
+  //   printf("\n");
+  //   printf("stepsExp2 is the power of 2 exponent for the number of steps\n");
+  //   printf("batchExp2 is the power of 2 exponent for the batch size\n");
+  //   printf("\n");
+  //   printf("Defaults:\n");
+  //   printf("\n");
+  //   printf("stepsExp2 = %d\n", sp);
+  //   printf("batchExp2 = %d\n", bp);
+  //   printf("ts_Cprob = %.3f\n", cp_start);
+  //   printf("ts_d = %d\n", d_start);
+  //   printf("te_Cprob = %.3f\n", cp_end);
+  //   printf("te_d = %d\n", d_end);
+  //   printf("\n");
+  //   printf("./project fname %d %d %.3f %d %.3f %d\n", sp, bp,
+	//    cp_start, d_start, cp_end, d_end);
+  //   printf("\n");
+  //   return 0;
+  // } else {
+
+
+
+    #include <stdlib.h>
+#include <stdio.h> 
+#include <stdbool.h>
+#include <limits.h>
+
+#include "state.h"
+#include "graph.h"
+
+
+struct Cluster;
+
+void population_bounds(TU **units, int margin, int *lower_bound, int *upper_bound, int k, int n) {
+    int population = 0;
+
+    for (int i = 0; i < n; i++) {
+        population += units[i]->voters;
+    }
+    
+    // int ideal_population = population / k;
+
+    // int ideal_population = 80707; //distrito 01
+    int ideal_population = 77817; // ditrito 03
+    int bound = ((ideal_population * margin)/100);
+
+    *lower_bound = (ideal_population - bound);
+    *upper_bound = (ideal_population + bound);
+}
+
+
+int compactnesss(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        //printf("shared borders = %d\n",cluster->size);
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+
+                    shared_borders += unit->border_sizes[j];
+                    break;
+                }
+            }
+        }
+    }
+
+    return shared_borders;
+}
+
+int compactness(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+               
+                    if (unit->code < unit->neighbor_codes[j]) {
+                        shared_borders += unit->border_sizes[j];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return shared_borders;
+}
+// diferença entre as fronteiras de populaçao
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+    int lower_bound, upper_bound;
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    //printf ("lower and upper = [%d, %d]\n", lower_bound, upper_bound);
+    long long total_difference = 0;
+    int min_diff = 0;
+    //printf("1-- total difference: %d\n", total_difference);
+    for (int i = 0; i < k; i++) {
+        int pop_cluster = 0;
+        //printf("%d\n",cluster[i].size);
+        for (int j = 0; j < cluster[i].size; j++) {
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+        }
+        if (pop_cluster > lower_bound && pop_cluster < upper_bound){
+            //min_diff = 0;
+            continue;
+        }
+
+        int lower_diff = abs(pop_cluster - lower_bound);
+        int upper_diff = abs(pop_cluster - upper_bound);
+
+        min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
+        //printf("min diff = %d and population = %d\n", min_diff, pop_cluster);
+        total_difference += (min_diff*2);
+        //printf("2-- total difference: %d\n", total_difference);
+    }
+    //printf("3-- total difference: %d\n", total_difference);
+    return total_difference;
+}
+
+// // double energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+// //     int total_population = 0;
+// //     int ideal_population;
+// //     int population_difference_sum = 0;
+
+// //     for (int i = 0; i < n; i++) {
+// //         total_population += units[i]->voters;
+// //     }
+
+// //     ideal_population = total_population / k;
+
+// //     for (int i = 0; i < k; i++) {
+// //         int pop_cluster = 0;
+
+// //         for (int j = 0; j < cluster[i].size; j++) {
+// //             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+// //         }
+
+// //         int population_difference = abs(pop_cluster - ideal_population);
+// //         population_difference_sum += population_difference;
+// //     }
+
+// //     double average_population_difference = (double)population_difference_sum / k;
+// //     double average_population_difference_percentage = (average_population_difference / ideal_population) * 100.0;
+// //     //printf("average population difference percentage: %lf%%\n", average_population_difference_percentage);
+// //     return average_population_difference_percentage;
+// // }
+
+
+
+int energy_compactness(Cluster *clusters, int k) {
+    int total_shared_borders = 0;
+    
+    for (int i = 0; i < k; i++) {
+        //printf("cluster %d\n", i);
+        total_shared_borders += compactness(&clusters[i]);
+    }
+    //rintf("shared borders = %d\n", total_shared_borders);
+
+    return total_shared_borders;
+}
+
+int energy(TU **units, Cluster *cluster, int margin, int k, int n) {
+    int lower_bound, upper_bound;
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    
+    int total_difference = 0;
+    
+    for (int i = 0; i < k; i++) {
+        int pop_cluster = 0;
+
+        for (int j = 0; j < cluster[i].size; j++) {
+          
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+             
+        }
+        int difference = abs(pop_cluster - 80306);
+        total_difference += difference;
+    }
+
+    return total_difference;
+}
+int energy2(TU **units, Cluster *cluster, int margin, int k, int n)
+{
+    int population = 0;
+    //int margin = 15;
+    int lower_bound, upper_bound;
+
+    
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    int pop_cluster = 0;
+
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < cluster[i].size; j++)
+        {
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+        }
+        if(pop_cluster > upper_bound || pop_cluster < lower_bound)
+             return 0;
+        if(pop_cluster <= upper_bound && pop_cluster >= lower_bound)
+             continue;
+
+    }
+
+    return 1;
+}
+
+
+int is_neighbor (TU *unit1, TU *unit2) {
+    for (int i = 0; i < unit1->num_neighbors; i++){
+        if (unit1->neighbor_codes[i] == unit2->code)
+            return 1;
+    }
+    return 0;
+}
+
+
+Cluster** first_cluster(TU **units, int k, int n) {
+    srand(time(NULL));
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+    for (int i = 0; i < k; i++)
+    {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
+    int l = 0;
+    int unit_num;
+    
+    for (int i = 0; i < k; i++) {
+        //unit_num = rand() % n;
+        
+        do {
+            unit_num = rand() % n;
+            if (units[unit_num]->assigned == false) {
+                units[unit_num]->assigned = true; 
+                units[unit_num]->cluster_id = i;
+                clusters[i].units[0] = malloc(sizeof(TU));
+                clusters[i].units[0] = units[unit_num];
+                clusters[i].size = 1;
+                l++;
+            } else{
+                clusters[i].size = 0;             
+            }
+        } while(units[unit_num]->assigned == false || clusters[i].size == 0);
+    }
+    
+
+    for (int i = k; i < n; i++) {
+        unit_num = rand() % n;
+        while (units[unit_num]->assigned) {
+            unit_num = rand() % n;
+        }
+        
+        units[unit_num]->assigned = true;
+        int cluster_id = rand() % k;
+        int j = 0;
+        while (j < clusters[cluster_id].size) {
+            TU *unit = clusters[cluster_id].units[j];
+            if (is_neighbor(units[unit_num], unit)) {
+                clusters[cluster_id].units[clusters[cluster_id].size] = units[unit_num];
+                clusters[cluster_id].size++;
+                units[unit_num]->cluster_id = cluster_id;
+                break;
+            }
+            j++;
+        }
+        if (j == clusters[cluster_id].size) {
+            units[unit_num]->assigned = false;
+            i--;
+        }
+
+    }
+
+    return clusters;
+}
+
+
+void change_unit_x(Cluster *clusters, TU **units, int k) {
+    int cluster_idx = rand() % k;
+    //printf("old size %d\n", clusters[cluster_idx].size);
+    Cluster *cluster = &clusters[cluster_idx];
+
+    int unit_idx = rand() % cluster->size;
+    //printf("unit_idx = %d\n", unit_idx);
+    TU *unit = cluster->units[unit_idx];
+
+    // Check if unit is contiguous with at least one unit in other clusters
+    bool is_contiguous = false;
+    int new_cluster_idx = -1;
+    for (int i = 0; i < k; i++) {
+        if (i == cluster_idx) {
+            continue;  // Skip current cluster
+        }
+        Cluster *other_cluster = &clusters[i];
+        for (int j = 0; j < other_cluster->size; j++) {
+            TU *other_unit = other_cluster->units[j];
+            if (is_neighbor(unit, other_unit)) {
+                is_contiguous = true;
+                new_cluster_idx = i;
+                break;
+            }
+        }
+        if (is_contiguous) {
+            break;
+        }
+    }
+
+    // If unit is contiguous with at least one unit in another cluster, move it there
+    if (is_contiguous) {
+        Cluster *new_cluster = &clusters[new_cluster_idx];
+        new_cluster->units[new_cluster->size] = unit;
+        new_cluster->size++;
+        unit->cluster_id = new_cluster_idx;
+
+        // Remove unit from current cluster
+        for (int i = unit_idx; i < cluster->size - 1; i++) {
+            cluster->units[i] = cluster->units[i+1];
+        }
+        cluster->size--;
+    }
+}
+
+void change_unit(Cluster *clusters, TU **units, int k, int n) {
+    int cluster_idx = 0;
+    
+    long long max_population = -1;
+    for (int i = 0; i < k; i++) {
+        long long cluster_population = 0;
+        for (int j = 0; j < clusters[i].size; j++) {
+            cluster_population += clusters[i].units[j]->voters;
+        }
+
+        if (cluster_population > max_population) {
+            max_population = cluster_population;
+            cluster_idx = i;
+        }
+    }
+    Cluster *cluster = &clusters[cluster_idx];
+  
+    while (cluster->size == 1) {
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+    }
+
+    // Find border units and their neighboring clusters
+    int *border_units = malloc(cluster->size * sizeof(int));
+    int *neighboring_clusters = malloc(cluster->size * sizeof(int));
+    int num_border_units = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *current_unit = cluster->units[i];
+        for (int j = 0; j < current_unit->num_neighbors; j++) {
+            TU *neighbor = NULL;
+            for (int k = 0; k < n; k++) {
+                if (units[k]->code == current_unit->neighbor_codes[j]) {
+                    neighbor = units[k];
+                    break;
+                }
+            }
+            if (!neighbor) continue;
+
+            if (neighbor->cluster_id != cluster_idx) {
+                border_units[num_border_units] = i;
+                neighboring_clusters[num_border_units] = neighbor->cluster_id;
+                num_border_units++;
+                break;
+            }
+        }
+    }
+
+    // Find the neighboring cluster with the least voters
+    int min_voters_cluster_idx = neighboring_clusters[0];
+    int min_voters = INT_MAX;
+    for (int i = 0; i < num_border_units; i++) {
+        int current_cluster_idx = neighboring_clusters[i];
+        Cluster *current_cluster = &clusters[current_cluster_idx];
+        int current_voters = 0;
+        for (int j = 0; j < current_cluster->size; j++) {
+            current_voters += current_cluster->units[j]->voters;
+        }
+        if (current_voters < min_voters) {
+            min_voters = current_voters;
+            min_voters_cluster_idx = current_cluster_idx;
+        }
+    }
+
+    // Select a random border unit
+    int unit_idx = border_units[rand() % num_border_units];
+    TU *unit = cluster->units[unit_idx];
+    free(border_units);
+    free(neighboring_clusters);
+
+    // Move the border unit to the neighboring cluster with the least voters
+    if (is_contiguous_after_removal(cluster, unit) != 0) {
+        Cluster *new_cluster = &clusters[min_voters_cluster_idx];
+        new_cluster->units[new_cluster->size] = unit;
+        new_cluster->size++;
+        unit->cluster_id = min_voters_cluster_idx;
+
+        // Remove unit from current cluster
+        for (int i = unit_idx; i < cluster->size - 1; i++) {
+            cluster->units[i] = cluster->units[i+1];
+        }
+        cluster->size--;
+    }
+}
+
+
+void change_unit_xx(Cluster *clusters, TU **units, int k, int n) {
+    
+    //int cluster_idx = rand() % k;
+    int cluster_idx = 0;
+    
+    
+    long long max_population = -1;
+    for (int i = 0; i < k; i++) {
+        long long cluster_population = 0;
+        for (int j = 0; j < clusters[i].size; j++) {
+            cluster_population += clusters[i].units[j]->voters;
+        }
+
+        if (cluster_population > max_population) {
+            max_population = cluster_population;
+            cluster_idx = i;
+            //printf("cluster id: %d, cluster pop: %d\n", cluster_idx, cluster_population);
+        }
+    }
+    Cluster *cluster = &clusters[cluster_idx];
+  
+    while (cluster->size == 1) {
+        
+        
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+        
+    }
+    //printf("final one ---> cluster id: %d, cluster size: %d\n", cluster_idx, cluster->size);
+    // Find border units
+    int *border_units = malloc(cluster->size * sizeof(int));
+    int num_border_units = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *current_unit = cluster->units[i];
+        for (int j = 0; j < current_unit->num_neighbors; j++) {
+            TU *neighbor = NULL;
+            for (int k = 0; k < n; k++) {
+                if (units[k]->code == current_unit->neighbor_codes[j]) {
+                    neighbor = units[k];
+                    break;
+                }
+            }
+            if (!neighbor) continue;
+
+            if (neighbor->cluster_id != cluster_idx) {
+                border_units[num_border_units++] = i;
+                break;
+            }
+        }
+    }
+
+    // Select a random border unit
+    int unit_idx = border_units[rand() % num_border_units];
+    TU *unit = cluster->units[unit_idx];
+    //printf("unit to change: %d\n", unit_idx);
+    free(border_units);
+
+
+    bool is_contiguous = false;
+    int new_cluster_idx = -1;
+
+    // Shuffle the neighbor units to select a random neighbor.
+    int num_neighbors = unit->num_neighbors;
+    int *shuffled_indices = malloc(num_neighbors * sizeof(int));
+    for (int i = 0; i < num_neighbors; i++) {
+        shuffled_indices[i] = i;
+
+    }
+    for (int i = num_neighbors - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int temp = shuffled_indices[i];
+        shuffled_indices[i] = shuffled_indices[j];
+        shuffled_indices[j] = temp;
+    }
+
+    for (int i = 0; i < num_neighbors; i++) {
+        TU *neighbor = NULL;
+        for (int j = 0; j < n; j++) {
+            if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
+                neighbor = units[j];
+                break;
+            }
+        }
+        if (!neighbor) continue;
+
+        int other_cluster_idx = neighbor->cluster_id;
+        if (other_cluster_idx != cluster_idx) {
+            is_contiguous = true;
+            new_cluster_idx = other_cluster_idx;
+            //printf("clk to change to : %d\n", new_cluster_idx);
+            break;
+        }
+    }
+
+    free(shuffled_indices);
+
+    if (is_contiguous  && is_contiguous_after_removal(cluster, unit) != 0)  {
+       Cluster *new_cluster = &clusters[new_cluster_idx];
+        new_cluster->units[new_cluster->size] = unit;
+        new_cluster->size++;
+        unit->cluster_id = new_cluster_idx;
+
+        // Remove unit from current cluster
+        for (int i = unit_idx; i < cluster->size - 1; i++) {
+            cluster->units[i] = cluster->units[i+1];
+        }
+        cluster->size--;
+    }
+    else {
+
+    }
+ 
+}
+ // && is_contiguous_after_removal(cluster, unit) != 0
+
+int is_contiguous_after_removal(Cluster *cluster, TU *unit_to_remove) {
+    if (cluster->size <= 1) {
+        return 0;
+    }
+
+    // Remove the unit from the cluster temporarily.
+    int unit_idx = -1;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] == unit_to_remove) {
+            unit_idx = i;
+            break;
+        }
+    }
+    if (unit_idx == -1) {
+        return 0;
+    }
+    cluster->units[unit_idx] = NULL;
+
+    // Perform DFS to check contiguity.
+    TU *start_unit = NULL;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] != NULL) {
+            start_unit = cluster->units[i];
+            break;
+        }
+    }
+    if (!start_unit) {
+        return 0;
+    }
+
+    bool *visited = calloc(cluster->size, sizeof(bool));
+    DFS(start_unit, cluster, visited);
+
+    // Check if all units in the cluster were visited.
+    bool all_visited = true;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] != NULL && !visited[i]) {
+            all_visited = 0;
+            break;
+        }
+    }
+
+    // Restore the removed unit.
+    cluster->units[unit_idx] = unit_to_remove;
+
+    free(visited);
+
+    return all_visited;
+}
+
+void DFS(TU *unit, Cluster *cluster, bool *visited) {
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] == unit) {
+            visited[i] = true;
+            break;
+        }
+    }
+
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        TU *neighbor = NULL;
+        for (int j = 0; j < cluster->size; j++) {
+            if (cluster->units[j] && cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor = cluster->units[j];
+                break;
+            }
+        }
+
+        if (neighbor) {
+            int neighbor_idx = -1;
+            for (int j = 0; j < cluster->size; j++) {
+                if (cluster->units[j] == neighbor) {
+                    neighbor_idx = j;
+                    break;
+                }
+            }
+
+            if (neighbor_idx != -1 && !visited[neighbor_idx]) {
+                DFS(neighbor, cluster, visited);
+            }
+        }
+    }
+}
+
+
+Cluster** transitionBound(int ell /* Bound */, TU **units, int k, int n, FILE *fp_out)
+{
+    int neighbor; //its not being used
+    srand(time(NULL));
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+
+    for (int i = 0; i < k; i++)
+    {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
+    
+    clusters = first_cluster (units, k, n);
+    //printf("here?!\n");
+    for (int i = 0; i < k; i++)
+    {
+        printf("Cluster %d with size %d: ", i, clusters[i].size);
+        for (int j = 0; j < clusters[i].size; j++)
+        {//
+            printf("%d ", clusters[i].units[j]->code);
+        }
+        printf("\n");
+    }
+ 
+    
+    for(int p = 0; p<4;p++) {
+        change_unit(clusters, units, k, n);
+        printf("--------------\n");
+        for (int i = 0; i < k; i++)
+        {
+            printf("Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++)
+            {
+                printf("%d ", clusters[i].units[j]->code);
+            }
+            printf("\n");
+        }
+    }
+    
+    for (int i = 0; i < k; i++)
+    {
+        //printf("i = %d\n", i);
+        fprintf(fp_out, "Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++)
+            {
+                //printf("j = %d\n", j);
+                fprintf(fp_out, "%d ", clusters[i].units[j]->code);
+            }
+            fprintf(fp_out, "\n");
+    }          
+    
+    fclose(fp_out);
+    return clusters;    
+}
+
+Cluster** storeState(Cluster *clusters, int k, int n)
+{
+    Cluster *stored_state = malloc(k * sizeof(Cluster));
+    for (int i = 0; i < k; i++)
+    {
+        stored_state[i].units = malloc(n * sizeof(TU *));
+        stored_state[i].size = 0;
+        for (int j = 0; j < clusters[i].size; j++) {
+            stored_state[i].units[j] = clusters[i].units[j];
+        }
+
+    }
+    return stored_state;
+}
+
+
+#include <stdlib.h>
+#include <stdio.h> 
+#include <stdbool.h>
+#include <limits.h>
+
+#include "state.h"
+#include "graph.h"
+
+
+struct Cluster;
+
+void population_bounds(TU **units, int margin, int *lower_bound, int *upper_bound, int k, int n) {
+    int population = 0;
+
+    for (int i = 0; i < n; i++) {
+        population += units[i]->voters;
+    }
+    
+    int ideal_population = population / k;
+
+    //int ideal_population = 80707; //distrito 01
+    //int  ideal_population = 77817; // ditrito 03
+
+    int bound = ((ideal_population * margin)/100);
+
+    *lower_bound = (ideal_population - bound);
+    *upper_bound = (ideal_population + bound);
+}
+
+
+int compactnesss(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        //printf("shared borders = %d\n",cluster->size);
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+
+                    shared_borders += unit->border_sizes[j];
+                    break;
+                }
+            }
+        }
+    }
+
+    return shared_borders;
+}
+
+int compactness(Cluster *cluster) {
+    int shared_borders = 0;
+    for (int i = 0; i < cluster->size; i++) {
+        TU *unit = cluster->units[i];
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            for (int k = 0; k < cluster->size; k++) {
+                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
+               
+                    if (unit->code < unit->neighbor_codes[j]) {
+                        shared_borders += unit->border_sizes[j];
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return shared_borders;
+}
+// diferença entre as fronteiras de populaçao
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+    int lower_bound, upper_bound;
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    //printf ("lower and upper = [%d, %d]\n", lower_bound, upper_bound);
+    long long total_difference = 0;
+    int min_diff = 0;
+    //printf("1-- total difference: %d\n", total_difference);
+    for (int i = 0; i < k; i++) {
+        int pop_cluster = 0;
+        //printf("%d\n",cluster[i].size);
+        for (int j = 0; j < cluster[i].size; j++) {
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+        }
+        if (pop_cluster > lower_bound && pop_cluster < upper_bound){
+            //min_diff = 0;
+            continue;
+        }
+
+        int lower_diff = abs(pop_cluster - lower_bound);
+        int upper_diff = abs(pop_cluster - upper_bound);
+
+        min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
+        //printf("min diff = %d and population = %d\n", min_diff, pop_cluster);
+        total_difference += (min_diff*2);
+        //printf("2-- total difference: %d\n", total_difference);
+    }
+    //printf("3-- total difference: %d\n", total_difference);
+    return total_difference;
+}
+
+// double energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+//     int total_population = 0;
+//     int ideal_population;
+//     int population_difference_sum = 0;
+
+//     for (int i = 0; i < n; i++) {
+//         total_population += units[i]->voters;
+//     }
+
+//     ideal_population = total_population / k;
+
+//     for (int i = 0; i < k; i++) {
+//         int pop_cluster = 0;
+
+//         for (int j = 0; j < cluster[i].size; j++) {
+//             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+//         }
+
+//         int population_difference = abs(pop_cluster - ideal_population);
+//         population_difference_sum += population_difference;
+//     }
+
+//     double average_population_difference = (double)population_difference_sum / k;
+//     double average_population_difference_percentage = (average_population_difference / ideal_population) * 100.0;
+//     //printf("average population difference percentage: %lf%%\n", average_population_difference_percentage);
+//     return average_population_difference_percentage;
+// }
+
+
+
+int energy_compactness(Cluster *clusters, int k) {
+    int total_shared_borders = 0;
+    
+    for (int i = 0; i < k; i++) {
+        //printf("cluster %d\n", i);
+        total_shared_borders += compactness(&clusters[i]);
+    }
+    //rintf("shared borders = %d\n", total_shared_borders);
+
+    return total_shared_borders;
+}
+
+int energy(TU **units, Cluster *cluster, int margin, int k, int n) {
+    int lower_bound, upper_bound;
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    
+    int total_difference = 0;
+    
+    for (int i = 0; i < k; i++) {
+        int pop_cluster = 0;
+
+        for (int j = 0; j < cluster[i].size; j++) {
+          
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+             
+        }
+        int difference = abs(pop_cluster - 80306);
+        total_difference += difference;
+    }
+
+    return total_difference;
+}
+int energy2(TU **units, Cluster *cluster, int margin, int k, int n)
+{
+    int population = 0;
+    //int margin = 15;
+    int lower_bound, upper_bound;
+
+    
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    int pop_cluster = 0;
+
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < cluster[i].size; j++)
+        {
+            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+        }
+        if(pop_cluster > upper_bound || pop_cluster < lower_bound)
+             return 0;
+        if(pop_cluster <= upper_bound && pop_cluster >= lower_bound)
+             continue;
+
+    }
+
+    return 1;
+}
+
+
+int is_neighbor (TU *unit1, TU *unit2) {
+    for (int i = 0; i < unit1->num_neighbors; i++){
+        if (unit1->neighbor_codes[i] == unit2->code)
+            return 1;
+    }
+    return 0;
+}
+
+
+Cluster** first_cluster(TU **units, int k, int n) {
+    srand(time(NULL));
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+    for (int i = 0; i < k; i++)
+    {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
+    int l = 0;
+    int unit_num;
+    
+    for (int i = 0; i < k; i++) {
+        //unit_num = rand() % n;
+        
+        do {
+            unit_num = rand() % n;
+            if (units[unit_num]->assigned == false) {
+                units[unit_num]->assigned = true; 
+                units[unit_num]->cluster_id = i;
+                clusters[i].units[0] = malloc(sizeof(TU));
+                clusters[i].units[0] = units[unit_num];
+                clusters[i].size = 1;
+                l++;
+            } else{
+                clusters[i].size = 0;             
+            }
+        } while(units[unit_num]->assigned == false || clusters[i].size == 0);
+    }
+    
+
+    for (int i = k; i < n; i++) {
+        unit_num = rand() % n;
+        while (units[unit_num]->assigned) {
+            unit_num = rand() % n;
+        }
+        
+        units[unit_num]->assigned = true;
+        int cluster_id = rand() % k;
+        int j = 0;
+        while (j < clusters[cluster_id].size) {
+            TU *unit = clusters[cluster_id].units[j];
+            if (is_neighbor(units[unit_num], unit)) {
+                clusters[cluster_id].units[clusters[cluster_id].size] = units[unit_num];
+                clusters[cluster_id].size++;
+                units[unit_num]->cluster_id = cluster_id;
+                break;
+            }
+            j++;
+        }
+        if (j == clusters[cluster_id].size) {
+            units[unit_num]->assigned = false;
+            i--;
+        }
+
+    }
+
+    return clusters;
+}
+
+
+void change_unit_x(Cluster *clusters, TU **units, int k) {
+    int cluster_idx = rand() % k;
+    //printf("old size %d\n", clusters[cluster_idx].size);
+    Cluster *cluster = &clusters[cluster_idx];
+
+    int unit_idx = rand() % cluster->size;
+    //printf("unit_idx = %d\n", unit_idx);
+    TU *unit = cluster->units[unit_idx];
+
+    // Check if unit is contiguous with at least one unit in other clusters
+    bool is_contiguous = false;
+    int new_cluster_idx = -1;
+    for (int i = 0; i < k; i++) {
+        if (i == cluster_idx) {
+            continue;  // Skip current cluster
+        }
+        Cluster *other_cluster = &clusters[i];
+        for (int j = 0; j < other_cluster->size; j++) {
+            TU *other_unit = other_cluster->units[j];
+            if (is_neighbor(unit, other_unit)) {
+                is_contiguous = true;
+                new_cluster_idx = i;
+                break;
+            }
+        }
+        if (is_contiguous) {
+            break;
+        }
+    }
+
+    // If unit is contiguous with at least one unit in another cluster, move it there
+    if (is_contiguous) {
+        Cluster *new_cluster = &clusters[new_cluster_idx];
+        new_cluster->units[new_cluster->size] = unit;
+        new_cluster->size++;
+        unit->cluster_id = new_cluster_idx;
+
+        // Remove unit from current cluster
+        for (int i = unit_idx; i < cluster->size - 1; i++) {
+            cluster->units[i] = cluster->units[i+1];
+        }
+        cluster->size--;
+    }
+}
+
+
+void change_unit(Cluster *clusters, TU **units, int k, int n) {
+    
+    //int cluster_idx = rand() % k;
+    int cluster_idx = 0;
+    
+
+    long long max_population = -1;
+    for (int i = 0; i < k; i++) {
+        long long cluster_population = 0;
+        for (int j = 0; j < clusters[i].size; j++) {
+            cluster_population += clusters[i].units[j]->voters;
+        }
+
+        if (cluster_population > max_population) {
+            max_population = cluster_population;
+            cluster_idx = i;
+        }
+    }
+    Cluster *cluster = &clusters[cluster_idx];
+  
+    while (cluster->size == 1) {
+        
+        
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+        
+    }
+
+    int unit_idx = rand() % cluster->size;
+    TU *unit = cluster->units[unit_idx];
+
+    bool is_contiguous = false;
+    int new_cluster_idx = -1;
+
+    // Shuffle the neighbor units to select a random neighbor.
+    int num_neighbors = unit->num_neighbors;
+    int *shuffled_indices = malloc(num_neighbors * sizeof(int));
+    for (int i = 0; i < num_neighbors; i++) {
+        shuffled_indices[i] = i;
+
+    }
+    for (int i = num_neighbors - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int temp = shuffled_indices[i];
+        shuffled_indices[i] = shuffled_indices[j];
+        shuffled_indices[j] = temp;
+    }
+
+    for (int i = 0; i < num_neighbors; i++) {
+        TU *neighbor = NULL;
+        for (int j = 0; j < n; j++) {
+            if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
+                neighbor = units[j];
+                break;
+            }
+        }
+        if (!neighbor) continue;
+
+        int other_cluster_idx = neighbor->cluster_id;
+        if (other_cluster_idx != cluster_idx) {
+            is_contiguous = true;
+            new_cluster_idx = other_cluster_idx;
+            break;
+        }
+    }
+
+    free(shuffled_indices);
+
+    if (is_contiguous) {
+       Cluster *new_cluster = &clusters[new_cluster_idx];
+        new_cluster->units[new_cluster->size] = unit;
+        new_cluster->size++;
+        unit->cluster_id = new_cluster_idx;
+
+        // Remove unit from current cluster
+        for (int i = unit_idx; i < cluster->size - 1; i++) {
+            cluster->units[i] = cluster->units[i+1];
+        }
+        cluster->size--;
+    }
+    else {
+
+    }
+ 
+}
+
+
+Cluster** transitionBound(int ell /* Bound */, TU **units, int k, int n, FILE *fp_out)
+{
+    int neighbor; //its not being used
+    srand(time(NULL));
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+
+    for (int i = 0; i < k; i++)
+    {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
+    
+    clusters = first_cluster (units, k, n);
+    //printf("here?!\n");
+    for (int i = 0; i < k; i++)
+    {
+        printf("Cluster %d with size %d: ", i, clusters[i].size);
+        for (int j = 0; j < clusters[i].size; j++)
+        {//
+            printf("%d ", clusters[i].units[j]->code);
+        }
+        printf("\n");
+    }
+ 
+    
+    for(int p = 0; p<4;p++) {
+        change_unit(clusters, units, k, n);
+        printf("--------------\n");
+        for (int i = 0; i < k; i++)
+        {
+            printf("Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++)
+            {
+                printf("%d ", clusters[i].units[j]->code);
+            }
+            printf("\n");
+        }
+    }
+    
+    for (int i = 0; i < k; i++)
+    {
+        //printf("i = %d\n", i);
+        fprintf(fp_out, "Cluster %d with size %d: ", i, clusters[i].size);
+            for (int j = 0; j < clusters[i].size; j++)
+            {
+                //printf("j = %d\n", j);
+                fprintf(fp_out, "%d ", clusters[i].units[j]->code);
+            }
+            fprintf(fp_out, "\n");
+    }          
+    
+    fclose(fp_out);
+    return clusters;    
+}
+
+Cluster** storeState(Cluster *clusters, int k, int n)
+{
+    Cluster *stored_state = malloc(k * sizeof(Cluster));
+    for (int i = 0; i < k; i++)
+    {
+        stored_state[i].units = malloc(n * sizeof(TU *));
+        stored_state[i].size = 0;
+        for (int j = 0; j < clusters[i].size; j++) {
+            stored_state[i].units[j] = clusters[i].units[j];
+        }
+
+    }
+    return stored_state;
+}
+
+// int runSA(double Tstart, /* [in] starting temperature */
+//           double Tstop,  /* [in] stopping temperature */
+//           int batch,     /* [in] number of iterations in a batch */
+//           int steps,     /* [in] number of steps to execute */
+//           TU **units, int k, int n, int m)
+// {
+//   printf("\nSA start!\n\n");
+
+//   int max = 0;
+//   double T = Tstart;
+//   double Td = Tstop - Tstart;
+//   Td /= steps;
+
+//   int ell = 1; /* Default value for greedy */
+//   unsigned int R;
+//   srand(time(NULL));
+//   FILE *output_file = fopen("output.txt", "w");
+//   fprintf(output_file, "%d;%d;%d\n", k, n, steps);
+//   Cluster *clusters = first_cluster(units, k, n);
+//   Cluster *best_clusters = NULL;
+
+//   for (int i = 0; i < k; i++)
+//   {
+
+//     fprintf(output_file, "0,%d:", i);
+//     for (int j = 0; j < clusters[i].size; j++)
+//     {
+//       int unit_code = clusters[i].units[j]->code / 1;
+
+//       fprintf(output_file, "%d,", unit_code);
+//     }
+
+//     fprintf(output_file, "\n");
+//   }
+
+//   double best_energy_population = 100.0;
+//   int best_energy_compactness = INT_MIN;
+//   double Final_energy_population = 100.0;
+//   int Final_energy_compactness = INT_MIN;
+//   Cluster *stored_state = NULL;
+//   for (int i = 0; i < k; i++)
+//   {
+//     printf("Cluster %d with size %d: ", i, clusters[i].size);
+//     for (int j = 0; j < clusters[i].size; j++)
+//     {
+//       printf("%d ", clusters[i].units[j]->code);
+//     }
+//     printf("\n");
+//   }
+//   //printf("Tstart: %f, Tstop: %f, steps: %d\n", Tstart, Tstop, steps);
+//   double ratio = Tstop / Tstart;
+//   //printf("ratio: %f\n", ratio);
+//   double exponent = 1.0 / steps;
+//   //printf("exponent: %f\n", exponent);
+//   double alpha = pow(ratio, exponent);
+//   //printf("alpha: %f\n", alpha);
+
+//   for (int s = 1; s <= steps; s++)
+//   {
+
+//     ell = getEll(T, &R); // E(s)
+//     FILE *fp_out = fopen("cluster_info.txt", "w");
+//     change_unit(clusters, units, k, n);
+
+//     double energy__population = energy_population(units, clusters, m, k, n);
+//     int energy__compactness = energy_compactness(clusters, k);
+
+//     double accept_prob = 0.0;
+
+//     if (energy__compactness > best_energy_compactness && energy__population < 15.0)
+//     {
+//       accept_prob = 1.0;
+//     }
+//     else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
+//     {
+//       accept_prob = exp(-T);
+//     }
+//     else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population)
+//     {
+//       accept_prob = exp(-T);
+//     }
+//     else
+//     {
+
+//       accept_prob = 0.0;
+//     }
+
+//     double random_number = (double)rand() / (double)RAND_MAX;
+//     if (random_number < accept_prob)
+//     {
+//       if ((energy__compactness > Final_energy_compactness && energy__population <= Final_energy_population) ||
+//       (energy__compactness >= Final_energy_compactness && energy__population < Final_energy_population))
+//       {
+//         Final_energy_compactness = energy__compactness;
+//         Final_energy_population = energy__population;
+
+//         if (best_clusters == NULL)
+//         {
+//           best_clusters = malloc(k * sizeof(Cluster));
+//           for (int i = 0; i < k; i++)
+//           {
+//             best_clusters[i].units = malloc(n * sizeof(TU *));
+//             best_clusters[i].size = 0;
+//           }
+//         }
+//         for (int i = 0; i < k; i++)
+//         {
+//           best_clusters[i].size = clusters[i].size;
+//           memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+//         }
+//       }
+
+//       best_energy_compactness = energy__compactness;
+//       best_energy_population = energy__population;
+
+//       // if (best_clusters == NULL)
+//       // {
+//       //   best_clusters = malloc(k * sizeof(Cluster));
+//       //   for (int i = 0; i < k; i++)
+//       //   {
+//       //     best_clusters[i].units = malloc(n * sizeof(TU *));
+//       //     best_clusters[i].size = 0;
+//       //   }
+//       // }
+//       for (int i = 0; i < k; i++)
+//       {
+//         // best_clusters[i].size = clusters[i].size;
+//         // memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+//         int pop_cluster = 0;
+//         fprintf(output_file, "%d,%d:", s, i);
+//         for (int j = 0; j < clusters[i].size; j++)
+//         {
+//           pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+//           int unit_code = clusters[i].units[j]->code / 1;
+//           fprintf(output_file, "%d,", unit_code);
+//         }
+//         fprintf(output_file, " --> população: %d", pop_cluster);
+//         fprintf(output_file, "\n");
+//       }
+//       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
+//       fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
+
+//       stored_state = storeState(clusters, k, n);
+//     }
+//     T *= alpha;
+//     // T =+ Td;
+//   }
+//   printf("compact: %d pop: %lf", Final_energy_compactness, Final_energy_population);
+//   print_best_clusters(best_clusters, k, output_file);
+//   for (int i = 0; i < k; i++)
+//   {
+//     free(best_clusters[i].units);
+//   }
+//   free(best_clusters);
+//   fclose(output_file);
+
+//   printf("\n");
+//   printf("SA end!\n");
+
+//   return;
+// }
+
+
+
+
+#include <time.h>
+#include <math.h>
+#include <assert.h>
+#include <bsd/stdlib.h>
+#include <limits.h>
+
+#include "sa.h"
+#include "state.h"
+#include "graph.h"
+#include "timer.h"
+
+static int
+myRandom(void)
+{
+  return random();
+}
+
+/* Used for defining calibration values */
+double
+getTemperature(double cp, /* complement probability */
+               int ell    /* Energy delta limit. -0.5 done internally */
+)
+{
+  assert(0 >= ell &&
+         "Invalid d to define T.");
+  assert(0.5 > cp &&
+         "Invalid complement probability to define T.");
+
+  double res = cp;
+  res /= 1.0 - cp;
+  res = log2(res);
+  res /= ((double)ell) - 0.5;
+
+  return res;
+}
+
+int                     // Energy delta
+getEll(double T,        /* [in] the temperature */
+       unsigned int *pR /* [out] the random number that was obtained */
+)
+{
+  double c = 1.0;
+
+  *pR = arc4random();
+  // *pR = myRandom();
+  // randvariavel
+  unsigned int R = *pR;
+
+  if (0 != R)
+  {
+    c = log2(-R);
+    c -= log2(R);
+    c /= T;
+    c = round(c);
+  }
+
+  return (int)c; // deltaE
+}
+
+void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
+{
+  int total_population = 0;
+  double max_population_deviation_percentage = 0.0;
+  double final_population_deviation = 0.0;
+  int total_deviation = 0;
+  int max_deviation = 0;
+  double deviation_percentage = 0.0;
+  
+  // ideal_population = total_population / k;
+
+  //ideal_population = 80707; // distrito 01
+  //ideal_population = 77817; // ditrito 03
+  //ideal_population = 
+  //ideal_population = 76019; //06
+
+
+  printf("ideal pop: %d\n", ideal_population);
+  fprintf(output_file, "\nBest solution found:\n");
+  printf("Best solution found:\n");
+  for (int i = 0; i < k; i++)
+  {
+    int pop_cluster = 0;
+    printf("%d:", i);
+    fprintf(output_file, "%d:", i);
+    for (int j = 0; j < best_clusters[i].size; j++)
+    {
+      pop_cluster = pop_cluster + best_clusters[i].units[j]->voters;
+      int unit_code = best_clusters[i].units[j]->code / 1;
+      printf("%d,", unit_code);
+      fprintf(output_file, "%d,", unit_code);
+    }
+    printf(" --> população: %d", pop_cluster);
+    printf("\n");
+    fprintf(output_file, " --> população: %d", pop_cluster);
+    fprintf(output_file, "\n");
+
+    int deviation = abs(pop_cluster - ideal_population);
+    printf("deviation: %d\n", deviation);
+    if (deviation > max_deviation) {
+      max_deviation = deviation;
+    }
+   
+    deviation_percentage = ((double)max_deviation / ideal_population) * 100.0;
+
+    // if (deviation_percentage > max_population_deviation_percentage) {
+    //     max_population_deviation_percentage = deviation_percentage;
+    // }
+  }
+
+  // final_population_deviation = ((double)total_deviation / (k * ideal_population)) * 100.0;
+
+  printf("final population deviation to theoretical best value: %lf%%\n", deviation_percentage);
+  fprintf(output_file, "final population deviation to theoretical best value: %lf%%\n", deviation_percentage);
+
+  printf("maximum deviation of population between electoral districts: %lf%%\n", deviation_percentage);
+  fprintf(output_file, "maximum deviation of population between electoral districts: %lf%%\n", deviation_percentage);
+
+  int energy__compactness = energy_compactness(best_clusters, k);
+  printf("fronteiras internas: %d\n\n", energy__compactness);
+  fprintf(output_file, "fronteiras internas: %d\n\n", energy__compactness);
+}
+
+int runSA(double Tstart, /* [in] starting temperature */
+          double Tstop,  /* [in] stopping temperature */
+          int batch,     /* [in] number of iterations in a batch */
+          int steps,     /* [in] number of steps to execute */
+          TU **units, int k, int n, int m, int ideal_pop)
+{
+ 
+  printf("\nSA start!\n\n");
+
+  int max = 0;
+  double T = Tstart;
+  double Td = Tstop - Tstart;
+  Td /= steps;
+
+  int ell = 1; /* Default value for greedy */
+  unsigned int R;
+  srand(time(NULL));
+  FILE *output_file = fopen("output.txt", "w");
+  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
+  Cluster *clusters = first_cluster(units, k, n);
+  Cluster *best_clusters = NULL;
+
+  for (int i = 0; i < k; i++)
+  {
+
+    fprintf(output_file, "0,%d:", i);
+    for (int j = 0; j < clusters[i].size; j++)
+    {
+      int unit_code = clusters[i].units[j]->code / 1;
+
+      fprintf(output_file, "%d,", unit_code);
+    }
+
+    fprintf(output_file, "\n");
+  }
+
+  long long best_energy_population = LONG_MAX;
+  int best_energy_compactness = INT_MIN;
+  long long Final_energy_population = LONG_MAX;
+  int Final_energy_compactness = INT_MIN;
+  Cluster *stored_state = NULL;
+  for (int i = 0; i < k; i++)
+  {
+    printf("Cluster %d with size %d: ", i, clusters[i].size);
+    for (int j = 0; j < clusters[i].size; j++)
+    {
+      printf("%d ", clusters[i].units[j]->code);
+    }
+    printf("\n");
+  }
+  double ratio = Tstop / Tstart;
+  double exponent = 1.0 / steps;
+  double alpha = pow(ratio, exponent);
+
+
+  for (int s = 1; s <= steps; s++)
+  {
+    if (s%100000==0)
+      printf("iteratio: %d\n", s);
+
+    ell = getEll(T, &R); // E(s)
+    FILE *fp_out = fopen("cluster_info.txt", "w");
+    change_unit(clusters, units, k, n);
+
+    long long energy__population = energy_population(units, clusters, m, k, n);
+    int energy__compactness = energy_compactness(clusters, k);
+
+    double accept_prob = 0.0;
+
+    if (energy__compactness > best_energy_compactness && energy__population == 0)
+    {
+      accept_prob = 1.0;
+    }
+    else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
+    {
+      accept_prob = exp(-T);
+    }
+    else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population)
+    {
+      accept_prob = exp(-T);
+    }
+    else
+    {
+
+      accept_prob = 0.0;
+    }
+
+    double random_number = (double)rand() / (double)RAND_MAX;
+    if (random_number < accept_prob)
+    {
+      if ((energy__compactness > Final_energy_compactness && energy__population <= Final_energy_population) ||
+      (energy__compactness >= Final_energy_compactness && energy__population < Final_energy_population))
+      {
+        Final_energy_compactness = energy__compactness;
+        Final_energy_population = energy__population;
+
+        if (best_clusters == NULL)
+        {
+          best_clusters = malloc(k * sizeof(Cluster));
+          for (int i = 0; i < k; i++)
+          {
+            best_clusters[i].units = malloc(n * sizeof(TU *));
+            best_clusters[i].size = 0;
+          }
+        }
+        for (int i = 0; i < k; i++)
+        {
+          best_clusters[i].size = clusters[i].size;
+          memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+        }
+      }
+
+      best_energy_compactness = energy__compactness;
+      best_energy_population = energy__population;
+
+      for (int i = 0; i < k; i++)
+      {
+        int pop_cluster = 0;
+        fprintf(output_file, "%d,%d:", s, i);
+        for (int j = 0; j < clusters[i].size; j++)
+        {
+          pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+          int unit_code = clusters[i].units[j]->code / 1;
+          fprintf(output_file, "%d,", unit_code);
+        }
+        fprintf(output_file, " --> população: %d", pop_cluster);
+        fprintf(output_file, "\n");
+      }
+      fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
+      fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
+      
+      stored_state = storeState(clusters, k, n);
+    }
+    T *= alpha;
+    // T =+ Td;
+  }
+
+  if(best_clusters != NULL){
+    print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+    for (int i = 0; i < k; i++)
+    {
+      free(best_clusters[i].units);
+    }
+    free(best_clusters);
+  }
+  fclose(output_file);
+
+  printf("\n");
+  printf("SA end!\n");
+
+  return;
+}
+
+// int energy(TU **units, Cluster *cluster, int margin, int k, int n) {
+//     int lower_bound, upper_bound;
+//     population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    
+//     int total_difference = 0;
+    
+//     for (int i = 0; i < k; i++) {
+//         int pop_cluster = 0;
+
+//         for (int j = 0; j < cluster[i].size; j++) {
+          
+//             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+             
+//         }
+//         int difference = abs(pop_cluster - 80306);
+//         total_difference += difference;
+//     }
+
+//     return total_difference;
+// }
+// int energy2(TU **units, Cluster *cluster, int margin, int k, int n)
+// {
+//     int population = 0;
+//     //int margin = 15;
+//     int lower_bound, upper_bound;
+
+    
+//     population_bounds(units, margin, &lower_bound, &upper_bound, k, n,);
+//     int pop_cluster = 0;
+
+//     for (int i = 0; i < k; i++)
+//     {
+//         for (int j = 0; j < cluster[i].size; j++)
+//         {
+//             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+//         }
+//         if(pop_cluster > upper_bound || pop_cluster < lower_bound)
+//              return 0;
+//         if(pop_cluster <= upper_bound && pop_cluster >= lower_bound)
+//              continue;
+
+//     }
+
+//     return 1;
+// }
+
+// // double energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+// //     int total_population = 0;
+// //     int ideal_population;
+// //     int population_difference_sum = 0;
+
+// //     for (int i = 0; i < n; i++) {
+// //         total_population += units[i]->voters;
+// //     }
+
+// //     ideal_population = total_population / k;
+
+// //     for (int i = 0; i < k; i++) {
+// //         int pop_cluster = 0;
+
+// //         for (int j = 0; j < cluster[i].size; j++) {
+// //             pop_cluster = pop_cluster + cluster[i].units[j]->voters;
+// //         }
+
+// //         int population_difference = abs(pop_cluster - ideal_population);
+// //         population_difference_sum += population_difference;
+// //     }
+
+// //     double average_population_difference = (double)population_difference_sum / k;
+// //     double average_population_difference_percentage = (average_population_difference / ideal_population) * 100.0;
+// //     //printf("average population difference percentage: %lf%%\n", average_population_difference_percentage);
+// //     return average_population_difference_percentage;
+// // }
+
+
+
+
+
+void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp, int ideal_population)
+{
+    int lb = 0.75 * ideal_population;
+    int ub = 1.25 * ideal_population;
+
+    for (int cluster = 0; cluster < k; cluster++)
+    {
+        int *row_indices = (int *)malloc(n * sizeof(int));
+        int *values = (int *)malloc(n * sizeof(int));
+
+        for (int i = 0; i < n; i++)
+        {
+            char var_name[32];
+            snprintf(var_name, sizeof(var_name), "x_%d_%d", i, cluster);
+            values[i] = units[i]->voters;
+
+            int col_index = CPXgetcolindex(env, lp, var_name, NULL);
+            if (col_index < 0)
+            {
+                fprintf(stderr, "Failed to get column index for x_%d.\n", i);
+                exit(1);
+            }
+            row_indices[i] = col_index;
+        }
+
+        int status = CPXaddrows(env, lp, 0, 1, n, &lb, NULL, row_indices, values, &ub, NULL, NULL);
+        if (status)
+        {
+            fprintf(stderr, "Failed to add population constraints for cluster %d.\n", cluster);
+            exit(1);
+        }
+
+        free(row_indices);
+        free(values);
+    }
+}
+
+void add_compactness_constraints(TU **units, int n, int num_vars, CPXENVptr env, CPXLPptr lp)
+{
+    int lb = 0.0;
+    int ub = CPX_INFBOUND;
+    int *row_indices = (int *)malloc(num_vars * sizeof(int));
+    int *values = (int *)malloc(num_vars * sizeof(int));
+
+    for (int i = 0, var_idx = 0; i < n; i++)
+    {
+        for (int j = 0; j < units[i]->num_neighbors; j++)
+        {
+            int neighbor_index = units[i]->neighbor_codes[j];
+            if (i < neighbor_index)
+            {
+                char var_name[32];
+                snprintf(var_name, sizeof(var_name), "x_%d_%d", i, neighbor_index);
+
+                int col_index = CPXgetcolindex(env, lp, var_name, NULL);
+                if (col_index < 0)
+                {
+                    fprintf(stderr, "Failed to get column index for %s.\n", var_name);
+                    exit(1);
+                }
+
+                row_indices[var_idx] = col_index;
+                values[var_idx] = units[i]->border_sizes[j];
+                var_idx++;
+            }
+        }
+    }
+
+    // Maximize the sum of internal borders between units in each cluster
+    int status = CPXaddrows(env, lp, 0, 1, num_vars, &lb, NULL, row_indices, values, &ub, NULL, NULL);
+    if (status)
+    {
+        fprintf(stderr, "Failed to add compactness constraints.\n");
+        exit(1);
+    }
+
+    free(row_indices);
+    free(values);
+}
+
+void create_flow_decision_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < units[i]->num_neighbors; j++)
+        {
+            int neighbor_code = units[i]->neighbor_codes[j];
+            int neighbor_index = -1;
+            // Find the neighbor's index using its code
+            for (int l = 0; l < n; l++)
+            {
+                if (units[l]->code == neighbor_code)
+                {
+                    neighbor_index = units[l]->unit_id;
+                    break;
+                }
+            }
+            if (neighbor_index == -1)
+            {
+                fprintf(stderr, "Failed to find unit with code %d.\n", neighbor_code);
+                exit(1);
+            }
+            if (i < neighbor_index)
+            {
+                for (int cluster = 0; cluster < k; cluster++)
+                {
+                    char *var_name[1];
+                    var_name[0] = (char *)malloc(32 * sizeof(char));
+                    snprintf(var_name[0], 32, "f_%d_%d_%d", i, neighbor_index, cluster); // Use f_ijk
+
+                    double lb = 0.0;
+                    double ub = 1.0; // binary variable
+                    double obj_coef = 0.0;
+
+                    int col_index = CPXnewcols(env, lp, 1, &obj_coef, &lb, &ub, "B", var_name); // binary variable
+
+                    if (col_index < 0)
+                    {
+                        fprintf(stderr, "Failed to create decision variable %s.\n", var_name[0]);
+                        exit(1);
+                    }
+                    free(var_name[0]);
+                }
+            }
+        }
+    }
+}
+
+
+
+// void add_unit_assignment_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
+// {
+//     // Adding constraint (i)
+//     for (int cluster = 0; cluster < k; cluster++)
+//     {
+//         int *indices = (int *)malloc(n * sizeof(int));
+//         double *values = (double *)malloc(n * sizeof(double));
+
+//         for (int unit = 0; unit < n; unit++)
+//         {
+//             char var_name[32];
+//             snprintf(var_name, sizeof(var_name), "x_%d_%d", cluster, unit);
+
+//             int col_index;
+//             int status = CPXgetcolindex(env, lp, var_name, &col_index);
+//             if (status)
+//             {
+//                 fprintf(stderr, "Failed to get column index for %s.\n", var_name);
+//                 exit(1);
+//             }
+//             indices[unit] = col_index;
+//             values[unit] = 1.0;
+//         }
+
+//         double rhs = 1.0;
+//         char sense = 'E';
+//         int matbeg = 0;
+//         int status = CPXaddrows(env, lp, 0, 1, n, &rhs, &sense, &matbeg, indices, values, NULL, NULL);
+//         if (status)
+//         {
+//             fprintf(stderr, "Failed to add unit assignment constraints.\n");
+//             exit(1);
+//         }
+
+//         free(indices);
+//         free(values);
+//     }
+
+//     // Adding constraint (ii)
+// for (int unit = 0; unit < n; unit++)
+// {
+//     int *indices = (int *)malloc(k * sizeof(int));
+//     double *values = (double *)malloc(k * sizeof(double));
+
+//     for (int cluster = 0; cluster < k; cluster++)
+//     {
+//         char var_name[32];
+//         snprintf(var_name, sizeof(var_name), "x_%d_%d", cluster, unit);
+
+//         int col_index;
+//         int status = CPXgetcolindex(env, lp, var_name, &col_index);
+//         if (status)
+//         {
+//             fprintf(stderr, "Failed to get column index for %s.\n", var_name);
+//             exit(1);
+//         }
+//         indices[cluster] = col_index;
+//         values[cluster] = 1.0;
+//     }
+
+//     double rhs = 1.0;
+//     char sense = 'E';  // Corrected here
+//     int matbeg = 0;
+//     int status = CPXaddrows(env, lp, 0, 1, k, &rhs, &sense, &matbeg, indices, values, NULL, NULL);
+//     if (status)
+//     {
+//         fprintf(stderr, "Failed to add district assignment constraints.\n");
+//         exit(1);
+//     }
+
+//     free(indices);
+//     free(values);
+// }
+
+// }
