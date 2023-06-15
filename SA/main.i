@@ -2753,6 +2753,9 @@ typedef struct TU{
 # 16 "graph.h"
         assigned;
     int cluster_id;
+    int visited;
+    int unit_id;
+    int* neighbor_ids;
 } TU;
 
 TU** graph (char* fp, int* d, int* k, int* n, int* m);
@@ -2785,7 +2788,7 @@ runSA(double Tstart,
       double Tstop,
       int batch,
       int steps,
-      TU** units, int k, int n, int m
+      TU** units, int k, int n, int m, int populacao_ideal
       );
 # 9 "main.c" 2
 # 1 "state.h" 1
@@ -2799,7 +2802,10 @@ typedef struct
     int size;
     int population;
 } Cluster;
-long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+
+int _pop_ideal(int d);
+void popul_test1(TU **units, int n, int k, int ideal_pop);
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_pop);
 int energy_compactness(Cluster *clusters, int k);
 
 int
@@ -2832,12 +2838,12 @@ main(int argc,
      char **argv
      )
 {
-  double cp_start = 0.009;
+  double cp_start = 0.09;
   int d_start = -1;
   double cp_end = 0.01;
-  int d_end = -3;
+  int d_end = -1;
   int bp = 1;
-  int sp = 7;
+  int sp = 1;
 
   startTimer();
 
@@ -2864,16 +2870,19 @@ main(int argc,
 
     units = graph(filename, &d, &k, &n, &m);
 
-    printf("SA(bp=%d)\n", 1<<sp);
+    int populacao_ideal = _pop_ideal(d);
+
+
+    printf("SA(sp=%d) and pop: %d\n", 1<<sp, populacao_ideal);
 
     runSA(
    getTemperature(cp_start, d_start),
    getTemperature(cp_end, d_end),
    1<<bp,
-   1<<sp , units, k, n, m
+   1<<sp , units, k, n, m, populacao_ideal
 
    );
-# 69 "main.c"
+# 72 "main.c"
   free(units);
 
   return 0;

@@ -71,7 +71,7 @@ graph:
 	call	fgets@PLT
 	testq	%rax, %rax
 	je	.L75
-	movl	$40, %edi
+	movl	$56, %edi
 	call	malloc@PLT
 	movq	%rax, %rbx
 	movq	%r12, %rax

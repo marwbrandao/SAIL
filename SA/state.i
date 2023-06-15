@@ -2353,6 +2353,45 @@ fread_unlocked (void *__restrict __ptr, size_t __size, size_t __n,
 # 3 "state.c" 2
 # 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h" 1 3 4
 # 4 "state.c" 2
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 34 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 1 3 4
+
+
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 194 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/include/limits.h" 1 3 4
+# 26 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
+# 27 "/usr/include/limits.h" 2 3 4
+# 183 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 28 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 161 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 1 3 4
+# 38 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 3 4
+# 1 "/usr/include/linux/limits.h" 1 3 4
+# 39 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 2 3 4
+# 162 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 184 "/usr/include/limits.h" 2 3 4
+
+
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix2_lim.h" 1 3 4
+# 188 "/usr/include/limits.h" 2 3 4
+# 195 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 8 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 2 3 4
+# 35 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 5 "state.c" 2
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/float.h" 1 3 4
+# 6 "state.c" 2
+
 
 # 1 "state.h" 1
 
@@ -2374,6 +2413,9 @@ typedef struct TU{
 # 16 "graph.h"
         assigned;
     int cluster_id;
+    int visited;
+    int unit_id;
+    int* neighbor_ids;
 } TU;
 
 TU** graph (char* fp, int* d, int* k, int* n, int* m);
@@ -2387,7 +2429,10 @@ typedef struct
     int size;
     int population;
 } Cluster;
-long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
+
+int _pop_ideal(int d);
+void popul_test1(TU **units, int n, int k, int ideal_pop);
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_pop);
 int energy_compactness(Cluster *clusters, int k);
 
 int
@@ -2402,20 +2447,90 @@ transitionBound(int ell , TU** units, int k, int n, FILE *pf_out
 
 
 Cluster** storeState(Cluster *clusters, int k, int n);
-# 6 "state.c" 2
+# 9 "state.c" 2
+
 
 
 struct Cluster;
-
-void population_bounds(TU **units, int margin, int *lower_bound, int *upper_bound, int k, int n) {
-    int population = 0;
-
-    for (int i = 0; i < n; i++) {
-        population += units[i]->voters;
+int _pop_ideal(int d) {
+    switch (d)
+    {
+    case 1:
+        return 80707;
+        break;
+    case 2:
+        return 61494;
+        break;
+    case 3:
+        return 77817;
+        break;
+    case 4:
+        return 70771;
+        break;
+    case 5:
+        return 85038;
+        break;
+    case 6:
+        return 76019;
+        break;
+    case 7:
+        return 68348;
+        break;
+    case 8:
+        return 75360;
+        break;
+    case 9:
+        return 75768;
+        break;
+    case 10:
+        return 83049;
+        break;
+    case 11:
+        return 80044;
+        break;
+    case 12:
+        return 96391;
+        break;
+    case 13:
+        return 79739;
+        break;
+    case 14:
+        return 76178;
+        break;
+    case 15:
+        return 81908;
+        break;
+    case 16:
+        return 80306;
+        break;
+    case 17:
+        return 73029;
+        break;
+    case 18:
+        return 86991;
+        break;
+    default:
+        break;
     }
+}
 
+void popul_test1(TU **units, int n, int k, int ideal_pop) {
+    int pop=0;
+    for(int i = 0; i < n; i++) {
+        pop += units[i]->voters;
+    }
+    printf("populacao total: %d\n", pop);
+    pop = pop/k;
+    printf("populacao ideal deste dist: %d\n", pop);
 
-    int ideal_population = population / k;
+    int lower_marg = ideal_pop*.85;
+    int upper_marg = ideal_pop*1.15;
+
+    printf("populacao ideal do tiago: %d com margens de %d e %d\n", ideal_pop, lower_marg, upper_marg);
+
+}
+
+void population_bounds(TU **units, int margin, int *lower_bound, int *upper_bound, int k, int n, int ideal_population) {
     int bound = ((ideal_population * margin)/100);
 
     *lower_bound = (ideal_population - bound);
@@ -2423,7 +2538,7 @@ void population_bounds(TU **units, int margin, int *lower_bound, int *upper_boun
 }
 
 
-int compactnesss(Cluster *cluster) {
+int compactness_s(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
         TU *unit = cluster->units[i];
@@ -2450,9 +2565,7 @@ int compactness(Cluster *cluster) {
             for (int k = 0; k < cluster->size; k++) {
                 if (unit->neighbor_codes[j] == cluster->units[k]->code) {
 
-
                     if (unit->code < unit->neighbor_codes[j]) {
-
                         shared_borders += unit->border_sizes[j];
                     }
                     break;
@@ -2463,9 +2576,9 @@ int compactness(Cluster *cluster) {
     return shared_borders;
 }
 
-long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n) {
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_population) {
     int lower_bound, upper_bound;
-    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
+    population_bounds(units, margin, &lower_bound, &upper_bound, k, n, ideal_population);
 
     long long total_difference = 0;
     int min_diff = 0;
@@ -2493,6 +2606,7 @@ long long energy_population(TU **units, Cluster *cluster, int margin, int k, int
     return total_difference;
 }
 
+
 int energy_compactness(Cluster *clusters, int k) {
     int total_shared_borders = 0;
 
@@ -2503,52 +2617,6 @@ int energy_compactness(Cluster *clusters, int k) {
 
 
     return total_shared_borders;
-}
-
-int energy(TU **units, Cluster *cluster, int margin, int k, int n) {
-    int lower_bound, upper_bound;
-    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
-
-    int total_difference = 0;
-
-    for (int i = 0; i < k; i++) {
-        int pop_cluster = 0;
-
-        for (int j = 0; j < cluster[i].size; j++) {
-
-            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
-
-        }
-        int difference = abs(pop_cluster - 80306);
-        total_difference += difference;
-    }
-
-    return total_difference;
-}
-int energy2(TU **units, Cluster *cluster, int margin, int k, int n)
-{
-    int population = 0;
-
-    int lower_bound, upper_bound;
-
-
-    population_bounds(units, margin, &lower_bound, &upper_bound, k, n);
-    int pop_cluster = 0;
-
-    for (int i = 0; i < k; i++)
-    {
-        for (int j = 0; j < cluster[i].size; j++)
-        {
-            pop_cluster = pop_cluster + cluster[i].units[j]->voters;
-        }
-        if(pop_cluster > upper_bound || pop_cluster < lower_bound)
-             return 0;
-        if(pop_cluster <= upper_bound && pop_cluster >= lower_bound)
-             continue;
-
-    }
-
-    return 1;
 }
 
 
@@ -2563,9 +2631,9 @@ int is_neighbor (TU *unit1, TU *unit2) {
 
 Cluster** first_cluster(TU **units, int k, int n) {
     srand(time(
-# 165 "state.c" 3 4
+# 191 "state.c" 3 4
               ((void *)0)
-# 165 "state.c"
+# 191 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
     for (int i = 0; i < k; i++)
@@ -2582,14 +2650,14 @@ Cluster** first_cluster(TU **units, int k, int n) {
         do {
             unit_num = rand() % n;
             if (units[unit_num]->assigned == 
-# 180 "state.c" 3 4
+# 206 "state.c" 3 4
                                             0
-# 180 "state.c"
+# 206 "state.c"
                                                  ) {
                 units[unit_num]->assigned = 
-# 181 "state.c" 3 4
+# 207 "state.c" 3 4
                                            1
-# 181 "state.c"
+# 207 "state.c"
                                                ;
                 units[unit_num]->cluster_id = i;
                 clusters[i].units[0] = malloc(sizeof(TU));
@@ -2600,9 +2668,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
                 clusters[i].size = 0;
             }
         } while(units[unit_num]->assigned == 
-# 190 "state.c" 3 4
+# 216 "state.c" 3 4
                                             0 
-# 190 "state.c"
+# 216 "state.c"
                                                   || clusters[i].size == 0);
     }
 
@@ -2614,9 +2682,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
 
         units[unit_num]->assigned = 
-# 200 "state.c" 3 4
+# 226 "state.c" 3 4
                                    1
-# 200 "state.c"
+# 226 "state.c"
                                        ;
         int cluster_id = rand() % k;
         int j = 0;
@@ -2632,9 +2700,9 @@ Cluster** first_cluster(TU **units, int k, int n) {
         }
         if (j == clusters[cluster_id].size) {
             units[unit_num]->assigned = 
-# 214 "state.c" 3 4
+# 240 "state.c" 3 4
                                        0
-# 214 "state.c"
+# 240 "state.c"
                                             ;
             i--;
         }
@@ -2645,155 +2713,537 @@ Cluster** first_cluster(TU **units, int k, int n) {
 }
 
 
-void change_unit_x(Cluster *clusters, TU **units, int k) {
-    int cluster_idx = rand() % k;
+void reset_visited(Cluster *cluster) {
+    for (int i = 0; i < cluster->size; i++) {
+        cluster->units[i]->visited = 0;
+    }
+}
 
-    Cluster *cluster = &clusters[cluster_idx];
-
-
-
-
-
-    int unit_idx = rand() % cluster->size;
-
-    TU *unit = cluster->units[unit_idx];
-
-
-    
-# 238 "state.c" 3 4
-   _Bool 
-# 238 "state.c"
-        is_contiguous = 
-# 238 "state.c" 3 4
-                        0
-# 238 "state.c"
-                             ;
-    int new_cluster_idx = -1;
-    for (int i = 0; i < k; i++) {
-        if (i == cluster_idx) {
-            continue;
+int has_neighbor_in_cluster(TU *unit, Cluster *cluster) {
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        for (int j = 0; j < cluster->size; j++) {
+            if (unit->neighbor_codes[i] == cluster->units[j]->code) {
+                return 1;
+            }
         }
-        Cluster *other_cluster = &clusters[i];
-        for (int j = 0; j < other_cluster->size; j++) {
-            TU *other_unit = other_cluster->units[j];
-            if (is_neighbor(unit, other_unit)) {
-                is_contiguous = 
-# 248 "state.c" 3 4
-                               1
-# 248 "state.c"
-                                   ;
-                new_cluster_idx = i;
+    }
+    return 0;
+}
+
+
+int are_neighbors_contiguous00(TU *unit, Cluster *cluster) {
+    printf("Checking if neighbors of unit %d are contiguous\n", unit->code);
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        TU *neighbor1 = 
+# 271 "state.c" 3 4
+                       ((void *)0)
+# 271 "state.c"
+                           ;
+        for (int j = 0; j < cluster->size; j++) {
+            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor1 = cluster->units[j];
                 break;
             }
         }
-        if (is_contiguous) {
+        if (!neighbor1) continue;
+        printf("Found neighbor1: %d\n", neighbor1->code);
+        for (int j = i + 1; j < unit->num_neighbors; j++) {
+            TU *neighbor2 = 
+# 281 "state.c" 3 4
+                           ((void *)0)
+# 281 "state.c"
+                               ;
+            for (int k = 0; k < cluster->size; k++) {
+                if (cluster->units[k]->code == unit->neighbor_codes[j]) {
+                    neighbor2 = cluster->units[k];
+                    break;
+                }
+            }
+            if (!neighbor2) continue;
+            printf("Found neighbor2: %d\n", neighbor2->code);
+            for (int k = 0; k < neighbor1->num_neighbors; k++) {
+                if (neighbor1->neighbor_codes[k] == neighbor2->code) {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void dfs_check_neighbors(int unit_index, Cluster *cluster, int *visited) {
+    TU *unit = cluster->units[unit_index];
+    visited[unit_index] = 1;
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        TU *neighbor = 
+# 304 "state.c" 3 4
+                      ((void *)0)
+# 304 "state.c"
+                          ;
+        int neighbor_index = -1;
+        for (int j = 0; j < cluster->size; j++) {
+            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor = cluster->units[j];
+                neighbor_index = j;
+                break;
+            }
+        }
+        if (neighbor && !visited[neighbor_index]) {
+            dfs_check_neighbors(neighbor_index, cluster, visited);
+        }
+    }
+}
+
+int are_neighbors_contiguousd(TU *unit, Cluster *cluster, int n) {
+    int *visited = calloc(n, sizeof(int));
+    int num_visited = 0;
+
+
+    int unit_index = -1;
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i]->code == unit->code) {
+            unit_index = i;
             break;
         }
     }
 
 
-    if (is_contiguous) {
-        Cluster *new_cluster = &clusters[new_cluster_idx];
-        new_cluster->units[new_cluster->size] = unit;
-        new_cluster->size++;
-        unit->cluster_id = new_cluster_idx;
+    dfs_check_neighbors(unit_index, cluster, visited);
 
 
-        for (int i = unit_idx; i < cluster->size - 1; i++) {
-            cluster->units[i] = cluster->units[i+1];
+    for (int i = 0; i < cluster->size; i++) {
+
+        if (visited[i]) {
+            num_visited++;
         }
-        cluster->size--;
     }
+
+
+    return num_visited == cluster->size;
+}
+
+
+int are_neighbors_contiguousss(TU *unit, Cluster *cluster, int n) {
+    int *visited = calloc(n, sizeof(int));
+    int num_visited = 0;
+
+     for (int i = 0; i < unit->num_neighbors; i++) {
+        TU *neighbor = 
+# 354 "state.c" 3 4
+                      ((void *)0)
+# 354 "state.c"
+                          ;
+        int neighbor_index = -1;
+
+        for (int j = 0; j < cluster->size; j++) {
+
+            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor = cluster->units[j];
+                neighbor_index = j;
+
+                break;
+            }
+        }
+
+        if (neighbor && !visited[neighbor_index]) {
+
+
+            dfs_check_neighbors(neighbor_index, cluster, visited);
+        }
+    }
+
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i]->code != unit->code ) {
+            num_visited++;
+        }
+    }
+
+
+    return num_visited == cluster->size - 1;
+}
+
+void dfs_contiguity_check(int unit_index, Cluster *cluster, int *visited) {
+    TU *unit = cluster->units[unit_index];
+    visited[unit_index] = 1;
+
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        int neighbor_index = -1;
+        for (int j = 0; j < cluster->size; j++) {
+            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor_index = j;
+                break;
+            }
+        }
+
+        if (neighbor_index != -1 && !visited[neighbor_index]) {
+            dfs_contiguity_check(neighbor_index, cluster, visited);
+        }
+    }
+}
+
+int are_neighbors_contiguous(TU *unit, Cluster *cluster) {
+    int *visited = calloc(cluster->size, sizeof(int));
+    int num_visited = 0;
+
+
+    int unit_index = -1;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i]->code == unit->code) {
+            unit_index = i;
+            break;
+        }
+    }
+
+
+    int start_index = (unit_index + 1) % cluster->size;
+
+
+    dfs_contiguity_check(start_index, cluster, visited);
+
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (visited[i]) {
+            num_visited++;
+        }
+    }
+
+
+    return num_visited == cluster->size - 1;
+}
+# 537 "state.c"
+void dfs_contiguity_exclude(int index, int exclude_index, Cluster *cluster, int *visited) {
+    visited[index] = 1;
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (i != exclude_index && !visited[i] && is_neighbor(cluster->units[index], cluster->units[i]) == 1) {
+            dfs_contiguity_exclude(i, exclude_index, cluster, visited);
+        }
+    }
+}
+
+int are_remaining_units_contiguous(Cluster *cluster, int exclude_index) {
+    if (cluster->size <= 1 || cluster->size > 0x7fffffff / sizeof(int)) {
+        return 0;
+    }
+    int *visited = calloc(cluster->size, sizeof(int));
+    int num_visited = 0;
+
+
+    int start_index = (exclude_index == 0) ? 1 : 0;
+
+
+    dfs_contiguity_exclude(start_index, exclude_index, cluster, visited);
+
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (i != exclude_index && visited[i]) {
+            num_visited++;
+        }
+    }
+
+
+    return num_visited == cluster->size - 1;
+}
+
+
+int contains(int *array, int size, int value) {
+    for (int i = 0; i < size; i++) {
+        if (array[i] == value) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 
 void change_unit(Cluster *clusters, TU **units, int k, int n) {
-
-    int cluster_idx = rand() % k;
-    Cluster *cluster = &clusters[cluster_idx];
-
-
-    while (cluster->size == 1) {
-
-
-        cluster_idx = rand() % k;
-        cluster = &clusters[cluster_idx];
-
-
+    int total_population = 0;
+    for (int i = 0; i < k; i++) {
+        total_population += clusters[i].size;
     }
 
-    int unit_idx = rand() % cluster->size;
-    TU *unit = cluster->units[unit_idx];
+    int random_population = rand() % total_population;
+    int cluster_idx = 0;
 
-    
-# 292 "state.c" 3 4
-   _Bool 
-# 292 "state.c"
-        is_contiguous = 
-# 292 "state.c" 3 4
-                        0
-# 292 "state.c"
-                             ;
-    int new_cluster_idx = -1;
-
-
-    int num_neighbors = unit->num_neighbors;
-    int *shuffled_indices = malloc(num_neighbors * sizeof(int));
-    for (int i = 0; i < num_neighbors; i++) {
-        shuffled_indices[i] = i;
-
-    }
-    for (int i = num_neighbors - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        int temp = shuffled_indices[i];
-        shuffled_indices[i] = shuffled_indices[j];
-        shuffled_indices[j] = temp;
-    }
-
-    for (int i = 0; i < num_neighbors; i++) {
-        TU *neighbor = 
-# 310 "state.c" 3 4
-                      ((void *)0)
-# 310 "state.c"
-                          ;
-        for (int j = 0; j < n; j++) {
-            if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
-                neighbor = units[j];
-                break;
-            }
-        }
-        if (!neighbor) continue;
-
-        int other_cluster_idx = neighbor->cluster_id;
-        if (other_cluster_idx != cluster_idx) {
-            is_contiguous = 
-# 321 "state.c" 3 4
-                           1
-# 321 "state.c"
-                               ;
-            new_cluster_idx = other_cluster_idx;
+    for (int i = 0; i < k; i++) {
+        random_population -= clusters[i].size;
+        if (random_population <= 0) {
+            cluster_idx = i;
             break;
         }
     }
 
-    free(shuffled_indices);
-
-    if (is_contiguous) {
-       Cluster *new_cluster = &clusters[new_cluster_idx];
-        new_cluster->units[new_cluster->size] = unit;
-        new_cluster->size++;
-        unit->cluster_id = new_cluster_idx;
 
 
-        for (int i = unit_idx; i < cluster->size - 1; i++) {
-            cluster->units[i] = cluster->units[i+1];
+
+
+    Cluster *cluster = &clusters[cluster_idx];
+
+
+    while (cluster->size == 1) {
+        cluster_idx = rand() % k;
+        cluster = &clusters[cluster_idx];
+    }
+
+
+
+
+    int avg_population = total_population / k;
+
+
+    int *border_units = malloc(cluster->size * sizeof(int));
+    int num_border_units = 0;
+    double min_diff = ((double)1.79769313486231570814527423731704357e+308L);
+    int best_unit_idx = -1;
+
+    for (int i = 0; i < cluster->size; i++) {
+        TU *current_unit = cluster->units[i];
+        for (int j = 0; j < current_unit->num_neighbors; j++) {
+            TU *neighbor = 
+# 625 "state.c" 3 4
+                          ((void *)0)
+# 625 "state.c"
+                              ;
+            for (int k = 0; k < n; k++) {
+                if (units[k]->code == current_unit->neighbor_codes[j]) {
+                    neighbor = units[k];
+                    break;
+                }
+            }
+            if (!neighbor) continue;
+
+            if (neighbor->cluster_id != cluster_idx) {
+                border_units[num_border_units++] = i;
+
+
+                double diff = abs((cluster->population - current_unit->voters) - avg_population);
+                if (diff < min_diff) {
+                    min_diff = diff;
+                    best_unit_idx = i;
+                }
+                break;
+            }
         }
-        cluster->size--;
-    }
-    else {
-
     }
 
+
+    int selected_unit_idx = best_unit_idx;
+    TU *selected_unit = cluster->units[selected_unit_idx];
+
+
+
+
+    while (selected_unit_idx == -1) {
+        int unit_idx = border_units[rand() % num_border_units];
+        TU *unit = cluster->units[unit_idx];
+        reset_visited(cluster);
+
+
+        if (are_remaining_units_contiguous(cluster, unit_idx)) {
+            selected_unit_idx = unit_idx;
+            selected_unit = unit;
+        }
+    }
+
+
+     int neighboring_cluster_idx;
+# 686 "state.c"
+     int *neighboring_clusters = malloc(k * sizeof(int));
+    int *neighboring_cluster_populations = malloc(k * sizeof(int));
+    int num_neighboring_clusters = 0;
+
+
+
+    for (int i = 0; i < selected_unit->num_neighbors; i++) {
+        int neighbor_code = selected_unit->neighbor_codes[i];
+        for (int j = 0; j < n; j++) {
+            if (units[j]->code == neighbor_code) {
+                int neighbor_cluster_id = units[j]->cluster_id;
+                if (neighbor_cluster_id != cluster_idx && !contains(neighboring_clusters, num_neighboring_clusters, neighbor_cluster_id)) {
+                    neighboring_clusters[num_neighboring_clusters] = neighbor_cluster_id;
+                    neighboring_cluster_populations[num_neighboring_clusters] = clusters[neighbor_cluster_id].size;
+                    num_neighboring_clusters++;
+                }
+                break;
+            }
+        }
+    }
+
+
+    double *probabilities = malloc(num_neighboring_clusters * sizeof(double));
+    double sum_inverse_populations = 0;
+
+    for (int i = 0; i < num_neighboring_clusters; i++) {
+        sum_inverse_populations += 1.0 / neighboring_cluster_populations[i];
+    }
+
+    for (int i = 0; i < num_neighboring_clusters; i++) {
+        probabilities[i] = (1.0 / neighboring_cluster_populations[i]) / sum_inverse_populations;
+    }
+
+
+    double random_value = (double)rand() / (double)
+# 720 "state.c" 3 4
+                                                  2147483647
+# 720 "state.c"
+                                                          ;
+    double cumulative_probability = 0.0;
+    int selected_neighboring_cluster_idx = 0;
+
+    for (int i = 0; i < num_neighboring_clusters; i++) {
+        cumulative_probability += probabilities[i];
+        if (random_value <= cumulative_probability) {
+            selected_neighboring_cluster_idx = i;
+            break;
+        }
+    }
+
+
+    neighboring_cluster_idx = neighboring_clusters[selected_neighboring_cluster_idx];
+
+
+
+    Cluster *new_cluster = &clusters[neighboring_cluster_idx];
+    new_cluster->units[new_cluster->size] = selected_unit;
+    new_cluster->size++;
+    selected_unit->cluster_id = neighboring_cluster_idx;
+
+
+    for (int i = selected_unit_idx; i < cluster->size - 1; i++) {
+        cluster->units[i] = cluster->units[i + 1];
+    }
+    cluster->size--;
+
+
+}
+# 868 "state.c"
+int is_contiguous_after_removal(Cluster *cluster, TU *unit_to_remove) {
+    if (cluster->size <= 1) {
+        return 0;
+    }
+
+
+    int unit_idx = -1;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] == unit_to_remove) {
+            unit_idx = i;
+            break;
+        }
+    }
+    if (unit_idx == -1) {
+        return 0;
+    }
+    cluster->units[unit_idx] = 
+# 884 "state.c" 3 4
+                              ((void *)0)
+# 884 "state.c"
+                                  ;
+
+
+    TU *start_unit = 
+# 887 "state.c" 3 4
+                    ((void *)0)
+# 887 "state.c"
+                        ;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] != 
+# 889 "state.c" 3 4
+                                ((void *)0)
+# 889 "state.c"
+                                    ) {
+            start_unit = cluster->units[i];
+            break;
+        }
+    }
+    if (!start_unit) {
+        return 0;
+    }
+
+    
+# 898 "state.c" 3 4
+   _Bool 
+# 898 "state.c"
+        *visited = calloc(cluster->size, sizeof(
+# 898 "state.c" 3 4
+                                                _Bool
+# 898 "state.c"
+                                                    ));
+
+
+
+    
+# 902 "state.c" 3 4
+   _Bool 
+# 902 "state.c"
+        all_visited = 
+# 902 "state.c" 3 4
+                      1
+# 902 "state.c"
+                          ;
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] != 
+# 904 "state.c" 3 4
+                                ((void *)0) 
+# 904 "state.c"
+                                     && !visited[i]) {
+            all_visited = 0;
+            break;
+        }
+    }
+
+
+    cluster->units[unit_idx] = unit_to_remove;
+
+    free(visited);
+
+    return all_visited;
+}
+
+void DFS(TU *unit, Cluster *cluster, 
+# 918 "state.c" 3 4
+                                    _Bool 
+# 918 "state.c"
+                                         *visited) {
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] == unit) {
+            visited[i] = 
+# 921 "state.c" 3 4
+                        1
+# 921 "state.c"
+                            ;
+            break;
+        }
+    }
+
+    for (int i = 0; i < unit->num_neighbors; i++) {
+        TU *neighbor = 
+# 927 "state.c" 3 4
+                      ((void *)0)
+# 927 "state.c"
+                          ;
+        for (int j = 0; j < cluster->size; j++) {
+            if (cluster->units[j] && cluster->units[j]->code == unit->neighbor_codes[i]) {
+                neighbor = cluster->units[j];
+                break;
+            }
+        }
+
+        if (neighbor) {
+            int neighbor_idx = -1;
+            for (int j = 0; j < cluster->size; j++) {
+                if (cluster->units[j] == neighbor) {
+                    neighbor_idx = j;
+                    break;
+                }
+            }
+
+            if (neighbor_idx != -1 && !visited[neighbor_idx]) {
+                DFS(neighbor, cluster, visited);
+            }
+        }
+    }
 }
 
 
@@ -2801,9 +3251,9 @@ Cluster** transitionBound(int ell , TU **units, int k, int n, FILE *fp_out)
 {
     int neighbor;
     srand(time(
-# 351 "state.c" 3 4
+# 955 "state.c" 3 4
               ((void *)0)
-# 351 "state.c"
+# 955 "state.c"
                   ));
     Cluster *clusters = malloc(k * sizeof(Cluster));
 
@@ -2840,8 +3290,6 @@ Cluster** transitionBound(int ell , TU **units, int k, int n, FILE *fp_out)
         }
     }
 
-
-
     for (int i = 0; i < k; i++)
     {
 
@@ -2871,73 +3319,4 @@ Cluster** storeState(Cluster *clusters, int k, int n)
 
     }
     return stored_state;
-}
-
-
-
-Cluster** transitionBound_old_random_clusters(int ell , TU **units, int k, int n)
-{
-
-    Cluster *clusters = malloc(k * sizeof(Cluster));
-
-    for (int i = 0; i < k; i++)
-    {
-        clusters[i].units = malloc(n * sizeof(TU *));
-        clusters[i].size = 0;
-    }
-
-
-    for (int i = 0; i < n; i++)
-    {
-        int cluster_index = rand() % k;
-
-        Cluster *cluster = &clusters[cluster_index];
-
-
-        int assigned = 0;
-
-
-        for (int j = 0; j < i; j++)
-        {
-            if (units[i] == cluster->units[j])
-            {
-                assigned = 1;
-                cluster->units[cluster->size] = units[i];
-                cluster->size++;
-
-                break;
-            }
-        }
-
-
-        if (assigned == 0)
-        {
-
-            cluster->units[cluster->size] = units[i];
-            assigned = 1;
-            cluster->size++;
-        }
-        if (assigned == 1)
-        {
-            continue;
-        }
-
-        else
-        {
-            i--;
-        }
-    }
-
-
-    for (int i = 0; i < k; i++)
-    {
-
-        for (int j = 0; j < clusters[i].size; j++)
-        {
-
-        }
-
-    }
-
-    return clusters;
 }

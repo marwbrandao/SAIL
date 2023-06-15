@@ -43,10 +43,12 @@ CFLAGS   = $(ANSI)
 #CFLAGS  += $(DEBUG)
 CFLAGS  += -D_DEFAULT_SOURCE
 CFLAGS  += -D NDEBUG
-#CFLAGS  += $(PROFILE)
+CFLAGS  += $(PROFILE)
 CFLAGS  += $(OPTIMIZE)
 #CFLAGS  += $(STATIC)
 CFLAGS  += $(THREADS)
+CFLAGS  += -I/home/mariana/tese/CPLEX_Studio201/cplex/include
+
 
 ##  Base Makefile
 ##  Diferent classes of files
@@ -70,7 +72,7 @@ coverage: $(COVS)
 ## Linking rule
 $(EXEC): $(OS)
 	@echo Linking: $@
-	$(CC) $(CFLAGS) $(OS) -o $@ -lm -lrt -lbsd
+	$(CC) $(CFLAGS) $(OS) -o $@ -lm -lrt -lbsd -L/home/mariana/tese/CPLEX_Studio201/cplex/lib/x86-64_linux/static_pic -lcplex -lm -lpthread -ldl
 
 ## Run Preprocessor
 %.i: %.c

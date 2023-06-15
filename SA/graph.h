@@ -15,6 +15,9 @@ typedef struct TU{
     int* border_sizes;
     bool assigned; 
     int cluster_id;
+    int visited; 
+    int unit_id;
+    int* neighbor_ids;
 } TU;
 
 TU** graph (char* fp, int* d, int* k, int* n, int* m);

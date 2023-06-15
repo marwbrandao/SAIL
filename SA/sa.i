@@ -3875,8 +3875,3362 @@ char *getbsize(int *headerlenp, long *blocksizep);
 # 8 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 2 3 4
 # 35 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
 # 6 "sa.c" 2
+# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h" 1
+# 17 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 1
+# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+    
+# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+   typedef signed char CPXBYTE;
 
-# 1 "sa.h" 1
+
+
+
+
+    typedef int CPXINT;
+# 78 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+       typedef long long CPXLONG;
+
+
+
+
+
+
+    typedef short CPXSHORT;
+# 134 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef CPXLONG CPXSIZE;
+# 146 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+       typedef unsigned long long CPXULONG;
+# 165 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 166 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 2
+# 175 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef int CPXBYTE_TEST[sizeof(CPXBYTE) == 1 ? 1 : -1];
+typedef int CPXSHORT_TEST[sizeof(CPXSHORT) == 2 ? 1 : -1];
+typedef int CPXINT_TEST[sizeof(CPXINT) == 4 ? 1 : -1];
+typedef int CPXLONG_TEST[sizeof(CPXLONG) == 8 ? 1 : -1];
+typedef int CPXULONG_TEST[sizeof(CPXULONG) == 8 ? 1 : -1];
+
+
+
+
+
+typedef int CPXSIZE_BITS_TEST[sizeof(CPXSIZE) == sizeof(size_t) ? 1 : -1];
+# 292 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+struct cpxenv;
+typedef struct cpxenv *CPXENVptr;
+typedef struct cpxenv const *CPXCENVptr;
+
+struct cpxchannel;
+typedef struct cpxchannel *CPXCHANNELptr;
+
+struct paramset;
+typedef struct paramset *CPXPARAMSETptr;
+typedef struct paramset const *CPXCPARAMSETptr;
+
+struct cpxlp;
+typedef struct cpxlp *CPXLPptr;
+
+typedef const struct cpxlp *CPXCLPptr;
+
+
+struct cpxnet;
+typedef struct cpxnet *CPXNETptr;
+
+typedef const struct cpxnet *CPXCNETptr;
+
+
+typedef char *CPXCHARptr;
+typedef const char *CPXCCHARptr;
+typedef void *CPXVOIDptr;
+# 385 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+struct cpxiodevice {
+   int ( *cpxiodev_eof)(struct cpxiodevice *dev);
+   int ( *cpxiodev_error)(struct cpxiodevice *dev);
+   int ( *cpxiodev_rewind)(struct cpxiodevice *dev);
+   int ( *cpxiodev_flush)(struct cpxiodevice *dev);
+   int ( *cpxiodev_close)(struct cpxiodevice *dev);
+   int ( *cpxiodev_putc)(int c, struct cpxiodevice *dev);
+   int ( *cpxiodev_puts)(const char *s, struct cpxiodevice *dev);
+   size_t ( *cpxiodev_read)(void *ptr, size_t size, struct cpxiodevice *dev);
+   size_t ( *cpxiodev_write)(const void *ptr, size_t size, struct cpxiodevice *dev);
+};
+typedef struct cpxiodevice CPXIODEVICE, *CPXIODEVICEptr;
+# 723 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef const char * CPXNAMEFUNCTION(void *, CPXLONG, char *);
+# 2220 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef enum {
+   CPXCALLBACKINFO_THREADID,
+   CPXCALLBACKINFO_NODECOUNT,
+   CPXCALLBACKINFO_ITCOUNT,
+   CPXCALLBACKINFO_BEST_SOL,
+   CPXCALLBACKINFO_BEST_BND,
+   CPXCALLBACKINFO_THREADS,
+   CPXCALLBACKINFO_FEASIBLE,
+   CPXCALLBACKINFO_TIME,
+   CPXCALLBACKINFO_DETTIME,
+   CPXCALLBACKINFO_NODEUID,
+   CPXCALLBACKINFO_NODEDEPTH,
+   CPXCALLBACKINFO_CANDIDATE_SOURCE,
+   CPXCALLBACKINFO_RESTARTS,
+   CPXCALLBACKINFO_AFTERCUTLOOP,
+   CPXCALLBACKINFO_NODESLEFT
+} CPXCALLBACKINFO;
+
+
+typedef enum {
+   CPXCALLBACKSOLUTION_NOCHECK = -1,
+   CPXCALLBACKSOLUTION_CHECKFEAS,
+   CPXCALLBACKSOLUTION_PROPAGATE,
+   CPXCALLBACKSOLUTION_SOLVE
+} CPXCALLBACKSOLUTIONSTRATEGY;
+
+
+typedef enum {
+   CPXINFO_BYTE,
+   CPXINFO_SHORT,
+   CPXINFO_INT,
+   CPXINFO_LONG,
+   CPXINFO_DOUBLE
+} CPXINFOTYPE;
+# 2691 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef struct cpxasynchandle *CPXASYNCptr;
+
+
+typedef struct cpxcallbackcontext *CPXCALLBACKCONTEXTptr;
+
+
+typedef int CPXCALLBACKFUNC(CPXCALLBACKCONTEXTptr context, CPXLONG contextid, void *userhandle);
+
+
+typedef struct cpxasynchandle const *CPXCASYNCptr;
+
+
+typedef struct cpxdeserializer const *CPXCDESERIALIZERptr;
+
+
+typedef struct cpxenvgroup const *CPXCENVGROUPptr;
+
+
+typedef struct messagehandler const *CPXCMESSAGEHANDLERptr;
+
+
+typedef struct cpxserializer const *CPXCSERIALIZERptr;
+
+
+typedef struct cpxdeserializer *CPXDESERIALIZERptr;
+
+
+typedef struct cpxenvgroup *CPXENVGROUPptr;
+
+
+typedef void ( CPXINFOHANDLER) (CPXENVptr env, CPXINFOTYPE type,
+                                        int tag, CPXLONG elems,
+     void const *data, void *handle);
+
+
+typedef struct messagehandler *CPXMESSAGEHANDLERptr;
+
+
+typedef int CPXMODELASSTCALLBACKFUNC(int issueid, const char *message, void *userhandle);
+
+
+typedef struct cpxserializer *CPXSERIALIZERptr;
+
+
+typedef int ( CPXUSERFUNCTION) (CPXENVptr env, int id,
+                                         CPXLONG insize, void const *indata,
+                                         CPXLONG maxout, CPXLONG *outsize_p,
+                                         void *outdata, void *handle);
+# 2762 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+struct cpxasynchandle;
+
+
+struct cpxdeserializer {
+   int ( *getbyte) (CPXDESERIALIZERptr deser, CPXBYTE *b);
+   int ( *getshort) (CPXDESERIALIZERptr deser, CPXSHORT *s);
+   int ( *getint) (CPXDESERIALIZERptr deser, CPXINT *i);
+   int ( *getlong) (CPXDESERIALIZERptr deser, CPXLONG *l);
+   int ( *getfloat) (CPXDESERIALIZERptr deser, float *f);
+   int ( *getdouble) (CPXDESERIALIZERptr deser, double *d);
+   int ( *getbytes) (CPXDESERIALIZERptr deser, CPXLONG cnt, CPXBYTE *b);
+   int ( *getshorts) (CPXDESERIALIZERptr deser, CPXLONG cnt, CPXSHORT *s);
+   int ( *getints) (CPXDESERIALIZERptr deser, CPXLONG cnt, CPXINT *i);
+   int ( *getlongs) (CPXDESERIALIZERptr deser, CPXLONG cnt, CPXLONG *l);
+   int ( *getfloats) (CPXDESERIALIZERptr deser, CPXLONG cnt, float *d);
+   int ( *getdoubles) (CPXDESERIALIZERptr deser, CPXLONG cnt, double *d);
+};
+
+
+struct cpxserializer {
+   int ( *addbyte) (CPXSERIALIZERptr ser, CPXBYTE b);
+   int ( *addshort) (CPXSERIALIZERptr ser, CPXSHORT s);
+   int ( *addint) (CPXSERIALIZERptr ser, CPXINT i);
+   int ( *addlong) (CPXSERIALIZERptr ser, CPXLONG l);
+   int ( *addfloat) (CPXSERIALIZERptr ser, float f);
+   int ( *adddouble) (CPXSERIALIZERptr ser, double d);
+   int ( *addbytes) (CPXSERIALIZERptr ser, CPXLONG cnt, CPXBYTE const *b);
+   int ( *addshorts) (CPXSERIALIZERptr ser, CPXLONG cnt, CPXSHORT const *s);
+   int ( *addints) (CPXSERIALIZERptr ser, CPXLONG cnt, CPXINT const *i);
+   int ( *addlongs) (CPXSERIALIZERptr ser, CPXLONG cnt, CPXLONG const *l);
+   int ( *addfloats) (CPXSERIALIZERptr ser, CPXLONG cnt, float const *d);
+   int ( *adddoubles) (CPXSERIALIZERptr ser, CPXLONG cnt, double const *d);
+};
+
+
+struct messagehandler;
+# 18 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h" 2
+# 27 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXaddcols (CPXCENVptr env, CPXLPptr lp, int ccnt, int nzcnt,
+               double const *obj, int const *cmatbeg,
+               int const *cmatind, double const *cmatval,
+               double const *lb, double const *ub, char **colname);
+
+
+
+int
+   CPXaddfuncdest (CPXCENVptr env, CPXCHANNELptr channel, void *handle,
+                   void( *msgfunction)(void *, const char *));
+
+
+
+int
+   CPXaddpwl (CPXCENVptr env, CPXLPptr lp, int vary, int varx,
+              double preslope, double postslope, int nbreaks,
+              double const *breakx, double const *breaky,
+              char const *pwlname);
+
+
+
+int
+   CPXaddrows (CPXCENVptr env, CPXLPptr lp, int ccnt, int rcnt,
+               int nzcnt, double const *rhs, char const *sense,
+               int const *rmatbeg, int const *rmatind,
+               double const *rmatval, char **colname, char **rowname);
+
+
+
+int
+   CPXbasicpresolve (CPXCENVptr env, CPXLPptr lp, double *redlb,
+                     double *redub, int *rstat);
+
+
+
+int
+   CPXbinvacol (CPXCENVptr env, CPXCLPptr lp, int j, double *x);
+
+
+
+int
+   CPXbinvarow (CPXCENVptr env, CPXCLPptr lp, int i, double *z);
+
+
+
+int
+   CPXbinvcol (CPXCENVptr env, CPXCLPptr lp, int j, double *x);
+
+
+
+int
+   CPXbinvrow (CPXCENVptr env, CPXCLPptr lp, int i, double *y);
+
+
+
+int
+   CPXboundsa (CPXCENVptr env, CPXCLPptr lp, int begin, int end,
+               double *lblower, double *lbupper, double *ublower,
+               double *ubupper);
+
+
+
+int
+   CPXbtran (CPXCENVptr env, CPXCLPptr lp, double *y);
+
+
+
+void
+   CPXcallbackabort (CPXCALLBACKCONTEXTptr context);
+
+
+
+int
+   CPXcallbackaddusercuts (CPXCALLBACKCONTEXTptr context, int rcnt,
+                           int nzcnt, double const *rhs,
+                           char const *sense, int const *rmatbeg,
+                           int const *rmatind, double const *rmatval,
+                           int const *purgeable, int const *local);
+
+
+
+int
+   CPXcallbackcandidateispoint (CPXCALLBACKCONTEXTptr context,
+                                int *ispoint_p);
+
+
+
+int
+   CPXcallbackcandidateisray (CPXCALLBACKCONTEXTptr context,
+                              int *isray_p);
+
+
+
+int
+   CPXcallbackexitcutloop (CPXCALLBACKCONTEXTptr context);
+
+
+
+int
+   CPXcallbackgetcandidatepoint (CPXCALLBACKCONTEXTptr context,
+                                 double *x, int begin, int end,
+                                 double *obj_p);
+
+
+
+int
+   CPXcallbackgetcandidateray (CPXCALLBACKCONTEXTptr context,
+                               double *x, int begin, int end);
+
+
+
+int
+   CPXcallbackgetfunc (CPXCENVptr env, CPXCLPptr lp,
+                       CPXLONG *contextmask_p,
+                       CPXCALLBACKFUNC **callback_p,
+                       void **cbhandle_p);
+
+
+
+int
+   CPXcallbackgetincumbent (CPXCALLBACKCONTEXTptr context, double *x,
+                            int begin, int end, double *obj_p);
+
+
+
+int
+   CPXcallbackgetinfodbl (CPXCALLBACKCONTEXTptr context,
+                          CPXCALLBACKINFO what, double *data_p);
+
+
+
+int
+   CPXcallbackgetinfoint (CPXCALLBACKCONTEXTptr context,
+                          CPXCALLBACKINFO what, CPXINT *data_p);
+
+
+
+int
+   CPXcallbackgetinfolong (CPXCALLBACKCONTEXTptr context,
+                           CPXCALLBACKINFO what, CPXLONG *data_p);
+
+
+
+int
+   CPXcallbackgetrelaxationpoint (CPXCALLBACKCONTEXTptr context,
+                                  double *x, int begin, int end,
+                                  double *obj_p);
+
+
+
+int
+   CPXcallbackgetrelaxationstatus (CPXCALLBACKCONTEXTptr context,
+                                   int *nodelpstat_p, CPXLONG flags);
+
+
+
+int
+   CPXcallbackmakebranch (CPXCALLBACKCONTEXTptr context, int varcnt,
+                          int const *varind, char const *varlu,
+                          double const *varbd, int rcnt, int nzcnt,
+                          double const *rhs, char const *sense,
+                          int const *rmatbeg, int const *rmatind,
+                          double const *rmatval, double nodeest,
+                          int *seqnum_p);
+
+
+
+int
+   CPXcallbackpostheursoln (CPXCALLBACKCONTEXTptr context, int cnt,
+                            int const *ind, double const *val,
+                            double obj,
+                            CPXCALLBACKSOLUTIONSTRATEGY strat);
+
+
+
+int
+   CPXcallbackprunenode (CPXCALLBACKCONTEXTptr context);
+
+
+
+int
+   CPXcallbackrejectcandidate (CPXCALLBACKCONTEXTptr context, int rcnt,
+                               int nzcnt, double const *rhs,
+                               char const *sense, int const *rmatbeg,
+                               int const *rmatind,
+                               double const *rmatval);
+
+
+
+int
+   CPXcallbackrejectcandidatelocal (CPXCALLBACKCONTEXTptr context,
+                                    int rcnt, int nzcnt,
+                                    double const *rhs,
+                                    char const *sense,
+                                    int const *rmatbeg,
+                                    int const *rmatind,
+                                    double const *rmatval);
+
+
+
+int
+   CPXcallbacksetfunc (CPXENVptr env, CPXLPptr lp, CPXLONG contextmask,
+                       CPXCALLBACKFUNC callback, void *userhandle);
+
+
+
+int
+   CPXcheckdfeas (CPXCENVptr env, CPXLPptr lp, int *infeas_p);
+
+
+
+int
+   CPXcheckpfeas (CPXCENVptr env, CPXLPptr lp, int *infeas_p);
+
+
+
+int
+   CPXchecksoln (CPXCENVptr env, CPXLPptr lp, int *lpstatus_p);
+
+
+
+int
+   CPXchgbds (CPXCENVptr env, CPXLPptr lp, int cnt, int const *indices,
+              char const *lu, double const *bd);
+
+
+
+int
+   CPXchgcoef (CPXCENVptr env, CPXLPptr lp, int i, int j,
+               double newvalue);
+
+
+
+int
+   CPXchgcoeflist (CPXCENVptr env, CPXLPptr lp, int numcoefs,
+                   int const *rowlist, int const *collist,
+                   double const *vallist);
+
+
+
+int
+   CPXchgcolname (CPXCENVptr env, CPXLPptr lp, int cnt,
+                  int const *indices, char **newname);
+
+
+
+int
+   CPXchgname (CPXCENVptr env, CPXLPptr lp, int key, int ij,
+               char const *newname_str);
+
+
+
+int
+   CPXchgobj (CPXCENVptr env, CPXLPptr lp, int cnt, int const *indices,
+              double const *values);
+
+
+
+int
+   CPXchgobjoffset (CPXCENVptr env, CPXLPptr lp, double offset);
+
+
+
+int
+   CPXchgobjsen (CPXCENVptr env, CPXLPptr lp, int maxormin);
+
+
+
+int
+   CPXchgprobname (CPXCENVptr env, CPXLPptr lp, char const *probname);
+
+
+
+int
+   CPXchgprobtype (CPXCENVptr env, CPXLPptr lp, int type);
+
+
+
+int
+   CPXchgprobtypesolnpool (CPXCENVptr env, CPXLPptr lp, int type,
+                           int soln);
+
+
+
+int
+   CPXchgrhs (CPXCENVptr env, CPXLPptr lp, int cnt, int const *indices,
+              double const *values);
+
+
+
+int
+   CPXchgrngval (CPXCENVptr env, CPXLPptr lp, int cnt,
+                 int const *indices, double const *values);
+
+
+
+int
+   CPXchgrowname (CPXCENVptr env, CPXLPptr lp, int cnt,
+                  int const *indices, char **newname);
+
+
+
+int
+   CPXchgsense (CPXCENVptr env, CPXLPptr lp, int cnt,
+                int const *indices, char const *sense);
+
+
+
+int
+   CPXcleanup (CPXCENVptr env, CPXLPptr lp, double eps);
+
+
+
+CPXLPptr
+   CPXcloneprob (CPXCENVptr env, CPXCLPptr lp, int *status_p);
+
+
+
+int
+   CPXcloseCPLEX (CPXENVptr *env_p);
+
+
+
+int
+   CPXclpwrite (CPXCENVptr env, CPXCLPptr lp, char const *filename_str);
+
+
+
+int
+   CPXcompletelp (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXcopybase (CPXCENVptr env, CPXLPptr lp, int const *cstat,
+                int const *rstat);
+
+
+
+int
+   CPXcopybasednorms (CPXCENVptr env, CPXLPptr lp, int const *cstat,
+                      int const *rstat, double const *dnorm);
+
+
+
+int
+   CPXcopydnorms (CPXCENVptr env, CPXLPptr lp, double const *norm,
+                  int const *head, int len);
+
+
+
+int
+   CPXcopylp (CPXCENVptr env, CPXLPptr lp, int numcols, int numrows,
+              int objsense, double const *objective, double const *rhs,
+              char const *sense, int const *matbeg, int const *matcnt,
+              int const *matind, double const *matval,
+              double const *lb, double const *ub, double const *rngval);
+
+
+
+int
+   CPXcopylpwnames (CPXCENVptr env, CPXLPptr lp, int numcols,
+                    int numrows, int objsense, double const *objective,
+                    double const *rhs, char const *sense,
+                    int const *matbeg, int const *matcnt,
+                    int const *matind, double const *matval,
+                    double const *lb, double const *ub,
+                    double const *rngval, char **colname,
+                    char **rowname);
+
+
+
+int
+   CPXcopynettolp (CPXCENVptr env, CPXLPptr lp, CPXCNETptr net);
+
+
+
+int
+   CPXcopyobjname (CPXCENVptr env, CPXLPptr lp,
+                   char const *objname_str);
+
+
+
+int
+   CPXcopypnorms (CPXCENVptr env, CPXLPptr lp, double const *cnorm,
+                  double const *rnorm, int len);
+
+
+
+int
+   CPXcopyprotected (CPXCENVptr env, CPXLPptr lp, int cnt,
+                     int const *indices);
+
+
+
+int
+   CPXcopystart (CPXCENVptr env, CPXLPptr lp, int const *cstat,
+                 int const *rstat, double const *cprim,
+                 double const *rprim, double const *cdual,
+                 double const *rdual);
+
+
+
+CPXLPptr
+   CPXcreateprob (CPXCENVptr env, int *status_p,
+                  char const *probname_str);
+
+
+
+int
+   CPXcrushform (CPXCENVptr env, CPXCLPptr lp, int len, int const *ind,
+                 double const *val, int *plen_p, double *poffset_p,
+                 int *pind, double *pval);
+
+
+
+int
+   CPXcrushpi (CPXCENVptr env, CPXCLPptr lp, double const *pi,
+               double *prepi);
+
+
+
+int
+   CPXcrushx (CPXCENVptr env, CPXCLPptr lp, double const *x,
+              double *prex);
+
+
+
+int
+   CPXdelcols (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXdeldblannotation (CPXCENVptr env, CPXLPptr lp, int idx);
+
+
+
+int
+   CPXdeldblannotations (CPXCENVptr env, CPXLPptr lp, int begin,
+                         int end);
+
+
+
+int
+   CPXdelfuncdest (CPXCENVptr env, CPXCHANNELptr channel, void *handle,
+                   void( *msgfunction)(void *, const char *));
+
+
+
+int
+   CPXdellongannotation (CPXCENVptr env, CPXLPptr lp, int idx);
+
+
+
+int
+   CPXdellongannotations (CPXCENVptr env, CPXLPptr lp, int begin,
+                          int end);
+
+
+
+int
+   CPXdelnames (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXdelpwl (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXdelrows (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXdelsetcols (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdelsetpwl (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdelsetrows (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdeserializercreate (CPXDESERIALIZERptr *deser_p, CPXLONG size,
+                          void const *buffer);
+
+
+
+void
+   CPXdeserializerdestroy (CPXDESERIALIZERptr deser);
+
+
+
+CPXLONG
+   CPXdeserializerleft (CPXCDESERIALIZERptr deser);
+
+
+
+int
+   CPXdisconnectchannel (CPXCENVptr env, CPXCHANNELptr channel);
+
+
+
+int
+   CPXdjfrompi (CPXCENVptr env, CPXCLPptr lp, double const *pi,
+                double *dj);
+
+
+
+int
+   CPXdperwrite (CPXCENVptr env, CPXLPptr lp, char const *filename_str,
+                 double epsilon);
+
+
+
+int
+   CPXdratio (CPXCENVptr env, CPXLPptr lp, int *indices, int cnt,
+              double *downratio, double *upratio, int *downenter,
+              int *upenter, int *downstatus, int *upstatus);
+
+
+
+int
+   CPXdualfarkas (CPXCENVptr env, CPXCLPptr lp, double *y,
+                  double *proof_p);
+
+
+
+int
+   CPXdualopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXdualwrite (CPXCENVptr env, CPXCLPptr lp,
+                 char const *filename_str, double *objshift_p);
+
+
+
+int
+   CPXembwrite (CPXCENVptr env, CPXLPptr lp, char const *filename_str);
+
+
+
+int
+   CPXfeasopt (CPXCENVptr env, CPXLPptr lp, double const *rhs,
+               double const *rng, double const *lb, double const *ub);
+
+
+
+int
+   CPXfeasoptext (CPXCENVptr env, CPXLPptr lp, int grpcnt, int concnt,
+                  double const *grppref, int const *grpbeg,
+                  int const *grpind, char const *grptype);
+
+
+
+void
+   CPXfinalize (void);
+
+
+
+int
+   CPXflushchannel (CPXCENVptr env, CPXCHANNELptr channel);
+
+
+
+int
+   CPXflushstdchannels (CPXCENVptr env);
+
+
+
+int
+   CPXfreepresolve (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXfreeprob (CPXCENVptr env, CPXLPptr *lp_p);
+
+
+
+int
+   CPXftran (CPXCENVptr env, CPXCLPptr lp, double *x);
+
+
+
+int
+   CPXgetax (CPXCENVptr env, CPXCLPptr lp, double *x, int begin,
+             int end);
+
+
+
+int
+   CPXgetbaritcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetbase (CPXCENVptr env, CPXCLPptr lp, int *cstat, int *rstat);
+
+
+
+int
+   CPXgetbasednorms (CPXCENVptr env, CPXCLPptr lp, int *cstat,
+                     int *rstat, double *dnorm);
+
+
+
+int
+   CPXgetbhead (CPXCENVptr env, CPXCLPptr lp, int *head, double *x);
+
+
+
+int
+   CPXgetcallbackinfo (CPXCENVptr env, void *cbdata, int wherefrom,
+                       int whichinfo, void *result_p);
+
+
+
+int
+   CPXgetchannels (CPXCENVptr env, CPXCHANNELptr *cpxresults_p,
+                   CPXCHANNELptr *cpxwarning_p,
+                   CPXCHANNELptr *cpxerror_p, CPXCHANNELptr *cpxlog_p);
+
+
+
+int
+   CPXgetchgparam (CPXCENVptr env, int *cnt_p, int *paramnum,
+                   int pspace, int *surplus_p);
+
+
+
+int
+   CPXgetcoef (CPXCENVptr env, CPXCLPptr lp, int i, int j,
+               double *coef_p);
+
+
+
+int
+   CPXgetcolindex (CPXCENVptr env, CPXCLPptr lp, char const *lname_str,
+                   int *index_p);
+
+
+
+int
+   CPXgetcolinfeas (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                    double *infeasout, int begin, int end);
+
+
+
+int
+   CPXgetcolname (CPXCENVptr env, CPXCLPptr lp, char **name,
+                  char *namestore, int storespace, int *surplus_p,
+                  int begin, int end);
+
+
+
+int
+   CPXgetcols (CPXCENVptr env, CPXCLPptr lp, int *nzcnt_p,
+               int *cmatbeg, int *cmatind, double *cmatval,
+               int cmatspace, int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXgetconflict (CPXCENVptr env, CPXCLPptr lp, int *confstat_p,
+                   int *rowind, int *rowbdstat, int *confnumrows_p,
+                   int *colind, int *colbdstat, int *confnumcols_p);
+
+
+
+int
+   CPXgetconflictext (CPXCENVptr env, CPXCLPptr lp, int *grpstat,
+                      int beg, int end);
+
+
+
+int
+   CPXgetconflictgroups (CPXCENVptr env, CPXCLPptr lp, int *concnt_p,
+                         double *grppref, int *grpbeg, int *grpind,
+                         char *grptype, int grpspace, int *surplus_p,
+                         int begin, int end);
+
+
+
+int
+   CPXgetconflictnumgroups (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetconflictnumpasses (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetcrossdexchcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetcrossdpushcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetcrosspexchcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetcrossppushcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetdblannotationdefval (CPXCENVptr env, CPXCLPptr lp, int idx,
+                              double *defval_p);
+
+
+
+int
+   CPXgetdblannotationindex (CPXCENVptr env, CPXCLPptr lp,
+                             char const *annotationname_str,
+                             int *index_p);
+
+
+
+int
+   CPXgetdblannotationname (CPXCENVptr env, CPXCLPptr lp, int idx,
+                            char *buf_str, int bufspace,
+                            int *surplus_p);
+
+
+
+int
+   CPXgetdblannotations (CPXCENVptr env, CPXCLPptr lp, int idx,
+                         int objtype, double *annotation, int begin,
+                         int end);
+
+
+
+int
+   CPXgetdblparam (CPXCENVptr env, int whichparam, double *value_p);
+
+
+
+int
+   CPXgetdblquality (CPXCENVptr env, CPXCLPptr lp, double *quality_p,
+                     int what);
+
+
+
+int
+   CPXgetdettime (CPXCENVptr env, double *dettimestamp_p);
+
+
+
+int
+   CPXgetdj (CPXCENVptr env, CPXCLPptr lp, double *dj, int begin,
+             int end);
+
+
+
+int
+   CPXgetdnorms (CPXCENVptr env, CPXCLPptr lp, double *norm, int *head,
+                 int *len_p);
+
+
+
+int
+   CPXgetdsbcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+CPXCCHARptr
+   CPXgeterrorstring (CPXCENVptr env, int errcode, char *buffer_str);
+
+
+
+int
+   CPXgetgrad (CPXCENVptr env, CPXCLPptr lp, int j, int *head,
+               double *y);
+
+
+
+int
+   CPXgetijdiv (CPXCENVptr env, CPXCLPptr lp, int *idiv_p, int *jdiv_p);
+
+
+
+int
+   CPXgetijrow (CPXCENVptr env, CPXCLPptr lp, int i, int j, int *row_p);
+
+
+
+int
+   CPXgetintparam (CPXCENVptr env, int whichparam, CPXINT *value_p);
+
+
+
+int
+   CPXgetintquality (CPXCENVptr env, CPXCLPptr lp, int *quality_p,
+                     int what);
+
+
+
+int
+   CPXgetitcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetlb (CPXCENVptr env, CPXCLPptr lp, double *lb, int begin,
+             int end);
+
+
+
+int
+   CPXgetlogfilename (CPXCENVptr env, char *buf_str, int bufspace,
+                      int *surplus_p);
+
+
+
+int
+   CPXgetlongannotationdefval (CPXCENVptr env, CPXCLPptr lp, int idx,
+                               CPXLONG *defval_p);
+
+
+
+int
+   CPXgetlongannotationindex (CPXCENVptr env, CPXCLPptr lp,
+                              char const *annotationname_str,
+                              int *index_p);
+
+
+
+int
+   CPXgetlongannotationname (CPXCENVptr env, CPXCLPptr lp, int idx,
+                             char *buf_str, int bufspace,
+                             int *surplus_p);
+
+
+
+int
+   CPXgetlongannotations (CPXCENVptr env, CPXCLPptr lp, int idx,
+                          int objtype, CPXLONG *annotation, int begin,
+                          int end);
+
+
+
+int
+   CPXgetlongparam (CPXCENVptr env, int whichparam, CPXLONG *value_p);
+
+
+
+int
+   CPXgetlpcallbackfunc (CPXCENVptr env,
+                         int( **callback_p)(CPXCENVptr, void *, int, void *),
+                         void **cbhandle_p);
+
+
+
+int
+   CPXgetmethod (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnetcallbackfunc (CPXCENVptr env,
+                          int( **callback_p)(CPXCENVptr, void *, int, void *),
+                          void **cbhandle_p);
+
+
+
+int
+   CPXgetnumcols (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumcores (CPXCENVptr env, int *numcores_p);
+
+
+
+int
+   CPXgetnumdblannotations (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumlongannotations (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumnz (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumobjs (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumpwl (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumrows (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetobj (CPXCENVptr env, CPXCLPptr lp, double *obj, int begin,
+              int end);
+
+
+
+int
+   CPXgetobjname (CPXCENVptr env, CPXCLPptr lp, char *buf_str,
+                  int bufspace, int *surplus_p);
+
+
+
+int
+   CPXgetobjoffset (CPXCENVptr env, CPXCLPptr lp, double *objoffset_p);
+
+
+
+int
+   CPXgetobjsen (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetobjval (CPXCENVptr env, CPXCLPptr lp, double *objval_p);
+
+
+
+int
+   CPXgetparamhiername (CPXCENVptr env, int whichparam, char *name_str);
+
+
+
+int
+   CPXgetparamname (CPXCENVptr env, int whichparam, char *name_str);
+
+
+
+int
+   CPXgetparamnum (CPXCENVptr env, char const *name_str,
+                   int *whichparam_p);
+
+
+
+int
+   CPXgetparamtype (CPXCENVptr env, int whichparam, int *paramtype);
+
+
+
+int
+   CPXgetphase1cnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetpi (CPXCENVptr env, CPXCLPptr lp, double *pi, int begin,
+             int end);
+
+
+
+int
+   CPXgetpnorms (CPXCENVptr env, CPXCLPptr lp, double *cnorm,
+                 double *rnorm, int *len_p);
+
+
+
+int
+   CPXgetprestat (CPXCENVptr env, CPXCLPptr lp, int *prestat_p,
+                  int *pcstat, int *prstat, int *ocstat, int *orstat);
+
+
+
+int
+   CPXgetprobname (CPXCENVptr env, CPXCLPptr lp, char *buf_str,
+                   int bufspace, int *surplus_p);
+
+
+
+int
+   CPXgetprobtype (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetprotected (CPXCENVptr env, CPXCLPptr lp, int *cnt_p,
+                    int *indices, int pspace, int *surplus_p);
+
+
+
+int
+   CPXgetpsbcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetpwl (CPXCENVptr env, CPXCLPptr lp, int pwlindex, int *vary_p,
+              int *varx_p, double *preslope_p, double *postslope_p,
+              int *nbreaks_p, double *breakx, double *breaky,
+              int breakspace, int *surplus_p);
+
+
+
+int
+   CPXgetpwlindex (CPXCENVptr env, CPXCLPptr lp, char const *lname_str,
+                   int *index_p);
+
+
+
+int
+   CPXgetpwlname (CPXCENVptr env, CPXCLPptr lp, char *buf_str,
+                  int bufspace, int *surplus_p, int which);
+
+
+
+int
+   CPXgetray (CPXCENVptr env, CPXCLPptr lp, double *z);
+
+
+
+int
+   CPXgetredlp (CPXCENVptr env, CPXCLPptr lp, CPXCLPptr *redlp_p);
+
+
+
+int
+   CPXgetrhs (CPXCENVptr env, CPXCLPptr lp, double *rhs, int begin,
+              int end);
+
+
+
+int
+   CPXgetrngval (CPXCENVptr env, CPXCLPptr lp, double *rngval,
+                 int begin, int end);
+
+
+
+int
+   CPXgetrowindex (CPXCENVptr env, CPXCLPptr lp, char const *lname_str,
+                   int *index_p);
+
+
+
+int
+   CPXgetrowinfeas (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                    double *infeasout, int begin, int end);
+
+
+
+int
+   CPXgetrowname (CPXCENVptr env, CPXCLPptr lp, char **name,
+                  char *namestore, int storespace, int *surplus_p,
+                  int begin, int end);
+
+
+
+int
+   CPXgetrows (CPXCENVptr env, CPXCLPptr lp, int *nzcnt_p,
+               int *rmatbeg, int *rmatind, double *rmatval,
+               int rmatspace, int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXgetsense (CPXCENVptr env, CPXCLPptr lp, char *sense, int begin,
+                int end);
+
+
+
+int
+   CPXgetsiftitcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetsiftphase1cnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetslack (CPXCENVptr env, CPXCLPptr lp, double *slack, int begin,
+                int end);
+
+
+
+int
+   CPXgetsolnpooldblquality (CPXCENVptr env, CPXCLPptr lp, int soln,
+                             double *quality_p, int what);
+
+
+
+int
+   CPXgetsolnpoolintquality (CPXCENVptr env, CPXCLPptr lp, int soln,
+                             int *quality_p, int what);
+
+
+
+int
+   CPXgetstat (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+CPXCHARptr
+   CPXgetstatstring (CPXCENVptr env, int statind, char *buffer_str);
+
+
+
+int
+   CPXgetstrparam (CPXCENVptr env, int whichparam, char *value_str);
+
+
+
+int
+   CPXgettime (CPXCENVptr env, double *timestamp_p);
+
+
+
+int
+   CPXgettuningcallbackfunc (CPXCENVptr env,
+                             int( **callback_p)(CPXCENVptr, void *, int, void *),
+                             void **cbhandle_p);
+
+
+
+int
+   CPXgetub (CPXCENVptr env, CPXCLPptr lp, double *ub, int begin,
+             int end);
+
+
+
+int
+   CPXgetweight (CPXCENVptr env, CPXCLPptr lp, int rcnt,
+                 int const *rmatbeg, int const *rmatind,
+                 double const *rmatval, double *weight, int dpriind);
+
+
+
+int
+   CPXgetx (CPXCENVptr env, CPXCLPptr lp, double *x, int begin,
+            int end);
+
+
+
+int
+   CPXhybnetopt (CPXCENVptr env, CPXLPptr lp, int method);
+
+
+
+int
+   CPXinfodblparam (CPXCENVptr env, int whichparam, double *defvalue_p,
+                    double *minvalue_p, double *maxvalue_p);
+
+
+
+int
+   CPXinfointparam (CPXCENVptr env, int whichparam, CPXINT *defvalue_p,
+                    CPXINT *minvalue_p, CPXINT *maxvalue_p);
+
+
+
+int
+   CPXinfolongparam (CPXCENVptr env, int whichparam,
+                     CPXLONG *defvalue_p, CPXLONG *minvalue_p,
+                     CPXLONG *maxvalue_p);
+
+
+
+int
+   CPXinfostrparam (CPXCENVptr env, int whichparam, char *defvalue_str);
+
+
+
+void
+   CPXinitialize (void);
+
+
+
+int
+   CPXkilldnorms (CPXLPptr lp);
+
+
+
+int
+   CPXkillpnorms (CPXLPptr lp);
+
+
+
+int
+   CPXlpopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXmbasewrite (CPXCENVptr env, CPXCLPptr lp,
+                  char const *filename_str);
+
+
+
+int
+   CPXmdleave (CPXCENVptr env, CPXLPptr lp, int const *indices,
+               int cnt, double *downratio, double *upratio);
+
+
+
+int
+   CPXmodelasstcallbackgetfunc (CPXCENVptr env, CPXCLPptr lp,
+                                CPXMODELASSTCALLBACKFUNC **callback_p,
+                                void **cbhandle_p);
+
+
+
+int
+   CPXmodelasstcallbacksetfunc (CPXENVptr env, CPXLPptr lp,
+                                CPXMODELASSTCALLBACKFUNC callback,
+                                void *userhandle);
+
+
+
+int
+   CPXmsgstr (CPXCHANNELptr channel, char const *msg_str);
+
+
+
+int
+   CPXmultiobjchgattribs (CPXCENVptr env, CPXLPptr lp, int objind,
+                          double offset, double weight, int priority,
+                          double abstol, double reltol,
+                          char const *name);
+
+
+
+
+int
+   CPXmultiobjgetdblinfo (CPXCENVptr env, CPXCLPptr lp, int subprob,
+                          double *info_p, int what);
+
+
+
+
+int
+   CPXmultiobjgetindex (CPXCENVptr env, CPXCLPptr lp, char const *name,
+                        int *index_p);
+
+
+
+int
+   CPXmultiobjgetintinfo (CPXCENVptr env, CPXCLPptr lp, int subprob,
+                          int *info_p, int what);
+
+
+
+int
+   CPXmultiobjgetlonginfo (CPXCENVptr env, CPXCLPptr lp, int subprob,
+                           CPXLONG *info_p, int what);
+
+
+
+int
+   CPXmultiobjgetname (CPXCENVptr env, CPXCLPptr lp, int objind,
+                       char *buf_str, int bufspace, int *surplus_p);
+
+
+
+int
+   CPXmultiobjgetnumsolves (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXmultiobjgetobj (CPXCENVptr env, CPXCLPptr lp, int n,
+                      double *coeffs, int begin, int end,
+                      double *offset_p, double *weight_p,
+                      int *priority_p, double *abstol_p,
+                      double *reltol_p);
+
+
+
+int
+   CPXmultiobjgetobjval (CPXCENVptr env, CPXCLPptr lp, int n,
+                         double *objval_p);
+
+
+
+int
+   CPXmultiobjgetobjvalbypriority (CPXCENVptr env, CPXCLPptr lp,
+                                   int priority, double *objval_p);
+
+
+
+int
+   CPXmultiobjopt (CPXCENVptr env, CPXLPptr lp,
+                   CPXCPARAMSETptr const *paramsets);
+
+
+
+int
+   CPXmultiobjsetobj (CPXCENVptr env, CPXLPptr lp, int n, int objnz,
+                      int const *objind, double const *objval,
+                      double offset, double weight, int priority,
+                      double abstol, double reltol,
+                      char const *objname);
+
+
+
+int
+   CPXNETextract (CPXCENVptr env, CPXNETptr net, CPXCLPptr lp,
+                  int *colmap, int *rowmap);
+
+
+
+int
+   CPXnewcols (CPXCENVptr env, CPXLPptr lp, int ccnt,
+               double const *obj, double const *lb, double const *ub,
+               char const *xctype, char **colname);
+
+
+
+int
+   CPXnewdblannotation (CPXCENVptr env, CPXLPptr lp,
+                        char const *annotationname_str, double defval);
+
+
+
+int
+   CPXnewlongannotation (CPXCENVptr env, CPXLPptr lp,
+                         char const *annotationname_str,
+                         CPXLONG defval);
+
+
+
+int
+   CPXnewrows (CPXCENVptr env, CPXLPptr lp, int rcnt,
+               double const *rhs, char const *sense,
+               double const *rngval, char **rowname);
+
+
+
+int
+   CPXobjsa (CPXCENVptr env, CPXCLPptr lp, int begin, int end,
+             double *lower, double *upper);
+
+
+
+CPXENVptr
+   CPXopenCPLEX (int *status_p);
+
+
+
+int
+   CPXparamsetadddbl (CPXCENVptr env, CPXPARAMSETptr ps,
+                      int whichparam, double newvalue);
+
+
+
+int
+   CPXparamsetaddint (CPXCENVptr env, CPXPARAMSETptr ps,
+                      int whichparam, CPXINT newvalue);
+
+
+
+int
+   CPXparamsetaddlong (CPXCENVptr env, CPXPARAMSETptr ps,
+                       int whichparam, CPXLONG newvalue);
+
+
+
+int
+   CPXparamsetaddstr (CPXCENVptr env, CPXPARAMSETptr ps,
+                      int whichparam, char const *svalue);
+
+
+
+int
+   CPXparamsetapply (CPXENVptr env, CPXCPARAMSETptr ps);
+
+
+
+int
+   CPXparamsetcopy (CPXCENVptr targetenv, CPXPARAMSETptr targetps,
+                    CPXCPARAMSETptr sourceps);
+
+
+
+CPXPARAMSETptr
+   CPXparamsetcreate (CPXCENVptr env, int *status_p);
+
+
+
+int
+   CPXparamsetdel (CPXCENVptr env, CPXPARAMSETptr ps, int whichparam);
+
+
+
+int
+   CPXparamsetfree (CPXCENVptr env, CPXPARAMSETptr *ps_p);
+
+
+
+int
+   CPXparamsetgetdbl (CPXCENVptr env, CPXCPARAMSETptr ps,
+                      int whichparam, double *dval_p);
+
+
+
+int
+   CPXparamsetgetids (CPXCENVptr env, CPXCPARAMSETptr ps, int *cnt_p,
+                      int *whichparams, int pspace, int *surplus_p);
+
+
+
+int
+   CPXparamsetgetint (CPXCENVptr env, CPXCPARAMSETptr ps,
+                      int whichparam, CPXINT *ival_p);
+
+
+
+int
+   CPXparamsetgetlong (CPXCENVptr env, CPXCPARAMSETptr ps,
+                       int whichparam, CPXLONG *ival_p);
+
+
+
+int
+   CPXparamsetgetstr (CPXCENVptr env, CPXCPARAMSETptr ps,
+                      int whichparam, char *sval);
+
+
+
+int
+   CPXparamsetreadcopy (CPXENVptr env, CPXPARAMSETptr ps,
+                        char const *filename_str);
+
+
+
+int
+   CPXparamsetwrite (CPXCENVptr env, CPXCPARAMSETptr ps,
+                     char const *filename_str);
+
+
+
+int
+   CPXpivot (CPXCENVptr env, CPXLPptr lp, int jenter, int jleave,
+             int leavestat);
+
+
+
+int
+   CPXpivotin (CPXCENVptr env, CPXLPptr lp, int const *rlist, int rlen);
+
+
+
+int
+   CPXpivotout (CPXCENVptr env, CPXLPptr lp, int const *clist,
+                int clen);
+
+
+
+int
+   CPXpperwrite (CPXCENVptr env, CPXLPptr lp, char const *filename_str,
+                 double epsilon);
+
+
+
+int
+   CPXpratio (CPXCENVptr env, CPXLPptr lp, int *indices, int cnt,
+              double *downratio, double *upratio, int *downleave,
+              int *upleave, int *downleavestatus, int *upleavestatus,
+              int *downstatus, int *upstatus);
+
+
+
+int
+   CPXpreaddrows (CPXCENVptr env, CPXLPptr lp, int rcnt, int nzcnt,
+                  double const *rhs, char const *sense,
+                  int const *rmatbeg, int const *rmatind,
+                  double const *rmatval, char **rowname);
+
+
+
+int
+   CPXprechgobj (CPXCENVptr env, CPXLPptr lp, int cnt,
+                 int const *indices, double const *values);
+
+
+
+int
+   CPXpreslvwrite (CPXCENVptr env, CPXLPptr lp,
+                   char const *filename_str, double *objoff_p);
+
+
+
+int
+   CPXpresolve (CPXCENVptr env, CPXLPptr lp, int method);
+
+
+
+int
+   CPXprimopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXqpdjfrompi (CPXCENVptr env, CPXCLPptr lp, double const *pi,
+                  double const *x, double *dj);
+
+
+
+int
+   CPXqpuncrushpi (CPXCENVptr env, CPXCLPptr lp, double *pi,
+                   double const *prepi, double const *x);
+
+
+
+int
+   CPXreadcopyannotations (CPXCENVptr env, CPXLPptr lp,
+                           char const *filename);
+
+
+
+int
+   CPXreadcopybase (CPXCENVptr env, CPXLPptr lp,
+                    char const *filename_str);
+
+
+
+int
+   CPXreadcopyparam (CPXENVptr env, char const *filename_str);
+
+
+
+int
+   CPXreadcopyprob (CPXCENVptr env, CPXLPptr lp,
+                    char const *filename_str, char const *filetype);
+
+
+__attribute__ ((deprecated))
+int
+   CPXreadcopysol (CPXCENVptr env, CPXLPptr lp,
+                   char const *filename_str);
+
+
+
+int
+   CPXreadcopystartinfo (CPXCENVptr env, CPXLPptr lp,
+                         char const *filename_str);
+
+
+__attribute__ ((deprecated))
+int
+   CPXrefineconflict (CPXCENVptr env, CPXLPptr lp, int *confnumrows_p,
+                      int *confnumcols_p);
+
+
+
+int
+   CPXrefineconflictext (CPXCENVptr env, CPXLPptr lp, int grpcnt,
+                         int concnt, double const *grppref,
+                         int const *grpbeg, int const *grpind,
+                         char const *grptype);
+
+
+
+int
+   CPXrhssa (CPXCENVptr env, CPXCLPptr lp, int begin, int end,
+             double *lower, double *upper);
+
+
+
+int
+   CPXrobustopt (CPXCENVptr env, CPXLPptr lp, CPXLPptr lblp,
+                 CPXLPptr ublp, double objchg, double const *maxchg);
+
+
+
+int
+   CPXserializercreate (CPXSERIALIZERptr *ser_p);
+
+
+
+void
+   CPXserializerdestroy (CPXSERIALIZERptr ser);
+
+
+
+CPXLONG
+   CPXserializerlength (CPXCSERIALIZERptr ser);
+
+
+
+void const *
+   CPXserializerpayload (CPXCSERIALIZERptr ser);
+
+
+
+int
+   CPXsetdblannotations (CPXCENVptr env, CPXLPptr lp, int idx,
+                         int objtype, int cnt, int const *indices,
+                         double const *values);
+
+
+
+int
+   CPXsetdblparam (CPXENVptr env, int whichparam, double newvalue);
+
+
+
+int
+   CPXsetdefaults (CPXENVptr env);
+
+
+
+int
+   CPXsetintparam (CPXENVptr env, int whichparam, CPXINT newvalue);
+
+
+
+int
+   CPXsetlogfilename (CPXCENVptr env, char const *filename,
+                      char const *mode);
+
+
+
+int
+   CPXsetlongannotations (CPXCENVptr env, CPXLPptr lp, int idx,
+                          int objtype, int cnt, int const *indices,
+                          CPXLONG const *values);
+
+
+
+int
+   CPXsetlongparam (CPXENVptr env, int whichparam, CPXLONG newvalue);
+
+
+
+int
+   CPXsetlpcallbackfunc (CPXENVptr env,
+                         int( *callback)(CPXCENVptr, void *, int, void *),
+                         void *cbhandle);
+
+
+
+int
+   CPXsetnetcallbackfunc (CPXENVptr env,
+                          int( *callback)(CPXCENVptr, void *, int, void *),
+                          void *cbhandle);
+
+
+
+int
+   CPXsetnumobjs (CPXCENVptr env, CPXCLPptr lp, int n);
+
+
+
+int
+   CPXsetphase2 (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXsetprofcallbackfunc (CPXENVptr env,
+                           int( *callback)(CPXCENVptr, int, void *),
+                           void *cbhandle);
+
+
+
+int
+   CPXsetstrparam (CPXENVptr env, int whichparam,
+                   char const *newvalue_str);
+
+
+
+int
+   CPXsetterminate (CPXENVptr env, volatile int *terminate_p);
+
+
+
+int
+   CPXsettuningcallbackfunc (CPXENVptr env,
+                             int( *callback)(CPXCENVptr, void *, int, void *),
+                             void *cbhandle);
+
+
+
+int
+   CPXsiftopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXslackfromx (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                  double *slack);
+
+
+
+int
+   CPXsolninfo (CPXCENVptr env, CPXCLPptr lp, int *solnmethod_p,
+                int *solntype_p, int *pfeasind_p, int *dfeasind_p);
+
+
+
+int
+   CPXsolution (CPXCENVptr env, CPXCLPptr lp, int *lpstat_p,
+                double *objval_p, double *x, double *pi, double *slack,
+                double *dj);
+
+
+
+int
+   CPXsolwrite (CPXCENVptr env, CPXCLPptr lp, char const *filename_str);
+
+
+
+int
+   CPXsolwritesolnpool (CPXCENVptr env, CPXCLPptr lp, int soln,
+                        char const *filename_str);
+
+
+
+int
+   CPXsolwritesolnpoolall (CPXCENVptr env, CPXCLPptr lp,
+                           char const *filename_str);
+
+
+
+int
+   CPXstrongbranch (CPXCENVptr env, CPXLPptr lp, int const *indices,
+                    int cnt, double *downobj, double *upobj, int itlim);
+
+
+
+int
+   CPXtightenbds (CPXCENVptr env, CPXLPptr lp, int cnt,
+                  int const *indices, char const *lu, double const *bd);
+
+
+
+int
+   CPXtuneparam (CPXENVptr env, CPXLPptr lp, int intcnt,
+                 int const *intnum, int const *intval, int dblcnt,
+                 int const *dblnum, double const *dblval, int strcnt,
+                 int const *strnum, char **strval, int *tunestat_p);
+
+
+
+int
+   CPXtuneparamprobset (CPXENVptr env, int filecnt, char **filename,
+                        char **filetype, int intcnt, int const *intnum,
+                        int const *intval, int dblcnt,
+                        int const *dblnum, double const *dblval,
+                        int strcnt, int const *strnum, char **strval,
+                        int *tunestat_p);
+
+
+
+int
+   CPXuncrushform (CPXCENVptr env, CPXCLPptr lp, int plen,
+                   int const *pind, double const *pval, int *len_p,
+                   double *offset_p, int *ind, double *val);
+
+
+
+int
+   CPXuncrushpi (CPXCENVptr env, CPXCLPptr lp, double *pi,
+                 double const *prepi);
+
+
+
+int
+   CPXuncrushx (CPXCENVptr env, CPXCLPptr lp, double *x,
+                double const *prex);
+
+
+
+int
+   CPXunscaleprob (CPXCENVptr env, CPXLPptr lp);
+
+
+
+CPXCCHARptr
+   CPXversion (CPXCENVptr env);
+
+
+
+int
+   CPXversionnumber (CPXCENVptr env, int *version_p);
+
+
+
+int
+   CPXwriteannotations (CPXCENVptr env, CPXCLPptr lp,
+                        char const *filename);
+
+
+
+int
+   CPXwritebendersannotation (CPXCENVptr env, CPXCLPptr lp,
+                              char const *filename);
+
+
+
+int
+   CPXwriteparam (CPXCENVptr env, char const *filename_str);
+
+
+
+int
+   CPXwriteprob (CPXCENVptr env, CPXCLPptr lp,
+                 char const *filename_str, char const *filetype);
+# 1875 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 1
+# 1876 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h" 2
+# 1885 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXbaropt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXhybbaropt (CPXCENVptr env, CPXLPptr lp, int method);
+# 1925 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXaddindconstraints (CPXCENVptr env, CPXLPptr lp, int indcnt,
+                         int const *type, int const *indvar,
+                         int const *complemented, int nzcnt,
+                         double const *rhs, char const *sense,
+                         int const *linbeg, int const *linind,
+                         double const *linval, char **indname);
+
+
+
+int
+   CPXaddlazyconstraints (CPXCENVptr env, CPXLPptr lp, int rcnt,
+                          int nzcnt, double const *rhs,
+                          char const *sense, int const *rmatbeg,
+                          int const *rmatind, double const *rmatval,
+                          char **rowname);
+
+
+
+int
+   CPXaddmipstarts (CPXCENVptr env, CPXLPptr lp, int mcnt, int nzcnt,
+                    int const *beg, int const *varindices,
+                    double const *values, int const *effortlevel,
+                    char **mipstartname);
+
+
+
+int
+   CPXaddsolnpooldivfilter (CPXCENVptr env, CPXLPptr lp,
+                            double lower_bound, double upper_bound,
+                            int nzcnt, int const *ind,
+                            double const *weight, double const *refval,
+                            char const *lname_str);
+
+
+
+int
+   CPXaddsolnpoolrngfilter (CPXCENVptr env, CPXLPptr lp, double lb,
+                            double ub, int nzcnt, int const *ind,
+                            double const *val, char const *lname_str);
+
+
+
+int
+   CPXaddsos (CPXCENVptr env, CPXLPptr lp, int numsos, int numsosnz,
+              char const *sostype, int const *sosbeg,
+              int const *sosind, double const *soswt, char **sosname);
+
+
+
+int
+   CPXaddusercuts (CPXCENVptr env, CPXLPptr lp, int rcnt, int nzcnt,
+                   double const *rhs, char const *sense,
+                   int const *rmatbeg, int const *rmatind,
+                   double const *rmatval, char **rowname);
+
+
+
+int
+   CPXbendersopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXbranchcallbackbranchasCPLEX (CPXCENVptr env, void *cbdata,
+                                   int wherefrom, int num,
+                                   void *userhandle, int *seqnum_p);
+
+
+
+int
+   CPXbranchcallbackbranchbds (CPXCENVptr env, void *cbdata,
+                               int wherefrom, int cnt,
+                               int const *indices, char const *lu,
+                               double const *bd, double nodeest,
+                               void *userhandle, int *seqnum_p);
+
+
+
+int
+   CPXbranchcallbackbranchconstraints (CPXCENVptr env, void *cbdata,
+                                       int wherefrom, int rcnt,
+                                       int nzcnt, double const *rhs,
+                                       char const *sense,
+                                       int const *rmatbeg,
+                                       int const *rmatind,
+                                       double const *rmatval,
+                                       double nodeest,
+                                       void *userhandle, int *seqnum_p);
+
+
+
+int
+   CPXbranchcallbackbranchgeneral (CPXCENVptr env, void *cbdata,
+                                   int wherefrom, int varcnt,
+                                   int const *varind,
+                                   char const *varlu,
+                                   double const *varbd, int rcnt,
+                                   int nzcnt, double const *rhs,
+                                   char const *sense,
+                                   int const *rmatbeg,
+                                   int const *rmatind,
+                                   double const *rmatval,
+                                   double nodeest, void *userhandle,
+                                   int *seqnum_p);
+
+
+
+int
+   CPXcallbackgetgloballb (CPXCALLBACKCONTEXTptr context, double *lb,
+                           int begin, int end);
+
+
+
+int
+   CPXcallbackgetglobalub (CPXCALLBACKCONTEXTptr context, double *ub,
+                           int begin, int end);
+
+
+
+int
+   CPXcallbackgetlocallb (CPXCALLBACKCONTEXTptr context, double *lb,
+                          int begin, int end);
+
+
+
+int
+   CPXcallbackgetlocalub (CPXCALLBACKCONTEXTptr context, double *ub,
+                          int begin, int end);
+
+
+
+int
+   CPXcallbacksetnodeuserhandle (CPXCENVptr env, void *cbdata,
+                                 int wherefrom, int nodeindex,
+                                 void *userhandle,
+                                 void **olduserhandle_p);
+
+
+
+int
+   CPXcallbacksetuserhandle (CPXCENVptr env, void *cbdata,
+                             int wherefrom, void *userhandle,
+                             void **olduserhandle_p);
+
+
+
+int
+   CPXchgctype (CPXCENVptr env, CPXLPptr lp, int cnt,
+                int const *indices, char const *xctype);
+
+
+
+int
+   CPXchgmipstarts (CPXCENVptr env, CPXLPptr lp, int mcnt,
+                    int const *mipstartindices, int nzcnt,
+                    int const *beg, int const *varindices,
+                    double const *values, int const *effortlevel);
+
+
+
+int
+   CPXcopyctype (CPXCENVptr env, CPXLPptr lp, char const *xctype);
+
+
+
+int
+   CPXcopyorder (CPXCENVptr env, CPXLPptr lp, int cnt,
+                 int const *indices, int const *priority,
+                 int const *direction);
+
+
+
+int
+   CPXcopysos (CPXCENVptr env, CPXLPptr lp, int numsos, int numsosnz,
+               char const *sostype, int const *sosbeg,
+               int const *sosind, double const *soswt, char **sosname);
+
+
+
+int
+   CPXcutcallbackadd (CPXCENVptr env, void *cbdata, int wherefrom,
+                      int nzcnt, double rhs, int sense,
+                      int const *cutind, double const *cutval,
+                      int purgeable);
+
+
+
+int
+   CPXcutcallbackaddlocal (CPXCENVptr env, void *cbdata, int wherefrom,
+                           int nzcnt, double rhs, int sense,
+                           int const *cutind, double const *cutval);
+
+
+
+int
+   CPXdelindconstrs (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXdelmipstarts (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXdelsetmipstarts (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdelsetsolnpoolfilters (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdelsetsolnpoolsolns (CPXCENVptr env, CPXLPptr lp, int *delstat);
+
+
+
+int
+   CPXdelsetsos (CPXCENVptr env, CPXLPptr lp, int *delset);
+
+
+
+int
+   CPXdelsolnpoolfilters (CPXCENVptr env, CPXLPptr lp, int begin,
+                          int end);
+
+
+
+int
+   CPXdelsolnpoolsolns (CPXCENVptr env, CPXLPptr lp, int begin,
+                        int end);
+
+
+
+int
+   CPXdelsos (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXfltwrite (CPXCENVptr env, CPXCLPptr lp, char const *filename_str);
+
+
+
+int
+   CPXfreelazyconstraints (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXfreeusercuts (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXgetbestobjval (CPXCENVptr env, CPXCLPptr lp, double *objval_p);
+
+
+
+int
+   CPXgetbranchcallbackfunc (CPXCENVptr env,
+                             int( **branchcallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int brtype, int brset, int nodecnt, int bdcnt, const int *nodebeg, const int *xindex, const char *lu, const double *bd, const double *nodeest, int *useraction_p),
+                             void **cbhandle_p);
+
+
+
+int
+   CPXgetbranchnosolncallbackfunc (CPXCENVptr env,
+                                   int( **branchnosolncallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int brtype, int brset, int nodecnt, int bdcnt, const int *nodebeg, const int *xindex, const char *lu, const double *bd, const double *nodeest, int *useraction_p),
+                                   void **cbhandle_p);
+
+
+
+int
+   CPXgetcallbackbranchconstraints (CPXCENVptr env, void *cbdata,
+                                    int wherefrom, int which,
+                                    int *cuts_p, int *nzcnt_p,
+                                    double *rhs, char *sense,
+                                    int *rmatbeg, int *rmatind,
+                                    double *rmatval, int rmatsz,
+                                    int *surplus_p);
+
+
+
+int
+   CPXgetcallbackctype (CPXCENVptr env, void *cbdata, int wherefrom,
+                        char *xctype, int begin, int end);
+
+
+
+int
+   CPXgetcallbackgloballb (CPXCENVptr env, void *cbdata, int wherefrom,
+                           double *lb, int begin, int end);
+
+
+
+int
+   CPXgetcallbackglobalub (CPXCENVptr env, void *cbdata, int wherefrom,
+                           double *ub, int begin, int end);
+
+
+
+int
+   CPXgetcallbackincumbent (CPXCENVptr env, void *cbdata,
+                            int wherefrom, double *x, int begin,
+                            int end);
+
+
+
+int
+   CPXgetcallbackindicatorinfo (CPXCENVptr env, void *cbdata,
+                                int wherefrom, int iindex,
+                                int whichinfo, void *result_p);
+
+
+
+int
+   CPXgetcallbacklp (CPXCENVptr env, void *cbdata, int wherefrom,
+                     CPXCLPptr *lp_p);
+
+
+
+int
+   CPXgetcallbacknodeinfo (CPXCENVptr env, void *cbdata, int wherefrom,
+                           int nodeindex, int whichinfo,
+                           void *result_p);
+
+
+
+int
+   CPXgetcallbacknodeintfeas (CPXCENVptr env, void *cbdata,
+                              int wherefrom, int *feas, int begin,
+                              int end);
+
+
+
+int
+   CPXgetcallbacknodelb (CPXCENVptr env, void *cbdata, int wherefrom,
+                         double *lb, int begin, int end);
+
+
+
+int
+   CPXgetcallbacknodelp (CPXCENVptr env, void *cbdata, int wherefrom,
+                         CPXLPptr *nodelp_p);
+
+
+
+int
+   CPXgetcallbacknodeobjval (CPXCENVptr env, void *cbdata,
+                             int wherefrom, double *objval_p);
+
+
+
+int
+   CPXgetcallbacknodestat (CPXCENVptr env, void *cbdata, int wherefrom,
+                           int *nodestat_p);
+
+
+
+int
+   CPXgetcallbacknodeub (CPXCENVptr env, void *cbdata, int wherefrom,
+                         double *ub, int begin, int end);
+
+
+
+int
+   CPXgetcallbacknodex (CPXCENVptr env, void *cbdata, int wherefrom,
+                        double *x, int begin, int end);
+
+
+
+int
+   CPXgetcallbackorder (CPXCENVptr env, void *cbdata, int wherefrom,
+                        int *priority, int *direction, int begin,
+                        int end);
+
+
+
+int
+   CPXgetcallbackpseudocosts (CPXCENVptr env, void *cbdata,
+                              int wherefrom, double *uppc,
+                              double *downpc, int begin, int end);
+
+
+
+int
+   CPXgetcallbackseqinfo (CPXCENVptr env, void *cbdata, int wherefrom,
+                          int seqid, int whichinfo, void *result_p);
+
+
+
+int
+   CPXgetcallbacksosinfo (CPXCENVptr env, void *cbdata, int wherefrom,
+                          int sosindex, int member, int whichinfo,
+                          void *result_p);
+
+
+
+int
+   CPXgetctype (CPXCENVptr env, CPXCLPptr lp, char *xctype, int begin,
+                int end);
+
+
+
+int
+   CPXgetcutoff (CPXCENVptr env, CPXCLPptr lp, double *cutoff_p);
+
+
+
+int
+   CPXgetdeletenodecallbackfunc (CPXCENVptr env,
+                                 void( **deletecallback_p)(CPXCENVptr xenv, int wherefrom, void *cbhandle, int seqnum, void *handle),
+                                 void **cbhandle_p);
+
+
+
+int
+   CPXgetheuristiccallbackfunc (CPXCENVptr env,
+                                int( **heuristiccallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, double *objval_p, double *x, int *checkfeas_p, int *useraction_p),
+                                void **cbhandle_p);
+
+
+
+int
+   CPXgetincumbentcallbackfunc (CPXCENVptr env,
+                                int( **incumbentcallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, double objval, double *x, int *isfeas_p, int *useraction_p),
+                                void **cbhandle_p);
+
+
+
+int
+   CPXgetindconstr (CPXCENVptr env, CPXCLPptr lp, int *indvar_p,
+                    int *complemented_p, int *nzcnt_p, double *rhs_p,
+                    char *sense_p, int *linind, double *linval,
+                    int space, int *surplus_p, int which);
+
+
+
+int
+   CPXgetindconstraints (CPXCENVptr env, CPXCLPptr lp, int *type,
+                         int *indvar, int *complemented, int *nzcnt_p,
+                         double *rhs, char *sense, int *linbeg,
+                         int *linind, double *linval, int linspace,
+                         int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXgetindconstrindex (CPXCENVptr env, CPXCLPptr lp,
+                         char const *lname_str, int *index_p);
+
+
+
+int
+   CPXgetindconstrinfeas (CPXCENVptr env, CPXCLPptr lp,
+                          double const *x, double *infeasout,
+                          int begin, int end);
+
+
+
+int
+   CPXgetindconstrname (CPXCENVptr env, CPXCLPptr lp, char *buf_str,
+                        int bufspace, int *surplus_p, int which);
+
+
+
+int
+   CPXgetindconstrslack (CPXCENVptr env, CPXCLPptr lp,
+                         double *indslack, int begin, int end);
+
+
+
+int
+   CPXgetinfocallbackfunc (CPXCENVptr env,
+                           int( **callback_p)(CPXCENVptr, void *, int, void *),
+                           void **cbhandle_p);
+
+
+
+int
+   CPXgetlazyconstraintcallbackfunc (CPXCENVptr env,
+                                     int( **cutcallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction_p),
+                                     void **cbhandle_p);
+
+
+
+int
+   CPXgetmipcallbackfunc (CPXCENVptr env,
+                          int( **callback_p)(CPXCENVptr, void *, int, void *),
+                          void **cbhandle_p);
+
+
+
+int
+   CPXgetmipitcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetmiprelgap (CPXCENVptr env, CPXCLPptr lp, double *gap_p);
+
+
+
+int
+   CPXgetmipstartindex (CPXCENVptr env, CPXCLPptr lp,
+                        char const *lname_str, int *index_p);
+
+
+
+int
+   CPXgetmipstartname (CPXCENVptr env, CPXCLPptr lp, char **name,
+                       char *store, int storesz, int *surplus_p,
+                       int begin, int end);
+
+
+
+int
+   CPXgetmipstarts (CPXCENVptr env, CPXCLPptr lp, int *nzcnt_p,
+                    int *beg, int *varindices, double *values,
+                    int *effortlevel, int startspace, int *surplus_p,
+                    int begin, int end);
+
+
+
+int
+   CPXgetnodecallbackfunc (CPXCENVptr env,
+                           int( **nodecallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *nodeindex, int *useraction),
+                           void **cbhandle_p);
+
+
+
+int
+   CPXgetnodecnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnodeint (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnodeleftcnt (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumbin (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumcuts (CPXCENVptr env, CPXCLPptr lp, int cuttype,
+                  int *num_p);
+
+
+
+int
+   CPXgetnumindconstrs (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumint (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumlazyconstraints (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnummipstarts (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumsemicont (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumsemiint (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumsos (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumusercuts (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetorder (CPXCENVptr env, CPXCLPptr lp, int *cnt_p, int *indices,
+                int *priority, int *direction, int ordspace,
+                int *surplus_p);
+
+
+
+int
+   CPXgetsolnpooldivfilter (CPXCENVptr env, CPXCLPptr lp,
+                            double *lower_cutoff_p,
+                            double *upper_cutoff_p, int *nzcnt_p,
+                            int *ind, double *val, double *refval,
+                            int space, int *surplus_p, int which);
+
+
+
+int
+   CPXgetsolnpoolfilterindex (CPXCENVptr env, CPXCLPptr lp,
+                              char const *lname_str, int *index_p);
+
+
+
+int
+   CPXgetsolnpoolfiltername (CPXCENVptr env, CPXCLPptr lp,
+                             char *buf_str, int bufspace,
+                             int *surplus_p, int which);
+
+
+
+int
+   CPXgetsolnpoolfiltertype (CPXCENVptr env, CPXCLPptr lp,
+                             int *ftype_p, int which);
+
+
+
+int
+   CPXgetsolnpoolmeanobjval (CPXCENVptr env, CPXCLPptr lp,
+                             double *meanobjval_p);
+
+
+
+int
+   CPXgetsolnpoolnumfilters (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetsolnpoolnumreplaced (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetsolnpoolnumsolns (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetsolnpoolobjval (CPXCENVptr env, CPXCLPptr lp, int soln,
+                         double *objval_p);
+
+
+
+int
+   CPXgetsolnpoolqconstrslack (CPXCENVptr env, CPXCLPptr lp, int soln,
+                               double *qcslack, int begin, int end);
+
+
+
+int
+   CPXgetsolnpoolrngfilter (CPXCENVptr env, CPXCLPptr lp, double *lb_p,
+                            double *ub_p, int *nzcnt_p, int *ind,
+                            double *val, int space, int *surplus_p,
+                            int which);
+
+
+
+int
+   CPXgetsolnpoolslack (CPXCENVptr env, CPXCLPptr lp, int soln,
+                        double *slack, int begin, int end);
+
+
+
+int
+   CPXgetsolnpoolsolnindex (CPXCENVptr env, CPXCLPptr lp,
+                            char const *lname_str, int *index_p);
+
+
+
+int
+   CPXgetsolnpoolsolnname (CPXCENVptr env, CPXCLPptr lp, char *store,
+                           int storesz, int *surplus_p, int which);
+
+
+
+int
+   CPXgetsolnpoolx (CPXCENVptr env, CPXCLPptr lp, int soln, double *x,
+                    int begin, int end);
+
+
+
+int
+   CPXgetsolvecallbackfunc (CPXCENVptr env,
+                            int( **solvecallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction),
+                            void **cbhandle_p);
+
+
+
+int
+   CPXgetsos (CPXCENVptr env, CPXCLPptr lp, int *numsosnz_p,
+              char *sostype, int *sosbeg, int *sosind, double *soswt,
+              int sosspace, int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXgetsosindex (CPXCENVptr env, CPXCLPptr lp, char const *lname_str,
+                   int *index_p);
+
+
+
+int
+   CPXgetsosinfeas (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                    double *infeasout, int begin, int end);
+
+
+
+int
+   CPXgetsosname (CPXCENVptr env, CPXCLPptr lp, char **name,
+                  char *namestore, int storespace, int *surplus_p,
+                  int begin, int end);
+
+
+
+int
+   CPXgetsubmethod (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetsubstat (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetusercutcallbackfunc (CPXCENVptr env,
+                              int( **cutcallback_p)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction_p),
+                              void **cbhandle_p);
+
+
+
+int
+   CPXindconstrslackfromx (CPXCENVptr env, CPXCLPptr lp,
+                           double const *x, double *indslack);
+
+
+
+int
+   CPXmipopt (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXordread (CPXCENVptr env, char const *filename_str, int numcols,
+               char **colname, int *cnt_p, int *indices, int *priority,
+               int *direction);
+
+
+
+int
+   CPXordwrite (CPXCENVptr env, CPXCLPptr lp, char const *filename_str);
+
+
+
+int
+   CPXpopulate (CPXCENVptr env, CPXLPptr lp);
+
+
+
+int
+   CPXreadcopymipstarts (CPXCENVptr env, CPXLPptr lp,
+                         char const *filename_str);
+
+
+
+int
+   CPXreadcopyorder (CPXCENVptr env, CPXLPptr lp,
+                     char const *filename_str);
+
+
+
+int
+   CPXreadcopysolnpoolfilters (CPXCENVptr env, CPXLPptr lp,
+                               char const *filename_str);
+
+
+__attribute__ ((deprecated))
+int
+   CPXrefinemipstartconflict (CPXCENVptr env, CPXLPptr lp,
+                              int mipstartindex, int *confnumrows_p,
+                              int *confnumcols_p);
+
+
+
+int
+   CPXrefinemipstartconflictext (CPXCENVptr env, CPXLPptr lp,
+                                 int mipstartindex, int grpcnt,
+                                 int concnt, double const *grppref,
+                                 int const *grpbeg, int const *grpind,
+                                 char const *grptype);
+
+
+
+int
+   CPXsetbranchcallbackfunc (CPXENVptr env,
+                             int( *branchcallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int brtype, int brset, int nodecnt, int bdcnt, const int *nodebeg, const int *xindex, const char *lu, const double *bd, const double *nodeest, int *useraction_p),
+                             void *cbhandle);
+
+
+
+int
+   CPXsetbranchnosolncallbackfunc (CPXENVptr env,
+                                   int( *branchnosolncallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int brtype, int brset, int nodecnt, int bdcnt, const int *nodebeg, const int *xindex, const char *lu, const double *bd, const double *nodeest, int *useraction_p),
+                                   void *cbhandle);
+
+
+
+int
+   CPXsetdeletenodecallbackfunc (CPXENVptr env,
+                                 void( *deletecallback)(CPXCENVptr xenv, int wherefrom, void *cbhandle, int seqnum, void *handle),
+                                 void *cbhandle);
+
+
+
+int
+   CPXsetheuristiccallbackfunc (CPXENVptr env,
+                                int( *heuristiccallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, double *objval_p, double *x, int *checkfeas_p, int *useraction_p),
+                                void *cbhandle);
+
+
+
+int
+   CPXsetincumbentcallbackfunc (CPXENVptr env,
+                                int( *incumbentcallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, double objval, double *x, int *isfeas_p, int *useraction_p),
+                                void *cbhandle);
+
+
+
+int
+   CPXsetinfocallbackfunc (CPXENVptr env,
+                           int( *callback)(CPXCENVptr, void *, int, void *),
+                           void *cbhandle);
+
+
+
+int
+   CPXsetlazyconstraintcallbackfunc (CPXENVptr env,
+                                     int( *lazyconcallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction_p),
+                                     void *cbhandle);
+
+
+
+int
+   CPXsetmipcallbackfunc (CPXENVptr env,
+                          int( *callback)(CPXCENVptr, void *, int, void *),
+                          void *cbhandle);
+
+
+
+int
+   CPXsetnodecallbackfunc (CPXENVptr env,
+                           int( *nodecallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *nodeindex, int *useraction),
+                           void *cbhandle);
+
+
+
+int
+   CPXsetsolvecallbackfunc (CPXENVptr env,
+                            int( *solvecallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction),
+                            void *cbhandle);
+
+
+
+int
+   CPXsetusercutcallbackfunc (CPXENVptr env,
+                              int( *cutcallback)(CPXCENVptr xenv, void *cbdata, int wherefrom, void *cbhandle, int *useraction_p),
+                              void *cbhandle);
+
+
+
+int
+   CPXwritemipstarts (CPXCENVptr env, CPXCLPptr lp,
+                      char const *filename_str, int begin, int end);
+# 2843 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXaddindconstr (CPXCENVptr env, CPXLPptr lp, int indvar,
+                    int complemented, int nzcnt, double rhs, int sense,
+                    int const *linind, double const *linval,
+                    char const *indname_str);
+# 2873 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXNETaddarcs (CPXCENVptr env, CPXNETptr net, int narcs,
+                  int const *fromnode, int const *tonode,
+                  double const *low, double const *up,
+                  double const *obj, char **anames);
+
+
+
+int
+   CPXNETaddnodes (CPXCENVptr env, CPXNETptr net, int nnodes,
+                   double const *supply, char **name);
+
+
+
+int
+   CPXNETbasewrite (CPXCENVptr env, CPXCNETptr net,
+                    char const *filename_str);
+
+
+
+int
+   CPXNETchgarcname (CPXCENVptr env, CPXNETptr net, int cnt,
+                     int const *indices, char **newname);
+
+
+
+int
+   CPXNETchgarcnodes (CPXCENVptr env, CPXNETptr net, int cnt,
+                      int const *indices, int const *fromnode,
+                      int const *tonode);
+
+
+
+int
+   CPXNETchgbds (CPXCENVptr env, CPXNETptr net, int cnt,
+                 int const *indices, char const *lu, double const *bd);
+
+
+
+int
+   CPXNETchgname (CPXCENVptr env, CPXNETptr net, int key, int vindex,
+                  char const *name_str);
+
+
+
+int
+   CPXNETchgnodename (CPXCENVptr env, CPXNETptr net, int cnt,
+                      int const *indices, char **newname);
+
+
+
+int
+   CPXNETchgobj (CPXCENVptr env, CPXNETptr net, int cnt,
+                 int const *indices, double const *obj);
+
+
+
+int
+   CPXNETchgobjsen (CPXCENVptr env, CPXNETptr net, int maxormin);
+
+
+
+int
+   CPXNETchgsupply (CPXCENVptr env, CPXNETptr net, int cnt,
+                    int const *indices, double const *supply);
+
+
+
+int
+   CPXNETcopybase (CPXCENVptr env, CPXNETptr net, int const *astat,
+                   int const *nstat);
+
+
+
+int
+   CPXNETcopynet (CPXCENVptr env, CPXNETptr net, int objsen,
+                  int nnodes, double const *supply, char **nnames,
+                  int narcs, int const *fromnode, int const *tonode,
+                  double const *low, double const *up,
+                  double const *obj, char **anames);
+
+
+
+CPXNETptr
+   CPXNETcreateprob (CPXENVptr env, int *status_p,
+                     char const *name_str);
+
+
+
+int
+   CPXNETdelarcs (CPXCENVptr env, CPXNETptr net, int begin, int end);
+
+
+
+int
+   CPXNETdelnodes (CPXCENVptr env, CPXNETptr net, int begin, int end);
+
+
+
+int
+   CPXNETdelset (CPXCENVptr env, CPXNETptr net, int *whichnodes,
+                 int *whicharcs);
+
+
+
+int
+   CPXNETfreeprob (CPXENVptr env, CPXNETptr *net_p);
+
+
+
+int
+   CPXNETgetarcindex (CPXCENVptr env, CPXCNETptr net,
+                      char const *lname_str, int *index_p);
+
+
+
+int
+   CPXNETgetarcname (CPXCENVptr env, CPXCNETptr net, char **nnames,
+                     char *namestore, int namespc, int *surplus_p,
+                     int begin, int end);
+
+
+
+int
+   CPXNETgetarcnodes (CPXCENVptr env, CPXCNETptr net, int *fromnode,
+                      int *tonode, int begin, int end);
+
+
+
+int
+   CPXNETgetbase (CPXCENVptr env, CPXCNETptr net, int *astat,
+                  int *nstat);
+
+
+
+int
+   CPXNETgetdj (CPXCENVptr env, CPXCNETptr net, double *dj, int begin,
+                int end);
+
+
+
+int
+   CPXNETgetitcnt (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetlb (CPXCENVptr env, CPXCNETptr net, double *low, int begin,
+                int end);
+
+
+
+int
+   CPXNETgetnodearcs (CPXCENVptr env, CPXCNETptr net, int *arccnt_p,
+                      int *arcbeg, int *arc, int arcspace,
+                      int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXNETgetnodeindex (CPXCENVptr env, CPXCNETptr net,
+                       char const *lname_str, int *index_p);
+
+
+
+int
+   CPXNETgetnodename (CPXCENVptr env, CPXCNETptr net, char **nnames,
+                      char *namestore, int namespc, int *surplus_p,
+                      int begin, int end);
+
+
+
+int
+   CPXNETgetnumarcs (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetnumnodes (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetobj (CPXCENVptr env, CPXCNETptr net, double *obj,
+                 int begin, int end);
+
+
+
+int
+   CPXNETgetobjsen (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetobjval (CPXCENVptr env, CPXCNETptr net, double *objval_p);
+
+
+
+int
+   CPXNETgetphase1cnt (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetpi (CPXCENVptr env, CPXCNETptr net, double *pi, int begin,
+                int end);
+
+
+
+int
+   CPXNETgetprobname (CPXCENVptr env, CPXCNETptr net, char *buf_str,
+                      int bufspace, int *surplus_p);
+
+
+
+int
+   CPXNETgetslack (CPXCENVptr env, CPXCNETptr net, double *slack,
+                   int begin, int end);
+
+
+
+int
+   CPXNETgetstat (CPXCENVptr env, CPXCNETptr net);
+
+
+
+int
+   CPXNETgetsupply (CPXCENVptr env, CPXCNETptr net, double *supply,
+                    int begin, int end);
+
+
+
+int
+   CPXNETgetub (CPXCENVptr env, CPXCNETptr net, double *up, int begin,
+                int end);
+
+
+
+int
+   CPXNETgetx (CPXCENVptr env, CPXCNETptr net, double *x, int begin,
+               int end);
+
+
+
+int
+   CPXNETprimopt (CPXCENVptr env, CPXNETptr net);
+
+
+
+int
+   CPXNETreadcopybase (CPXCENVptr env, CPXNETptr net,
+                       char const *filename_str);
+
+
+
+int
+   CPXNETreadcopyprob (CPXCENVptr env, CPXNETptr net,
+                       char const *filename_str);
+
+
+
+int
+   CPXNETsolninfo (CPXCENVptr env, CPXCNETptr net, int *pfeasind_p,
+                   int *dfeasind_p);
+
+
+
+int
+   CPXNETsolution (CPXCENVptr env, CPXCNETptr net, int *netstat_p,
+                   double *objval_p, double *x, double *pi,
+                   double *slack, double *dj);
+
+
+
+int
+   CPXNETwriteprob (CPXCENVptr env, CPXCNETptr net,
+                    char const *filename_str, char const *format_str);
+# 3175 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXchgqpcoef (CPXCENVptr env, CPXLPptr lp, int i, int j,
+                 double newvalue);
+
+
+
+int
+   CPXcopyqpsep (CPXCENVptr env, CPXLPptr lp, double const *qsepvec);
+
+
+
+int
+   CPXcopyquad (CPXCENVptr env, CPXLPptr lp, int const *qmatbeg,
+                int const *qmatcnt, int const *qmatind,
+                double const *qmatval);
+
+
+
+int
+   CPXgetnumqpnz (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetnumquad (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetqpcoef (CPXCENVptr env, CPXCLPptr lp, int rownum, int colnum,
+                 double *coef_p);
+
+
+
+int
+   CPXgetquad (CPXCENVptr env, CPXCLPptr lp, int *nzcnt_p,
+               int *qmatbeg, int *qmatind, double *qmatval,
+               int qmatspace, int *surplus_p, int begin, int end);
+
+
+
+int
+   CPXqpindefcertificate (CPXCENVptr env, CPXCLPptr lp, double *x);
+
+
+
+int
+   CPXqpopt (CPXCENVptr env, CPXLPptr lp);
+# 3248 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+
+int
+   CPXaddqconstr (CPXCENVptr env, CPXLPptr lp, int linnzcnt,
+                  int quadnzcnt, double rhs, int sense,
+                  int const *linind, double const *linval,
+                  int const *quadrow, int const *quadcol,
+                  double const *quadval, char const *lname_str);
+
+
+
+int
+   CPXdelqconstrs (CPXCENVptr env, CPXLPptr lp, int begin, int end);
+
+
+
+int
+   CPXgetnumqconstrs (CPXCENVptr env, CPXCLPptr lp);
+
+
+
+int
+   CPXgetqconstr (CPXCENVptr env, CPXCLPptr lp, int *linnzcnt_p,
+                  int *quadnzcnt_p, double *rhs_p, char *sense_p,
+                  int *linind, double *linval, int linspace,
+                  int *linsurplus_p, int *quadrow, int *quadcol,
+                  double *quadval, int quadspace, int *quadsurplus_p,
+                  int which);
+
+
+
+int
+   CPXgetqconstrdslack (CPXCENVptr env, CPXCLPptr lp, int qind,
+                        int *nz_p, int *ind, double *val, int space,
+                        int *surplus_p);
+
+
+
+int
+   CPXgetqconstrindex (CPXCENVptr env, CPXCLPptr lp,
+                       char const *lname_str, int *index_p);
+
+
+
+int
+   CPXgetqconstrinfeas (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                        double *infeasout, int begin, int end);
+
+
+
+int
+   CPXgetqconstrname (CPXCENVptr env, CPXCLPptr lp, char *buf_str,
+                      int bufspace, int *surplus_p, int which);
+
+
+
+int
+   CPXgetqconstrslack (CPXCENVptr env, CPXCLPptr lp, double *qcslack,
+                       int begin, int end);
+
+
+
+int
+   CPXgetxqxax (CPXCENVptr env, CPXCLPptr lp, double *xqxax, int begin,
+                int end);
+
+
+
+int
+   CPXqconstrslackfromx (CPXCENVptr env, CPXCLPptr lp, double const *x,
+                         double *qcslack);
+# 7 "sa.c" 2
+
+# 1 "ILP.h" 1
 
 
 # 1 "graph.h" 1
@@ -3889,8 +7243,6 @@ char *getbsize(int *headerlenp, long *blocksizep);
 # 7 "graph.h" 2
 
 
-
-# 9 "graph.h"
 typedef struct TU{
     int code;
     int num_code;
@@ -3904,12 +7256,72 @@ typedef struct TU{
 # 16 "graph.h"
         assigned;
     int cluster_id;
+    int visited;
+    int unit_id;
+    int* neighbor_ids;
 } TU;
 
 TU** graph (char* fp, int* d, int* k, int* n, int* m);
 
 void free_units(TU** units);
-# 4 "sa.h" 2
+# 4 "ILP.h" 2
+# 1 "state.h" 1
+
+
+
+
+typedef struct
+{
+    TU **units;
+    int size;
+    int population;
+} Cluster;
+
+int _pop_ideal(int d);
+void popul_test1(TU **units, int n, int k, int ideal_pop);
+long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_pop);
+int energy_compactness(Cluster *clusters, int k);
+
+int
+energy(TU** units, Cluster* clusters, int margin, int k, int n);
+Cluster** first_cluster(TU **units, int k, int n);
+void change_unit(Cluster *clusters, TU **units, int k, int n);
+
+
+Cluster**
+transitionBound(int ell , TU** units, int k, int n, FILE *pf_out
+  );
+
+
+Cluster** storeState(Cluster *clusters, int k, int n);
+# 5 "ILP.h" 2
+typedef struct {
+    int code;
+    int *indices;
+} Mapping;
+
+typedef struct {
+    int code;
+    int index;
+    int num_mappings;
+    Mapping *mappings;
+} CodeIndexMapping;
+
+void create_code_index(TU **units, int n);
+
+
+void create_flow_decision_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp);
+
+int create_decision_variables(TU **units,int k, int n, CPXENVptr env, CPXLPptr lp);
+
+void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int ideal_pop);
+
+Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters);
+# 9 "sa.c" 2
+# 1 "sa.h" 1
+
+
+
 
 
 
@@ -3932,36 +7344,10 @@ runSA(double Tstart,
       double Tstop,
       int batch,
       int steps,
-      TU** units, int k, int n, int m
+      TU** units, int k, int n, int m, int populacao_ideal
       );
-# 8 "sa.c" 2
-# 1 "state.h" 1
+# 10 "sa.c" 2
 
-
-
-
-typedef struct
-{
-    TU **units;
-    int size;
-    int population;
-} Cluster;
-long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n);
-int energy_compactness(Cluster *clusters, int k);
-
-int
-energy(TU** units, Cluster* clusters, int margin, int k, int n);
-Cluster** first_cluster(TU **units, int k, int n);
-void change_unit(Cluster *clusters, TU **units, int k, int n);
-
-
-Cluster**
-transitionBound(int ell , TU** units, int k, int n, FILE *pf_out
-  );
-
-
-Cluster** storeState(Cluster *clusters, int k, int n);
-# 9 "sa.c" 2
 
 # 1 "timer.h" 1
 
@@ -3972,10 +7358,7 @@ startTimer(void);
 
 double
 getTime(void);
-# 11 "sa.c" 2
-
-
-
+# 13 "sa.c" 2
 
 static int
 myRandom(void)
@@ -3990,16 +7373,16 @@ getTemperature(double cp,
 )
 {
   
-# 27 "sa.c" 3 4
+# 26 "sa.c" 3 4
  ((void) (0))
                                   
-# 28 "sa.c"
+# 27 "sa.c"
                                  ;
   
-# 29 "sa.c" 3 4
+# 28 "sa.c" 3 4
  ((void) (0))
                                                        
-# 30 "sa.c"
+# 29 "sa.c"
                                                       ;
 
   double res = cp;
@@ -4033,161 +7416,291 @@ getEll(double T,
   return (int)c;
 }
 
+void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
+{
+  int total_population = 0;
+  double max_population_deviation_percentage = 0.0;
+  double final_population_deviation = 0.0;
+  int total_deviation = 0;
+  int max_deviation = 0;
+  double deviation_percentage = 0.0;
+
+  printf("ideal pop: %d\n", ideal_population);
+  fprintf(output_file, "\nBest solution found:\n");
+  printf("Best solution found:\n");
+  for (int i = 0; i < k; i++)
+  {
+    int pop_cluster = 0;
+    printf("%d:", i);
+    fprintf(output_file, "%d:", i);
+    for (int j = 0; j < best_clusters[i].size; j++)
+    {
+      pop_cluster = pop_cluster + best_clusters[i].units[j]->voters;
+      int unit_code = best_clusters[i].units[j]->code / 1;
+      printf("%d,", unit_code);
+      fprintf(output_file, "%d,", unit_code);
+    }
+    printf(" --> população: %d", pop_cluster);
+    printf("\n");
+    fprintf(output_file, " --> população: %d", pop_cluster);
+    fprintf(output_file, "\n");
+
+    int deviation = abs(pop_cluster - ideal_population);
+    printf("deviation: %d\n", deviation);
+    if (deviation > max_deviation)
+    {
+      max_deviation = deviation;
+    }
+
+    deviation_percentage = ((double)max_deviation / ideal_population) * 100.0;
+  }
+  printf("final population deviation to theoretical best value: %lf%%\n", deviation_percentage);
+  fprintf(output_file, "final population deviation to theoretical best value: %lf%%\n", deviation_percentage);
+
+  printf("maximum deviation of population between electoral districts: %lf%%\n", deviation_percentage);
+  fprintf(output_file, "maximum deviation of population between electoral districts: %lf%%\n", deviation_percentage);
+
+  int energy__compactness = energy_compactness(best_clusters, k);
+  printf("fronteiras internas: %d\n\n", energy__compactness);
+  fprintf(output_file, "fronteiras internas: %d\n\n", energy__compactness);
+}
+
 int runSA(double Tstart,
           double Tstop,
           int batch,
           int steps,
-          TU **units, int k, int n, int m)
+          TU **units, int k, int n, int m, int ideal_pop)
 {
-  printf("\nSA start!\n\n");
-
 
   int max = 0;
   double T = Tstart;
   double Td = Tstop - Tstart;
   Td /= steps;
-
   int ell = 1;
   unsigned int R;
-  srand(time(
-# 79 "sa.c" 3 4
-            ((void *)0)
-# 79 "sa.c"
-                ));
-  FILE *output_file = fopen("output.txt", "w");
-  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
-  Cluster *clusters = first_cluster(units, k, n);
-  for (int i = 0; i < k; i++)
-      {
-
-        fprintf(output_file, "0,%d:", i);
-        for (int j = 0; j < clusters[i].size; j++)
-        {
-          int unit_code = clusters[i].units[j]->code / 1;
-
-          fprintf(output_file, "%d,", unit_code);
-        }
-
-
-        fprintf(output_file, "\n");
-      }
-
   long long best_energy_population = 0x7fffffffffffffffL;
   int best_energy_compactness = 
-# 99 "sa.c" 3 4
+# 125 "sa.c" 3 4
                                (-0x7fffffff - 1)
-# 99 "sa.c"
+# 125 "sa.c"
                                       ;
+  long long Final_energy_population = 0x7fffffffffffffffL;
+  int Final_energy_compactness = 
+# 127 "sa.c" 3 4
+                                (-0x7fffffff - 1)
+# 127 "sa.c"
+                                       ;
   Cluster *stored_state = 
-# 100 "sa.c" 3 4
+# 128 "sa.c" 3 4
                          ((void *)0)
-# 100 "sa.c"
+# 128 "sa.c"
                              ;
+
+  double ratio = Tstop / Tstart;
+
+  double exponent = 1.0 / steps;
+
+  double alpha = pow(ratio, exponent);
+
+  int perfect_score = 0;
+  int not_as_great_score = 0;
+# 147 "sa.c"
+  printf("\nSA start!\n\n");
+
+  double startingValue = 1.0;
+  double endingValue = 0.000001;
+  int numIterations = 2000000;
+
+  double increment = (endingValue - startingValue) / (numIterations - 1);
+
+  int iteration;
+  double value;
+  srand(time(
+# 157 "sa.c" 3 4
+            ((void *)0)
+# 157 "sa.c"
+                ));
+  FILE *output_file = fopen("output.txt", "w");
+  FILE *sa_graph_file = fopen("SA_graph.txt", "w");
+  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
+
+  Cluster *clusters = first_cluster(units, k, n);
+  Cluster *best_clusters = 
+# 163 "sa.c" 3 4
+                          ((void *)0)
+# 163 "sa.c"
+                              ;
+
+
+
   for (int i = 0; i < k; i++)
   {
+    int pop_cluster = 0;
+    fprintf(output_file, "0,%d:", i);
     printf("Cluster %d with size %d: ", i, clusters[i].size);
     for (int j = 0; j < clusters[i].size; j++)
     {
+      int unit_code = clusters[i].units[j]->code / 1;
       printf("%d ", clusters[i].units[j]->code);
+      fprintf(output_file, "%d,", unit_code);
+      pop_cluster = pop_cluster + clusters[i].units[j]->voters;
     }
+    printf(" --> população: %d", pop_cluster);
     printf("\n");
+    fprintf(output_file, "\n");
   }
-  printf("Tstart: %f, Tstop: %f, steps: %d\n", Tstart, Tstop, steps);
-  double ratio = Tstop / Tstart;
-  printf("ratio: %f\n", ratio);
-  double exponent = 1.0 / steps;
-  printf("exponent: %f\n", exponent);
-  double alpha = pow(ratio, exponent);
-  printf("alpha: %f\n", alpha);
 
-
-
-  for (int s = 1; s <= steps; s++)
+  for (int s = 1; s <= numIterations; s++)
   {
 
     ell = getEll(T, &R);
     FILE *fp_out = fopen("cluster_info.txt", "w");
     change_unit(clusters, units, k, n);
+# 218 "sa.c"
+    long long energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
 
-    long long energy__population = energy_population(units, clusters, m, k, n);
     int energy__compactness = energy_compactness(clusters, k);
-
     double accept_prob = 0.0;
-
     if (energy__compactness > best_energy_compactness && energy__population == 0)
     {
       accept_prob = 1.0;
-    }
+      perfect_score++;
+     }
     else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
     {
-      accept_prob = exp(1.0 / T);
+       accept_prob = startingValue + (increment * (s - 1));
 
-      fprintf(output_file, "prob: %f compact\n", accept_prob);
     }
     else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population)
     {
-      accept_prob = exp(1.0 / T);
-      fprintf(output_file, "prob: %f pop\n", accept_prob);
+      accept_prob = startingValue + (increment * (s - 1));
+
     }
     else
     {
+
       accept_prob = 0.0;
     }
+
+
+
     double random_number = (double)rand() / (double)
-# 151 "sa.c" 3 4
+# 245 "sa.c" 3 4
                                                    2147483647
-# 151 "sa.c"
+# 245 "sa.c"
                                                            ;
     if (random_number < accept_prob)
     {
+      if (accept_prob != 1.0)
+        not_as_great_score++;
+
+      if ((energy__compactness > Final_energy_compactness && energy__population <= Final_energy_population) ||
+          (energy__compactness >= Final_energy_compactness && energy__population < Final_energy_population))
+      {
+        Final_energy_compactness = energy__compactness;
+        Final_energy_population = energy__population;
+
+        if (best_clusters == 
+# 257 "sa.c" 3 4
+                            ((void *)0)
+# 257 "sa.c"
+                                )
+        {
+          best_clusters = malloc(k * sizeof(Cluster));
+          for (int i = 0; i < k; i++)
+          {
+            best_clusters[i].units = malloc(n * sizeof(TU *));
+            best_clusters[i].size = 0;
+          }
+        }
+        for (int i = 0; i < k; i++)
+        {
+          best_clusters[i].size = clusters[i].size;
+          memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+        }
+      }
 
       best_energy_compactness = energy__compactness;
       best_energy_population = energy__population;
 
+      int max_deviation = 0;
+      double deviation_percentage = 0.0;
 
       for (int i = 0; i < k; i++)
       {
         int pop_cluster = 0;
-
         fprintf(output_file, "%d,%d:", s, i);
         for (int j = 0; j < clusters[i].size; j++)
         {
           pop_cluster = pop_cluster + clusters[i].units[j]->voters;
           int unit_code = clusters[i].units[j]->code / 1;
-
           fprintf(output_file, "%d,", unit_code);
         }
-
         fprintf(output_file, " --> população: %d", pop_cluster);
         fprintf(output_file, "\n");
+
+        int deviation = abs(pop_cluster - ideal_pop);
+        if (deviation > max_deviation)
+        {
+          max_deviation = deviation;
+        }
       }
+      deviation_percentage = ((double)max_deviation / ideal_pop) * 100.0;
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
-      fprintf(output_file, "fronteiras internas: %d\n", best_energy_compactness);
+      fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
 
-
-
+      fprintf(sa_graph_file, "%d,%f,%f\n", s, deviation_percentage, T);
 
       stored_state = storeState(clusters, k, n);
     }
-    T *= alpha;
 
 
-  }
 
-  for (int i = 0; i < k; i++)
+
+    if (s % (numIterations/15) == 0)
+    {
+      printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
+      accept_prob = startingValue + (increment * (s - 1));
+      for (int i = 0; i < k; i++)
       {
-
-
+        int pop_cluster = 0; printf("Cluster %d with size %d: ", i, clusters[i].size);
         for (int j = 0; j < clusters[i].size; j++)
         {
+          pop_cluster = pop_cluster + clusters[i].units[j]->voters;
           int unit_code = clusters[i].units[j]->code / 1;
 
-
         }
+        printf(" --> população: %d", pop_cluster);
+        printf("\n");
 
-
-        fprintf(output_file, "\n");
       }
+      printf("fronteiras: %d prob: %f\n\n", energy__compactness, accept_prob);
+
+
+
+
+
+      perfect_score = 0;
+      not_as_great_score = 0;
+    }
+    T *= alpha;
+
+    increment = (endingValue - startingValue) / (numIterations - 1);
+  }
+
+  if (best_clusters != 
+# 341 "sa.c" 3 4
+                      ((void *)0)
+# 341 "sa.c"
+                          )
+  {
+    print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+    for (int i = 0; i < k; i++)
+    {
+      free(best_clusters[i].units);
+    }
+    free(best_clusters);
+  }
   fclose(output_file);
 
   printf("\n");

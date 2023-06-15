@@ -15,12 +15,12 @@ main(int argc,
      char **argv
      )
 {
-  double cp_start = 0.9;
-  int d_start = -15;
-  double cp_end = 0.001;
+  double cp_start = 0.09;
+  int d_start = -1;
+  double cp_end = 0.01;
   int d_end = -1;
   int bp = 1; /* Batch size power of 2   4 */
-  int sp = 20; /* Number of steps power of 2   10*/
+  int sp = 1; /* Number of steps power of 2   10*/
 
   startTimer();
 
@@ -46,14 +46,17 @@ main(int argc,
     TU** units = malloc(n * sizeof(TU*)); 
 
     units = graph(filename, &d, &k, &n, &m);
+
+    int populacao_ideal = _pop_ideal(d);
+
     
-    printf("SA(bp=%d)\n", 1<<sp);
+    printf("SA(sp=%d) and pop: %d\n", 1<<sp, populacao_ideal);
 
     runSA(
 	  getTemperature(cp_start, d_start),
 	  getTemperature(cp_end, d_end),
 	  1<<bp, /* Batch size */
-	  1<<sp /* Number of steps */, units, k, n, m
+	  1<<sp /* Number of steps */, units, k, n, m, populacao_ideal
     
 	  );
 

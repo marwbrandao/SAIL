@@ -23,7 +23,7 @@ runSA(double Tstart, /* [in] starting temperature */
       double Tstop, /* [in] stopping temperature */
       int batch, /* [in] number of iterations in a batch */
       int steps, /* [in] number of steps to execute */
-      TU** units, int k, int n, int m
+      TU** units, int k, int n, int m, int populacao_ideal
       );
 
 #endif /* _SA_H */
