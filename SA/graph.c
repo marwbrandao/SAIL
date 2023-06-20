@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <bsd/stdlib.h>
+//#include <bsd/stdlib.h>
 /* #include <stdio.h> */
 #include "graph.h"
 

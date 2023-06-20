@@ -5,639 +5,164 @@
 	.string	"d%d_k%d_n%d_m%d.data"
 .LC1:
 	.string	"r"
-.LC4:
+.LC2:
 	.string	"'%d':"
-.LC5:
+.LC3:
 	.string	"'voters':"
-.LC6:
+.LC4:
 	.string	"%d,"
-.LC7:
+.LC5:
 	.string	"%d"
 	.text
 	.p2align 4
 	.globl	graph
 	.type	graph, @function
 graph:
-.LFB57:
+.LFB51:
 	.cfi_startproc
 	endbr64
-	pushq	%r15
-	.cfi_def_cfa_offset 16
-	.cfi_offset 15, -16
-	movq	%r8, %r9
-	movq	%rcx, %r8
-	pushq	%r14
-	.cfi_def_cfa_offset 24
-	.cfi_offset 14, -24
-	pushq	%r13
-	.cfi_def_cfa_offset 32
-	.cfi_offset 13, -32
-	pushq	%r12
-	.cfi_def_cfa_offset 40
-	.cfi_offset 12, -40
 	pushq	%rbp
-	.cfi_def_cfa_offset 48
-	.cfi_offset 6, -48
-	movq	%rdi, %rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	pushq	%r15
+	pushq	%r14
+	pushq	%r13
+	pushq	%r12
 	pushq	%rbx
-	.cfi_def_cfa_offset 56
+	subq	$328, %rsp
+	.cfi_offset 15, -24
+	.cfi_offset 14, -32
+	.cfi_offset 13, -40
+	.cfi_offset 12, -48
 	.cfi_offset 3, -56
+1:	call	*mcount@GOTPCREL(%rip)
+	movq	%fs:40, %rax
+	movq	%rax, -56(%rbp)
+	xorl	%eax, %eax
+	movq	%rdi, %r12
 	movq	%rcx, %rbx
+	movq	%r8, %r9
+	lock addq	$1, __gcov0.graph(%rip)
+	movq	%rcx, %r8
 	movq	%rdx, %rcx
 	movq	%rsi, %rdx
 	leaq	.LC0(%rip), %rsi
-	subq	$312, %rsp
-	.cfi_def_cfa_offset 368
-	movq	%fs:40, %rax
-	movq	%rax, 296(%rsp)
-	xorl	%eax, %eax
-	leaq	32(%rsp), %r12
 	call	__isoc99_sscanf@PLT
 	leaq	.LC1(%rip), %rsi
-	movq	%rbp, %rdi
+	movq	%r12, %rdi
 	call	fopen@PLT
+	movq	%rax, -352(%rbp)
+	lock addq	$1, 8+__gcov0.graph(%rip)
 	movslq	(%rbx), %rdi
-	movq	%rax, 16(%rsp)
 	salq	$3, %rdi
 	call	malloc@PLT
-	movq	%rax, 24(%rsp)
-	movq	%rax, (%rsp)
+	leaq	-320(%rbp), %r12
+	movq	%rax, -360(%rbp)
+	movq	%rax, -328(%rbp)
 	.p2align 4,,10
 	.p2align 3
 .L2:
-	movq	16(%rsp), %rdx
+	movq	-352(%rbp), %rdx
 	movl	$256, %esi
 	movq	%r12, %rdi
 	call	fgets@PLT
 	testq	%rax, %rax
-	je	.L75
+	je	.L17
 	movl	$56, %edi
 	call	malloc@PLT
 	movq	%rax, %rbx
-	movq	%r12, %rax
-.L3:
-	movl	(%rax), %ecx
-	addq	$4, %rax
-	leal	-16843009(%rcx), %edx
-	notl	%ecx
-	andl	%ecx, %edx
-	andl	$-2139062144, %edx
-	je	.L3
-	movl	%edx, %ecx
-	shrl	$16, %ecx
-	testl	$32896, %edx
-	cmove	%ecx, %edx
-	leaq	2(%rax), %rcx
-	cmove	%rcx, %rax
-	movl	%edx, %esi
-	addb	%dl, %sil
-	sbbq	$3, %rax
-	subq	%r12, %rax
-	je	.L30
-	leaq	-1(%rax), %rdx
-	cmpq	$14, %rdx
-	jbe	.L31
-	movdqa	32(%rsp), %xmm1
-	pxor	%xmm0, %xmm0
-	pxor	%xmm3, %xmm3
-	movq	%rax, %rdx
-	movdqa	%xmm3, %xmm4
-	shrq	$4, %rdx
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm0
-	movdqa	%xmm1, %xmm2
-	punpcklbw	%xmm0, %xmm2
-	punpckhbw	%xmm0, %xmm1
-	pcmpgtw	%xmm2, %xmm4
-	movdqa	%xmm2, %xmm5
-	movdqa	%xmm2, %xmm0
-	movdqa	%xmm1, %xmm2
-	punpcklwd	%xmm4, %xmm5
-	punpckhwd	%xmm4, %xmm0
-	movdqa	%xmm3, %xmm4
-	pcmpgtw	%xmm1, %xmm4
-	paddd	%xmm5, %xmm0
-	punpcklwd	%xmm4, %xmm2
-	punpckhwd	%xmm4, %xmm1
-	paddd	%xmm2, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$1, %rdx
-	je	.L7
-	movdqa	48(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm2
-	punpcklwd	%xmm5, %xmm2
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm2, %xmm0
-	movdqa	%xmm3, %xmm2
-	pcmpgtw	%xmm1, %xmm2
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm2, %xmm4
-	punpckhwd	%xmm2, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$2, %rdx
-	je	.L7
-	movdqa	64(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm2
-	punpcklwd	%xmm5, %xmm2
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm2, %xmm0
-	movdqa	%xmm3, %xmm2
-	pcmpgtw	%xmm1, %xmm2
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm2, %xmm4
-	punpckhwd	%xmm2, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$3, %rdx
-	je	.L7
-	movdqa	80(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm2
-	punpcklwd	%xmm5, %xmm2
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm2, %xmm0
-	movdqa	%xmm3, %xmm2
-	pcmpgtw	%xmm1, %xmm2
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm2, %xmm4
-	punpckhwd	%xmm2, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$4, %rdx
-	je	.L7
-	movdqa	96(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm2
-	punpcklwd	%xmm5, %xmm2
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm2, %xmm0
-	movdqa	%xmm3, %xmm2
-	pcmpgtw	%xmm1, %xmm2
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm2, %xmm4
-	punpckhwd	%xmm2, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$5, %rdx
-	je	.L7
-	movdqa	112(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm2
-	punpcklwd	%xmm5, %xmm2
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm2, %xmm0
-	movdqa	%xmm3, %xmm2
-	pcmpgtw	%xmm1, %xmm2
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm2, %xmm4
-	punpckhwd	%xmm2, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$6, %rdx
-	je	.L7
-	movdqa	128(%rsp), %xmm2
-	pxor	%xmm1, %xmm1
-	movdqa	%xmm3, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm2
-	pand	.LC3(%rip), %xmm2
-	pcmpgtb	%xmm2, %xmm1
-	movdqa	%xmm2, %xmm4
-	punpcklbw	%xmm1, %xmm4
-	punpckhbw	%xmm1, %xmm2
-	pcmpgtw	%xmm4, %xmm5
-	pcmpgtw	%xmm2, %xmm3
-	movdqa	%xmm4, %xmm1
-	punpcklwd	%xmm5, %xmm1
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm1, %xmm0
-	movdqa	%xmm3, %xmm1
-	movdqa	%xmm2, %xmm3
-	paddd	%xmm4, %xmm0
-	punpcklwd	%xmm1, %xmm3
-	punpckhwd	%xmm1, %xmm2
-	paddd	%xmm3, %xmm0
-	paddd	%xmm2, %xmm0
-	cmpq	$7, %rdx
-	je	.L7
-	movdqa	144(%rsp), %xmm1
-	pxor	%xmm2, %xmm2
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm2
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm2, %xmm4
-	punpckhbw	%xmm2, %xmm1
-	pxor	%xmm2, %xmm2
-	movdqa	%xmm2, %xmm5
-	movdqa	%xmm4, %xmm3
-	pcmpgtw	%xmm4, %xmm5
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$8, %rdx
-	je	.L7
-	movdqa	160(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$9, %rdx
-	je	.L7
-	movdqa	176(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$10, %rdx
-	je	.L7
-	movdqa	192(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$11, %rdx
-	je	.L7
-	movdqa	208(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$12, %rdx
-	je	.L7
-	movdqa	224(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$13, %rdx
-	je	.L7
-	movdqa	240(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	punpckhwd	%xmm5, %xmm4
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm2, %xmm3
-	pcmpgtw	%xmm1, %xmm3
-	paddd	%xmm4, %xmm0
-	movdqa	%xmm1, %xmm4
-	punpcklwd	%xmm3, %xmm4
-	punpckhwd	%xmm3, %xmm1
-	paddd	%xmm4, %xmm0
-	paddd	%xmm1, %xmm0
-	cmpq	$15, %rdx
-	jne	.L7
-	movdqa	256(%rsp), %xmm1
-	pxor	%xmm3, %xmm3
-	movdqa	%xmm2, %xmm5
-	pcmpeqb	.LC2(%rip), %xmm1
-	pand	.LC3(%rip), %xmm1
-	pcmpgtb	%xmm1, %xmm3
-	movdqa	%xmm1, %xmm4
-	punpcklbw	%xmm3, %xmm4
-	punpckhbw	%xmm3, %xmm1
-	pcmpgtw	%xmm4, %xmm5
-	pcmpgtw	%xmm1, %xmm2
-	movdqa	%xmm4, %xmm3
-	punpcklwd	%xmm5, %xmm3
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm4, %xmm3
-	punpckhwd	%xmm5, %xmm3
-	paddd	%xmm3, %xmm0
-	movdqa	%xmm1, %xmm3
-	punpcklwd	%xmm2, %xmm3
-	paddd	%xmm0, %xmm3
-	movdqa	%xmm1, %xmm0
-	punpckhwd	%xmm2, %xmm0
-	paddd	%xmm3, %xmm0
+	lock addq	$1, 16+__gcov0.graph(%rip)
+	xorl	%esi, %esi
+	xorl	%r15d, %r15d
+	jmp	.L3
 	.p2align 4,,10
 	.p2align 3
 .L7:
-	movdqa	%xmm0, %xmm1
-	movq	%rax, %rcx
-	psrldq	$8, %xmm1
-	andq	$-16, %rcx
-	paddd	%xmm1, %xmm0
-	movl	%ecx, %edx
-	movdqa	%xmm0, %xmm1
-	psrldq	$4, %xmm1
-	paddd	%xmm1, %xmm0
-	movd	%xmm0, %ebp
-	cmpq	%rcx, %rax
-	je	.L5
-.L6:
-	movslq	%edx, %rcx
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L9
-	addl	$1, %ebp
-.L9:
-	leal	1(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L10
-	addl	$1, %ebp
-.L10:
-	leal	2(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L11
-	addl	$1, %ebp
-.L11:
-	leal	3(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L12
-	addl	$1, %ebp
-.L12:
-	leal	4(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L13
-	addl	$1, %ebp
-.L13:
-	leal	5(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L14
-	addl	$1, %ebp
-.L14:
-	leal	6(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L15
-	addl	$1, %ebp
-.L15:
-	leal	7(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L16
-	addl	$1, %ebp
-.L16:
-	leal	8(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L17
-	addl	$1, %ebp
-.L17:
-	leal	9(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L18
-	addl	$1, %ebp
-.L18:
-	leal	10(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L19
-	addl	$1, %ebp
-.L19:
-	leal	11(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L20
-	addl	$1, %ebp
-.L20:
-	leal	12(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L21
-	addl	$1, %ebp
-.L21:
-	leal	13(%rdx), %ecx
-	movslq	%ecx, %rcx
-	cmpq	%rcx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rcx)
-	jne	.L22
-	addl	$1, %ebp
-.L22:
-	addl	$14, %edx
-	movslq	%edx, %rdx
-	cmpq	%rdx, %rax
-	jbe	.L5
-	cmpb	$58, 32(%rsp,%rdx)
-	jne	.L5
-	addl	$1, %ebp
-	.p2align 4,,10
-	.p2align 3
+	cmpb	$58, (%r12,%rsi)
+	jne	.L4
+	lock addq	$1, 24+__gcov0.graph(%rip)
+	addl	$1, %r15d
+.L4:
+	lock addq	$1, 32+__gcov0.graph(%rip)
+	addq	$1, %rsi
+.L3:
+	movq	%r12, %rdx
 .L5:
+	movl	(%rdx), %ecx
+	addq	$4, %rdx
+	leal	-16843009(%rcx), %eax
+	notl	%ecx
+	andl	%ecx, %eax
+	andl	$-2139062144, %eax
+	je	.L5
+	movl	%eax, %ecx
+	shrl	$16, %ecx
+	testl	$32896, %eax
+	cmove	%ecx, %eax
+	leaq	2(%rdx), %rcx
+	cmove	%rcx, %rdx
+	movl	%eax, %edi
+	addb	%al, %dil
+	sbbq	$3, %rdx
+	subq	%r12, %rdx
+	cmpq	%rsi, %rdx
+	ja	.L7
 	movq	%rbx, %rdx
-	leaq	.LC4(%rip), %rsi
+	leaq	.LC2(%rip), %rsi
 	movq	%r12, %rdi
 	xorl	%eax, %eax
 	call	__isoc99_sscanf@PLT
-	leaq	.LC5(%rip), %rsi
+	leaq	.LC3(%rip), %rsi
 	movq	%r12, %rdi
-	subl	$2, %ebp
+	subl	$2, %r15d
 	call	strstr@PLT
 	leaq	8(%rbx), %rdx
-	leaq	.LC6(%rip), %rsi
+	leaq	.LC4(%rip), %rsi
 	leaq	9(%rax), %rdi
 	xorl	%eax, %eax
 	call	__isoc99_sscanf@PLT
 	movl	$44, %esi
 	movq	%r12, %rdi
 	call	strchr@PLT
-	movslq	%ebp, %rdi
-	movl	%ebp, 12(%rbx)
-	leaq	0(,%rdi,4), %r15
+	movl	%r15d, 12(%rbx)
+	movslq	%r15d, %rdi
+	salq	$2, %rdi
 	leaq	2(%rax), %r14
-	movq	%r15, %rdi
+	movq	%rdi, -336(%rbp)
 	call	malloc@PLT
-	movq	%r15, %rdi
+	movq	-336(%rbp), %rdi
 	movq	%rax, 16(%rbx)
-	movq	%rax, 8(%rsp)
+	movq	%rax, -344(%rbp)
 	call	malloc@PLT
 	movb	$0, 32(%rbx)
 	movq	%rax, 24(%rbx)
-	testl	%ebp, %ebp
-	jle	.L25
-	movq	8(%rsp), %rdx
+	testl	%r15d, %r15d
+	jle	.L8
+	movq	-344(%rbp), %rdx
 	xorl	%r15d, %r15d
-	leaq	.LC4(%rip), %rbp
-	jmp	.L27
+	jmp	.L11
 	.p2align 4,,10
 	.p2align 3
-.L76:
+.L9:
+	lock addq	$1, 48+__gcov0.graph(%rip)
+	movl	$44, %esi
+	movq	%r14, %rdi
+	addq	$1, %r15
+	call	strchr@PLT
+	movl	$32, %esi
+	leaq	1(%rax), %rdi
+	call	strchr@PLT
+	leaq	1(%rax), %r14
+	cmpl	%r15d, 12(%rbx)
+	jle	.L8
+.L10:
 	movq	16(%rbx), %rdx
-.L27:
+.L11:
 	leaq	0(,%r15,4), %r13
 	movq	%r14, %rdi
-	movq	%rbp, %rsi
+	leaq	.LC2(%rip), %rsi
 	xorl	%eax, %eax
 	addq	%r13, %rdx
 	call	__isoc99_sscanf@PLT
@@ -645,152 +170,192 @@ graph:
 	movl	$58, %esi
 	call	strchr@PLT
 	movq	24(%rbx), %rdx
-	leaq	.LC7(%rip), %rsi
+	leaq	.LC5(%rip), %rsi
 	leaq	1(%rax), %r14
 	xorl	%eax, %eax
 	addq	%r13, %rdx
 	movq	%r14, %rdi
 	call	__isoc99_sscanf@PLT
-	movl	12(%rbx), %r13d
-	leal	-1(%r13), %eax
+	movl	12(%rbx), %eax
+	subl	$1, %eax
 	cmpl	%r15d, %eax
-	je	.L26
-	movq	%r14, %rdi
-	movl	$44, %esi
-	call	strchr@PLT
-	movl	$32, %esi
-	leaq	1(%rax), %rdi
-	call	strchr@PLT
-	leaq	1(%rax), %r14
-.L26:
+	jne	.L9
+	lock addq	$1, 40+__gcov0.graph(%rip)
 	addq	$1, %r15
-	cmpl	%r15d, %r13d
-	jg	.L76
-.L25:
-	movq	(%rsp), %rax
+	cmpl	%r15d, 12(%rbx)
+	jg	.L10
+.L8:
+	movq	-328(%rbp), %rax
 	movq	%rbx, (%rax)
 	addq	$8, %rax
-	movq	%rax, (%rsp)
+	movq	%rax, -328(%rbp)
 	jmp	.L2
 	.p2align 4,,10
 	.p2align 3
-.L75:
-	movq	296(%rsp), %rax
+.L17:
+	lock addq	$1, 56+__gcov0.graph(%rip)
+	movq	-56(%rbp), %rax
 	xorq	%fs:40, %rax
-	jne	.L77
-	movq	24(%rsp), %rax
-	addq	$312, %rsp
-	.cfi_remember_state
-	.cfi_def_cfa_offset 56
+	jne	.L18
+	movq	-360(%rbp), %rax
+	addq	$328, %rsp
 	popq	%rbx
-	.cfi_def_cfa_offset 48
-	popq	%rbp
-	.cfi_def_cfa_offset 40
 	popq	%r12
-	.cfi_def_cfa_offset 32
 	popq	%r13
-	.cfi_def_cfa_offset 24
 	popq	%r14
-	.cfi_def_cfa_offset 16
 	popq	%r15
-	.cfi_def_cfa_offset 8
+	popq	%rbp
+	.cfi_remember_state
+	.cfi_def_cfa 7, 8
 	ret
-	.p2align 4,,10
-	.p2align 3
-.L30:
+.L18:
 	.cfi_restore_state
-	xorl	%ebp, %ebp
-	jmp	.L5
-.L31:
-	xorl	%edx, %edx
-	xorl	%ebp, %ebp
-	jmp	.L6
-.L77:
 	call	__stack_chk_fail@PLT
 	.cfi_endproc
-.LFE57:
+.LFE51:
 	.size	graph, .-graph
 	.p2align 4
 	.globl	free_units
 	.type	free_units, @function
 free_units:
-.LFB58:
+.LFB52:
 	.cfi_startproc
 	endbr64
-	pushq	%r12
-	.cfi_def_cfa_offset 16
-	.cfi_offset 12, -16
-	movq	%rdi, %r12
 	pushq	%rbp
-	.cfi_def_cfa_offset 24
-	.cfi_offset 6, -24
-	leaq	80(%rdi), %rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	pushq	%r13
+	pushq	%r12
 	pushq	%rbx
-	.cfi_def_cfa_offset 32
-	.cfi_offset 3, -32
+	subq	$8, %rsp
+	.cfi_offset 13, -24
+	.cfi_offset 12, -32
+	.cfi_offset 3, -40
+1:	call	*mcount@GOTPCREL(%rip)
+	movq	%rdi, %r13
+	lock addq	$1, __gcov0.free_units(%rip)
 	movq	%rdi, %rbx
+	leaq	80(%rdi), %r12
 	.p2align 4,,10
 	.p2align 3
-.L79:
+.L20:
 	movq	(%rbx), %rax
-	addq	$8, %rbx
 	movq	16(%rax), %rdi
 	call	free@PLT
-	movq	-8(%rbx), %rax
+	movq	(%rbx), %rax
 	movq	24(%rax), %rdi
 	call	free@PLT
-	movq	-8(%rbx), %rdi
+	movq	(%rbx), %rdi
 	call	free@PLT
-	cmpq	%rbp, %rbx
-	jne	.L79
+	lock addq	$1, 8+__gcov0.free_units(%rip)
+	addq	$8, %rbx
+	cmpq	%r12, %rbx
+	jne	.L20
+	addq	$8, %rsp
+	movq	%r13, %rdi
 	popq	%rbx
-	.cfi_def_cfa_offset 24
-	movq	%r12, %rdi
-	popq	%rbp
-	.cfi_def_cfa_offset 16
 	popq	%r12
-	.cfi_def_cfa_offset 8
+	popq	%r13
+	popq	%rbp
+	.cfi_def_cfa 7, 8
 	jmp	free@PLT
 	.cfi_endproc
-.LFE58:
+.LFE52:
 	.size	free_units, .-free_units
-	.section	.rodata.cst16,"aM",@progbits,16
+	.section	.text.startup,"ax",@progbits
+	.p2align 4
+	.type	_sub_I_00100_0, @function
+_sub_I_00100_0:
+.LFB53:
+	.cfi_startproc
+	endbr64
+	leaq	.LPBX0(%rip), %rdi
+	jmp	__gcov_init@PLT
+	.cfi_endproc
+.LFE53:
+	.size	_sub_I_00100_0, .-_sub_I_00100_0
+	.section	.init_array.00100,"aw"
+	.align 8
+	.quad	_sub_I_00100_0
+	.section	.text.exit,"ax",@progbits
+	.p2align 4
+	.type	_sub_D_00100_1, @function
+_sub_D_00100_1:
+.LFB54:
+	.cfi_startproc
+	endbr64
+	jmp	__gcov_exit@PLT
+	.cfi_endproc
+.LFE54:
+	.size	_sub_D_00100_1, .-_sub_D_00100_1
+	.section	.fini_array.00100,"aw"
+	.align 8
+	.quad	_sub_D_00100_1
+	.section	.data.rel.local,"aw"
 	.align 16
-.LC2:
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.byte	58
-	.align 16
-.LC3:
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
-	.byte	1
+	.type	.LPBX1, @object
+	.size	.LPBX1, 16
+.LPBX1:
+	.quad	__gcov_.free_units
+	.quad	__gcov_.graph
+	.align 32
+	.type	__gcov_.graph, @object
+	.size	__gcov_.graph, 40
+__gcov_.graph:
+	.quad	.LPBX0
+	.long	838227871
+	.long	1982802344
+	.long	1897928477
+	.zero	4
+	.long	8
+	.zero	4
+	.quad	__gcov0.graph
+	.section	.rodata.str1.8,"aMS",@progbits,1
+	.align 8
+.LC6:
+	.string	"/home/mariana/tese/SA/graph.gcda"
+	.section	.data.rel,"aw"
+	.align 32
+	.type	.LPBX0, @object
+	.size	.LPBX0, 120
+.LPBX0:
+	.long	1094267690
+	.zero	4
+	.quad	0
+	.long	-623896417
+	.zero	4
+	.quad	.LC6
+	.quad	__gcov_merge_add
+	.quad	0
+	.quad	0
+	.quad	0
+	.quad	0
+	.quad	0
+	.quad	0
+	.quad	0
+	.quad	0
+	.long	2
+	.zero	4
+	.quad	.LPBX1
+	.section	.data.rel.local
+	.align 32
+	.type	__gcov_.free_units, @object
+	.size	__gcov_.free_units, 40
+__gcov_.free_units:
+	.quad	.LPBX0
+	.long	210411925
+	.long	-1068817311
+	.long	-1192601709
+	.zero	4
+	.long	2
+	.zero	4
+	.quad	__gcov0.free_units
+	.local	__gcov0.graph
+	.comm	__gcov0.graph,64,32
+	.local	__gcov0.free_units
+	.comm	__gcov0.free_units,16,16
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"
