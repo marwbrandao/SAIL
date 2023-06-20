@@ -4,7 +4,7 @@
 	.globl	getTemperature
 	.type	getTemperature, @function
 getTemperature:
-.LFB47:
+.LFB41:
 	.cfi_startproc
 	endbr64
 	pushq	%rbp
@@ -32,73 +32,8 @@ getTemperature:
 	divsd	%xmm1, %xmm0
 	ret
 	.cfi_endproc
-.LFE47:
+.LFE41:
 	.size	getTemperature, .-getTemperature
-	.p2align 4
-	.globl	getEll
-	.type	getEll, @function
-getEll:
-.LFB48:
-	.cfi_startproc
-	endbr64
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	pushq	%r12
-	pushq	%rbx
-	subq	$16, %rsp
-	.cfi_offset 12, -24
-	.cfi_offset 3, -32
-1:	call	*mcount@GOTPCREL(%rip)
-	movq	%rdi, %r12
-	movsd	%xmm0, -24(%rbp)
-	lock addq	$1, __gcov0.getEll(%rip)
-	call	arc4random@PLT
-	movl	%eax, %ebx
-	lock addq	$1, 8+__gcov0.getEll(%rip)
-	movl	$1, %eax
-	movl	%ebx, (%r12)
-	testl	%ebx, %ebx
-	jne	.L11
-	addq	$16, %rsp
-	popq	%rbx
-	popq	%r12
-	popq	%rbp
-	.cfi_remember_state
-	.cfi_def_cfa 7, 8
-	ret
-	.p2align 4,,10
-	.p2align 3
-.L11:
-	.cfi_restore_state
-	movl	%ebx, %eax
-	pxor	%xmm0, %xmm0
-	negl	%eax
-	movl	%eax, %eax
-	cvtsi2sdq	%rax, %xmm0
-	call	log2@PLT
-	movsd	%xmm0, -32(%rbp)
-	pxor	%xmm0, %xmm0
-	cvtsi2sdq	%rbx, %xmm0
-	call	log2@PLT
-	movsd	-32(%rbp), %xmm1
-	subsd	%xmm0, %xmm1
-	movapd	%xmm1, %xmm0
-	divsd	-24(%rbp), %xmm0
-	call	round@PLT
-	lock addq	$1, 16+__gcov0.getEll(%rip)
-	addq	$16, %rsp
-	cvttsd2sil	%xmm0, %eax
-	popq	%rbx
-	popq	%r12
-	popq	%rbp
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE48:
-	.size	getEll, .-getEll
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC3:
 	.string	"ideal pop: %d\n"
@@ -131,7 +66,7 @@ getEll:
 	.globl	print_best_clusters
 	.type	print_best_clusters, @function
 print_best_clusters:
-.LFB49:
+.LFB42:
 	.cfi_startproc
 	endbr64
 	pushq	%rbp
@@ -176,14 +111,14 @@ print_best_clusters:
 	call	__printf_chk@PLT
 	lock addq	$1, 24+__gcov0.print_best_clusters(%rip)
 	testl	%ebx, %ebx
-	jle	.L17
+	jle	.L8
 	movl	$0, -60(%rbp)
 	leaq	8(%r14), %r15
 	leaq	.LC7(%rip), %rbx
 	movl	$0, -64(%rbp)
 	.p2align 4,,10
 	.p2align 3
-.L16:
+.L7:
 	lock addq	$1, 104+__gcov0.print_best_clusters(%rip)
 	leaq	.LC6(%rip), %rsi
 	movl	$1, %edi
@@ -201,12 +136,12 @@ print_best_clusters:
 	lock addq	$1, 40+__gcov0.print_best_clusters(%rip)
 	movl	(%r15), %eax
 	testl	%eax, %eax
-	jle	.L18
+	jle	.L9
 	xorl	%r13d, %r13d
 	xorl	%r14d, %r14d
 	.p2align 4,,10
 	.p2align 3
-.L15:
+.L6:
 	lock addq	$1, 56+__gcov0.print_best_clusters(%rip)
 	movl	$1, %edi
 	movq	-8(%r15), %rax
@@ -227,8 +162,8 @@ print_best_clusters:
 	addq	$1, %r13
 	call	__fprintf_chk@PLT
 	cmpl	%r13d, (%r15)
-	jg	.L15
-.L14:
+	jg	.L6
+.L5:
 	lock addq	$1, 64+__gcov0.print_best_clusters(%rip)
 	leaq	.LC8(%rip), %rsi
 	movl	$1, %edi
@@ -275,14 +210,14 @@ print_best_clusters:
 	movl	-60(%rbp), %eax
 	movl	%r9d, -64(%rbp)
 	cmpl	%eax, -68(%rbp)
-	jne	.L16
+	jne	.L7
 	pxor	%xmm0, %xmm0
 	pxor	%xmm1, %xmm1
 	cvtsi2sdl	%r9d, %xmm0
 	cvtsi2sdl	-72(%rbp), %xmm1
 	divsd	%xmm1, %xmm0
 	mulsd	.LC11(%rip), %xmm0
-.L13:
+.L4:
 	lock addq	$1, 112+__gcov0.print_best_clusters(%rip)
 	movl	$1, %edi
 	movl	$1, %eax
@@ -340,78 +275,78 @@ print_best_clusters:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L18:
+.L9:
 	.cfi_restore_state
 	xorl	%r14d, %r14d
-	jmp	.L14
-.L17:
+	jmp	.L5
+.L8:
 	pxor	%xmm0, %xmm0
-	jmp	.L13
+	jmp	.L4
 	.cfi_endproc
-.LFE49:
+.LFE42:
 	.size	print_best_clusters, .-print_best_clusters
 	.section	.rodata.str1.1
 .LC15:
 	.string	"temp start : %f\n"
-.LC16:
-	.string	"\nSA start!\n\n"
 .LC17:
-	.string	"w"
+	.string	"\nSA start!\n\n"
 .LC18:
-	.string	"output.txt"
+	.string	"w"
 .LC19:
-	.string	"SA_graph.txt"
+	.string	"output.txt"
 .LC20:
-	.string	"%d;%d;%d\n"
+	.string	"SA_graph.txt"
 .LC21:
-	.string	"0,%d:"
+	.string	"%d;%d;%d\n"
 .LC22:
-	.string	"Cluster %d with size %d: "
+	.string	"0,%d:"
 .LC23:
-	.string	"%d "
+	.string	"Cluster %d with size %d: "
 .LC24:
+	.string	"%d "
+.LC25:
 	.string	"cluster_info.txt"
 	.section	.rodata.str1.8
 	.align 8
-.LC25:
+.LC26:
 	.string	"best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n"
 	.align 8
-.LC26:
+.LC27:
 	.string	"temperature population: %f, temperature compactness: %f\n"
 	.align 8
-.LC27:
+.LC28:
 	.string	"---- here:accpet prob pop: %f and ccpet prob comp: %f\n"
 	.section	.rodata.str1.1
-.LC29:
-	.string	"%d,%d:"
 .LC30:
-	.string	"prob: %f and random: %f\n"
+	.string	"%d,%d:"
 .LC31:
+	.string	"prob: %f and random: %f\n"
+.LC32:
 	.string	"%d,%f,%d,%f\n"
 	.section	.rodata.str1.8
 	.align 8
-.LC32:
-	.string	"Temperature Population: %f, Temperature Compactness: %f, T: %f\n"
-	.align 8
 .LC33:
+	.string	"Temperature Population: %f, Temperature Compactness: %f, T: \n"
+	.align 8
+.LC34:
 	.string	"----->iteration: %d, perfect: %d, not_perfect: %d\n"
 	.section	.rodata.str1.1
-.LC34:
-	.string	"Borders: %d prob: %f\n\n"
 .LC35:
-	.string	"pop: %d prob: %f\n\n"
+	.string	"Borders: %d prob: %f\n\n"
 .LC36:
-	.string	" --> population: %d\n"
+	.string	"pop: %d prob: %f\n\n"
 .LC37:
+	.string	" --> population: %d\n"
+.LC38:
 	.string	"SA end!\n"
-.LC39:
+.LC40:
 	.string	"Time taken: %f seconds\n"
 	.text
 	.p2align 4
 	.globl	runSA
 	.type	runSA, @function
 runSA:
-.LFB50:
+.LFB43:
 	.cfi_startproc
 	endbr64
 	pushq	%rbp
@@ -451,15 +386,12 @@ runSA:
 	movsd	-72(%rbp), %xmm0
 	call	__printf_chk@PLT
 	lock addq	$1, 16+__gcov0.runSA(%rip)
-	pxor	%xmm2, %xmm2
 	movsd	-56(%rbp), %xmm1
 	divsd	-72(%rbp), %xmm1
 	movapd	%xmm1, %xmm0
-	movsd	.LC0(%rip), %xmm1
-	cvtsi2sdl	%ebx, %xmm2
-	divsd	%xmm2, %xmm1
+	movsd	.LC16(%rip), %xmm1
 	call	pow@PLT
-	leaq	.LC16(%rip), %rsi
+	leaq	.LC17(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	movsd	%xmm0, -136(%rbp)
@@ -471,17 +403,17 @@ runSA:
 	lock addq	$1, 32+__gcov0.runSA(%rip)
 	call	srand@PLT
 	lock addq	$1, 40+__gcov0.runSA(%rip)
-	leaq	.LC17(%rip), %rsi
-	leaq	.LC18(%rip), %rdi
+	leaq	.LC18(%rip), %rsi
+	leaq	.LC19(%rip), %rdi
 	call	fopen@PLT
 	movq	%rax, %r12
 	lock addq	$1, 48+__gcov0.runSA(%rip)
-	leaq	.LC17(%rip), %rsi
-	leaq	.LC19(%rip), %rdi
+	leaq	.LC18(%rip), %rsi
+	leaq	.LC20(%rip), %rdi
 	call	fopen@PLT
 	movq	%rax, -168(%rbp)
 	lock addq	$1, 56+__gcov0.runSA(%rip)
-	leaq	.LC20(%rip), %rdx
+	leaq	.LC21(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
 	movl	%ebx, %r9d
@@ -496,16 +428,16 @@ runSA:
 	call	first_cluster@PLT
 	movq	%rax, -104(%rbp)
 	lock addq	$1, 72+__gcov0.runSA(%rip)
-	leaq	.LC23(%rip), %rbx
+	leaq	.LC24(%rip), %rbx
 	movl	$0, -60(%rbp)
 	leaq	8(%rax), %r15
 	testl	%r14d, %r14d
-	jle	.L27
+	jle	.L18
 	.p2align 4,,10
 	.p2align 3
-.L26:
+.L17:
 	lock addq	$1, 136+__gcov0.runSA(%rip)
-	leaq	.LC21(%rip), %rdx
+	leaq	.LC22(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
 	movl	-60(%rbp), %r14d
@@ -513,7 +445,7 @@ runSA:
 	movq	%r12, %rdi
 	call	__fprintf_chk@PLT
 	lock addq	$1, 80+__gcov0.runSA(%rip)
-	leaq	.LC22(%rip), %rsi
+	leaq	.LC23(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	movl	(%r15), %ecx
@@ -522,13 +454,13 @@ runSA:
 	lock addq	$1, 88+__gcov0.runSA(%rip)
 	movl	(%r15), %r9d
 	testl	%r9d, %r9d
-	jle	.L69
+	jle	.L53
 	movq	%r12, -56(%rbp)
 	xorl	%r13d, %r13d
 	xorl	%r14d, %r14d
 	.p2align 4,,10
 	.p2align 3
-.L25:
+.L16:
 	lock addq	$1, 104+__gcov0.runSA(%rip)
 	movl	$1, %edi
 	movq	-8(%r15), %rax
@@ -550,9 +482,9 @@ runSA:
 	addq	$1, %r13
 	addl	8(%rax), %r14d
 	cmpl	%r13d, (%r15)
-	jg	.L25
+	jg	.L16
 	movq	-56(%rbp), %r12
-.L24:
+.L15:
 	lock addq	$1, 112+__gcov0.runSA(%rip)
 	leaq	.LC8(%rip), %rsi
 	movl	$1, %edi
@@ -574,8 +506,8 @@ runSA:
 	addl	$1, -60(%rbp)
 	movl	-60(%rbp), %eax
 	cmpl	%eax, -64(%rbp)
-	jne	.L26
-.L27:
+	jne	.L17
+.L18:
 	lock addq	$1, 144+__gcov0.runSA(%rip)
 	movslq	-64(%rbp), %rax
 	movq	%rax, %rbx
@@ -596,15 +528,25 @@ runSA:
 	movl	$-2147483648, -144(%rbp)
 	movq	%rax, -152(%rbp)
 	movl	$2147483647, -116(%rbp)
-	jmp	.L23
+	jmp	.L14
 	.p2align 4,,10
 	.p2align 3
-.L28:
-	lock addq	$1, 152+__gcov0.runSA(%rip)
-	leaq	.LC17(%rip), %rsi
-	leaq	.LC24(%rip), %rdi
+.L20:
+	testb	$1, -60(%rbp)
+	je	.L85
+.L42:
+	movsd	-72(%rbp), %xmm5
+	mulsd	-136(%rbp), %xmm5
+	addl	$1, -60(%rbp)
+	movl	-60(%rbp), %eax
+	movsd	%xmm5, -72(%rbp)
+	cmpl	$21, %eax
+	je	.L86
+.L14:
+	leaq	.LC18(%rip), %rsi
+	leaq	.LC25(%rip), %rdi
 	call	fopen@PLT
-	lock addq	$1, 160+__gcov0.runSA(%rip)
+	lock addq	$1, 152+__gcov0.runSA(%rip)
 	movl	-64(%rbp), %r13d
 	movq	-128(%rbp), %r15
 	movq	-104(%rbp), %r14
@@ -613,7 +555,7 @@ runSA:
 	movq	%r15, %rsi
 	movq	%r14, %rdi
 	call	change_unit@PLT
-	lock addq	$1, 168+__gcov0.runSA(%rip)
+	lock addq	$1, 160+__gcov0.runSA(%rip)
 	movl	16(%rbp), %r9d
 	movl	-96(%rbp), %r8d
 	movl	-120(%rbp), %edx
@@ -622,13 +564,13 @@ runSA:
 	movq	%r14, %rsi
 	call	energy_population@PLT
 	movl	%eax, %r15d
-	lock addq	$1, 176+__gcov0.runSA(%rip)
+	lock addq	$1, 168+__gcov0.runSA(%rip)
 	movl	%r13d, %esi
 	movq	%r14, %rdi
 	call	energy_compactness@PLT
 	movl	%eax, %r13d
-	lock addq	$1, 184+__gcov0.runSA(%rip)
-	leaq	.LC25(%rip), %rsi
+	lock addq	$1, 176+__gcov0.runSA(%rip)
+	leaq	.LC26(%rip), %rsi
 	movl	$1, %edi
 	movl	-116(%rbp), %r14d
 	movl	-92(%rbp), %r8d
@@ -637,14 +579,14 @@ runSA:
 	movl	%r15d, %ecx
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
-	lock addq	$1, 192+__gcov0.runSA(%rip)
+	lock addq	$1, 184+__gcov0.runSA(%rip)
 	movl	$1, %edi
 	movl	$2, %eax
-	leaq	.LC26(%rip), %rsi
+	leaq	.LC27(%rip), %rsi
 	movsd	-72(%rbp), %xmm1
 	movapd	%xmm1, %xmm0
 	call	__printf_chk@PLT
-	lock addq	$1, 200+__gcov0.runSA(%rip)
+	lock addq	$1, 192+__gcov0.runSA(%rip)
 	pxor	%xmm0, %xmm0
 	movl	%r14d, %eax
 	subl	%r15d, %eax
@@ -660,123 +602,86 @@ runSA:
 	call	exp@PLT
 	movl	$1, %edi
 	movl	$2, %eax
-	leaq	.LC27(%rip), %rsi
+	leaq	.LC28(%rip), %rsi
 	movsd	%xmm0, -80(%rbp)
 	movapd	%xmm0, %xmm1
 	movsd	-56(%rbp), %xmm0
 	call	__printf_chk@PLT
+	lock addq	$1, 200+__gcov0.runSA(%rip)
+	movsd	-56(%rbp), %xmm3
+	movsd	-80(%rbp), %xmm4
+	comisd	%xmm3, %xmm4
+	movsd	%xmm3, -88(%rbp)
+	ja	.L19
 	lock addq	$1, 208+__gcov0.runSA(%rip)
-	movsd	-56(%rbp), %xmm4
-	movsd	-80(%rbp), %xmm5
-	comisd	%xmm4, %xmm5
 	movsd	%xmm4, -88(%rbp)
-	ja	.L35
-	lock addq	$1, 216+__gcov0.runSA(%rip)
-	movsd	%xmm5, -88(%rbp)
-.L35:
+.L19:
 	call	rand@PLT
-	lock addq	$1, 224+__gcov0.runSA(%rip)
+	lock addq	$1, 216+__gcov0.runSA(%rip)
 	pxor	%xmm0, %xmm0
-	movsd	-88(%rbp), %xmm7
+	movsd	-88(%rbp), %xmm6
 	cvtsi2sdl	%eax, %xmm0
-	divsd	.LC28(%rip), %xmm0
-	comisd	%xmm0, %xmm7
+	divsd	.LC29(%rip), %xmm0
+	comisd	%xmm0, %xmm6
 	movsd	%xmm0, -112(%rbp)
-	ja	.L104
-	testb	$1, -60(%rbp)
-	je	.L105
-.L58:
-	movsd	-72(%rbp), %xmm6
-	mulsd	-136(%rbp), %xmm6
-	addl	$1, -60(%rbp)
-	movl	-60(%rbp), %eax
-	movsd	%xmm6, -72(%rbp)
-	cmpl	$21, %eax
-	je	.L106
-.L23:
-	lock addq	$1, __gcov0.getEll(%rip)
-	call	arc4random@PLT
-	lock addq	$1, 8+__gcov0.getEll(%rip)
-	testl	%eax, %eax
-	je	.L28
-	movl	%eax, %edx
-	pxor	%xmm0, %xmm0
-	pxor	%xmm7, %xmm7
-	negl	%edx
-	movl	%edx, %edx
-	cvtsi2sdq	%rdx, %xmm0
-	ucomisd	%xmm0, %xmm7
-	jnb	.L107
-.L31:
-	movl	%eax, %eax
-	pxor	%xmm0, %xmm0
-	pxor	%xmm2, %xmm2
-	cvtsi2sdq	%rax, %xmm0
-	ucomisd	%xmm0, %xmm2
-	jnb	.L108
-.L34:
-	lock addq	$1, 16+__gcov0.getEll(%rip)
-	jmp	.L28
-	.p2align 4,,10
-	.p2align 3
-.L104:
-	ucomisd	.LC0(%rip), %xmm7
-	jp	.L77
-	je	.L38
-.L77:
-	lock addq	$1, 232+__gcov0.runSA(%rip)
+	jbe	.L20
+	ucomisd	.LC0(%rip), %xmm6
+	jp	.L61
+	je	.L22
+.L61:
+	lock addq	$1, 224+__gcov0.runSA(%rip)
 	addl	$1, -156(%rbp)
-.L38:
+.L22:
 	cmpl	-144(%rbp), %r13d
-	jle	.L40
-	lock addq	$1, 240+__gcov0.runSA(%rip)
+	jle	.L24
+	lock addq	$1, 232+__gcov0.runSA(%rip)
 	movslq	%r15d, %rax
 	cmpq	-152(%rbp), %rax
-	jle	.L109
-.L42:
-	lock addq	$1, 248+__gcov0.runSA(%rip)
+	jle	.L87
+.L26:
+	lock addq	$1, 240+__gcov0.runSA(%rip)
 	cmpq	%rax, -152(%rbp)
-	jg	.L110
-.L44:
-	movsd	-56(%rbp), %xmm6
-	comisd	-112(%rbp), %xmm6
-	jbe	.L50
-	lock addq	$1, 304+__gcov0.runSA(%rip)
+	jg	.L88
+.L28:
+	movsd	-56(%rbp), %xmm7
+	comisd	-112(%rbp), %xmm7
+	jbe	.L34
+	lock addq	$1, 296+__gcov0.runSA(%rip)
 	movl	%r15d, -116(%rbp)
-.L50:
-	movsd	-80(%rbp), %xmm2
-	comisd	-112(%rbp), %xmm2
-	jbe	.L52
-	lock addq	$1, 312+__gcov0.runSA(%rip)
+.L34:
+	movsd	-80(%rbp), %xmm7
+	comisd	-112(%rbp), %xmm7
+	jbe	.L36
+	lock addq	$1, 304+__gcov0.runSA(%rip)
 	movl	%r13d, -92(%rbp)
-.L52:
+.L36:
 	movl	-64(%rbp), %esi
 	testl	%esi, %esi
-	jle	.L73
+	jle	.L57
 	movq	-104(%rbp), %rax
 	movl	$0, -56(%rbp)
 	movl	$0, -80(%rbp)
 	leaq	8(%rax), %r15
 	.p2align 4,,10
 	.p2align 3
-.L57:
-	lock addq	$1, 352+__gcov0.runSA(%rip)
-	leaq	.LC29(%rip), %rdx
+.L41:
+	lock addq	$1, 344+__gcov0.runSA(%rip)
+	leaq	.LC30(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
 	movl	-56(%rbp), %r8d
 	movl	-60(%rbp), %ecx
 	movq	%r12, %rdi
 	call	__fprintf_chk@PLT
-	lock addq	$1, 320+__gcov0.runSA(%rip)
+	lock addq	$1, 312+__gcov0.runSA(%rip)
 	movl	(%r15), %ecx
 	testl	%ecx, %ecx
-	jle	.L74
+	jle	.L58
 	xorl	%r13d, %r13d
 	xorl	%r14d, %r14d
 	.p2align 4,,10
 	.p2align 3
-.L56:
+.L40:
 	movq	-8(%r15), %rax
 	movq	%rbx, %rdx
 	movl	$1, %esi
@@ -786,19 +691,19 @@ runSA:
 	addl	8(%rax), %r14d
 	xorl	%eax, %eax
 	call	__fprintf_chk@PLT
-	lock addq	$1, 328+__gcov0.runSA(%rip)
+	lock addq	$1, 320+__gcov0.runSA(%rip)
 	addq	$1, %r13
 	cmpl	%r13d, (%r15)
-	jg	.L56
-.L55:
-	lock addq	$1, 336+__gcov0.runSA(%rip)
+	jg	.L40
+.L39:
+	lock addq	$1, 328+__gcov0.runSA(%rip)
 	leaq	.LC8(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
 	movl	%r14d, %ecx
 	movq	%r12, %rdi
 	call	__fprintf_chk@PLT
-	lock addq	$1, 344+__gcov0.runSA(%rip)
+	lock addq	$1, 336+__gcov0.runSA(%rip)
 	xorl	%eax, %eax
 	movl	$1, %esi
 	leaq	.LC9(%rip), %rdx
@@ -818,17 +723,17 @@ runSA:
 	movl	-56(%rbp), %eax
 	movl	%r9d, -80(%rbp)
 	cmpl	%eax, -64(%rbp)
-	jne	.L57
-.L54:
-	lock addq	$1, 360+__gcov0.runSA(%rip)
+	jne	.L41
+.L38:
+	lock addq	$1, 352+__gcov0.runSA(%rip)
 	movl	$1, %esi
 	movl	$2, %eax
-	leaq	.LC30(%rip), %rdx
+	leaq	.LC31(%rip), %rdx
 	movsd	-112(%rbp), %xmm1
 	movsd	-88(%rbp), %xmm0
 	movq	%r12, %rdi
 	call	__fprintf_chk@PLT
-	lock addq	$1, 368+__gcov0.runSA(%rip)
+	lock addq	$1, 360+__gcov0.runSA(%rip)
 	leaq	.LC14(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
@@ -836,10 +741,10 @@ runSA:
 	movl	%r14d, %ecx
 	movq	%r12, %rdi
 	call	__fprintf_chk@PLT
-	lock addq	$1, 376+__gcov0.runSA(%rip)
+	lock addq	$1, 368+__gcov0.runSA(%rip)
 	pxor	%xmm0, %xmm0
 	pxor	%xmm1, %xmm1
-	leaq	.LC31(%rip), %rdx
+	leaq	.LC32(%rip), %rdx
 	movl	$1, %esi
 	movl	$2, %eax
 	movl	-60(%rbp), %ecx
@@ -851,76 +756,75 @@ runSA:
 	movsd	-88(%rbp), %xmm1
 	mulsd	.LC11(%rip), %xmm0
 	call	__fprintf_chk@PLT
-	lock addq	$1, 384+__gcov0.runSA(%rip)
+	lock addq	$1, 376+__gcov0.runSA(%rip)
 	movl	-96(%rbp), %edx
 	movl	-64(%rbp), %esi
 	movq	-104(%rbp), %rdi
 	call	storeState@PLT
-	lock addq	$1, 392+__gcov0.runSA(%rip)
+	lock addq	$1, 384+__gcov0.runSA(%rip)
 	testb	$1, -60(%rbp)
-	jne	.L58
-.L105:
-	lock addq	$1, 400+__gcov0.runSA(%rip)
+	jne	.L42
+.L85:
+	lock addq	$1, 392+__gcov0.runSA(%rip)
 	movl	$1, %edi
-	movl	$3, %eax
-	leaq	.LC32(%rip), %rsi
+	movl	$2, %eax
+	leaq	.LC33(%rip), %rsi
 	movsd	-72(%rbp), %xmm1
-	movapd	%xmm1, %xmm2
 	movapd	%xmm1, %xmm0
 	call	__printf_chk@PLT
-	lock addq	$1, 408+__gcov0.runSA(%rip)
+	lock addq	$1, 400+__gcov0.runSA(%rip)
 	xorl	%ecx, %ecx
-	leaq	.LC33(%rip), %rsi
+	leaq	.LC34(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	movl	-156(%rbp), %r8d
 	movl	-60(%rbp), %edx
 	call	__printf_chk@PLT
-	lock addq	$1, 416+__gcov0.runSA(%rip)
+	lock addq	$1, 408+__gcov0.runSA(%rip)
 	xorl	%r15d, %r15d
 	movq	-104(%rbp), %rax
 	movl	-64(%rbp), %edx
 	movl	-64(%rbp), %r14d
 	leaq	8(%rax), %r13
 	testl	%edx, %edx
-	jle	.L63
+	jle	.L47
 	.p2align 4,,10
 	.p2align 3
-.L62:
+.L46:
 	movl	0(%r13), %ecx
 	movl	%r15d, %edx
-	leaq	.LC22(%rip), %rsi
+	leaq	.LC23(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	call	__printf_chk@PLT
-	lock addq	$1, 424+__gcov0.runSA(%rip)
+	lock addq	$1, 416+__gcov0.runSA(%rip)
 	movl	0(%r13), %eax
 	testl	%eax, %eax
-	jle	.L75
+	jle	.L59
 	xorl	%eax, %eax
 	xorl	%edx, %edx
 	.p2align 4,,10
 	.p2align 3
-.L61:
+.L45:
 	movq	-8(%r13), %rcx
 	movq	(%rcx,%rax,8), %rcx
 	addl	8(%rcx), %edx
-	lock addq	$1, 432+__gcov0.runSA(%rip)
+	lock addq	$1, 424+__gcov0.runSA(%rip)
 	addq	$1, %rax
 	cmpl	%eax, 0(%r13)
-	jg	.L61
-.L60:
-	leaq	.LC36(%rip), %rsi
+	jg	.L45
+.L44:
+	leaq	.LC37(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
-	lock addq	$1, 440+__gcov0.runSA(%rip)
+	lock addq	$1, 432+__gcov0.runSA(%rip)
 	addl	$1, %r15d
 	addq	$16, %r13
 	cmpl	%r15d, %r14d
-	jne	.L62
-.L63:
-	lock addq	$1, 448+__gcov0.runSA(%rip)
+	jne	.L46
+.L47:
+	lock addq	$1, 440+__gcov0.runSA(%rip)
 	movl	-64(%rbp), %r15d
 	movq	-104(%rbp), %r14
 	movl	16(%rbp), %r9d
@@ -930,13 +834,13 @@ runSA:
 	movl	%r15d, %ecx
 	movq	%r14, %rsi
 	call	energy_population@PLT
-	lock addq	$1, 456+__gcov0.runSA(%rip)
+	lock addq	$1, 448+__gcov0.runSA(%rip)
 	movl	%r15d, %esi
 	movq	%r14, %rdi
 	movslq	%eax, %r13
 	call	energy_compactness@PLT
 	movl	%eax, %r15d
-	lock addq	$1, 464+__gcov0.runSA(%rip)
+	lock addq	$1, 456+__gcov0.runSA(%rip)
 	pxor	%xmm0, %xmm0
 	movslq	-116(%rbp), %rax
 	subq	%r13, %rax
@@ -952,38 +856,38 @@ runSA:
 	call	exp@PLT
 	movl	%r15d, %edx
 	movl	$1, %edi
-	leaq	.LC34(%rip), %rsi
+	leaq	.LC35(%rip), %rsi
 	movl	$1, %eax
 	call	__printf_chk@PLT
-	lock addq	$1, 472+__gcov0.runSA(%rip)
+	lock addq	$1, 464+__gcov0.runSA(%rip)
 	movl	$1, %edi
 	movl	$1, %eax
-	leaq	.LC35(%rip), %rsi
+	leaq	.LC36(%rip), %rsi
 	movsd	-56(%rbp), %xmm1
 	movapd	%xmm1, %xmm0
 	movq	%r13, %rdx
 	call	__printf_chk@PLT
-	lock addq	$1, 480+__gcov0.runSA(%rip)
-	jmp	.L58
+	lock addq	$1, 472+__gcov0.runSA(%rip)
+	jmp	.L42
 	.p2align 4,,10
 	.p2align 3
-.L74:
+.L58:
 	xorl	%r14d, %r14d
-	jmp	.L55
-.L75:
+	jmp	.L39
+.L59:
 	xorl	%edx, %edx
-	jmp	.L60
-.L40:
-	movslq	%r15d, %rax
-	je	.L42
-	lock addq	$1, 256+__gcov0.runSA(%rip)
 	jmp	.L44
-.L106:
-	lock addq	$1, 488+__gcov0.runSA(%rip)
+.L24:
+	movslq	%r15d, %rax
+	je	.L26
+	lock addq	$1, 248+__gcov0.runSA(%rip)
+	jmp	.L28
+.L86:
+	lock addq	$1, 480+__gcov0.runSA(%rip)
 	movq	-176(%rbp), %rbx
 	testq	%rbx, %rbx
-	je	.L64
-	lock addq	$1, 496+__gcov0.runSA(%rip)
+	je	.L48
+	lock addq	$1, 488+__gcov0.runSA(%rip)
 	movl	-64(%rbp), %r14d
 	movl	16(%rbp), %r9d
 	movl	-96(%rbp), %ecx
@@ -992,49 +896,49 @@ runSA:
 	movq	%r12, %r8
 	movq	%rbx, %rdi
 	call	print_best_clusters
-	lock addq	$1, 504+__gcov0.runSA(%rip)
+	lock addq	$1, 496+__gcov0.runSA(%rip)
 	movq	%rbx, %r13
 	movq	-208(%rbp), %rbx
 	leaq	16(%r13,%rbx), %rbx
 	testl	%r14d, %r14d
-	jle	.L67
+	jle	.L51
 	.p2align 4,,10
 	.p2align 3
-.L66:
+.L50:
 	movq	0(%r13), %rdi
 	call	free@PLT
-	lock addq	$1, 512+__gcov0.runSA(%rip)
+	lock addq	$1, 504+__gcov0.runSA(%rip)
 	addq	$16, %r13
 	cmpq	%r13, %rbx
-	jne	.L66
-.L67:
+	jne	.L50
+.L51:
 	movq	-176(%rbp), %rdi
 	call	free@PLT
-.L64:
+.L48:
 	movq	%r12, %rdi
 	call	fclose@PLT
-	lock addq	$1, 520+__gcov0.runSA(%rip)
+	lock addq	$1, 512+__gcov0.runSA(%rip)
 	leaq	.LC9(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
-	lock addq	$1, 528+__gcov0.runSA(%rip)
-	leaq	.LC37(%rip), %rsi
+	lock addq	$1, 520+__gcov0.runSA(%rip)
+	leaq	.LC38(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
-	lock addq	$1, 536+__gcov0.runSA(%rip)
+	lock addq	$1, 528+__gcov0.runSA(%rip)
 	call	clock@PLT
-	lock addq	$1, 544+__gcov0.runSA(%rip)
+	lock addq	$1, 536+__gcov0.runSA(%rip)
 	pxor	%xmm0, %xmm0
 	movl	$1, %edi
-	leaq	.LC39(%rip), %rsi
+	leaq	.LC40(%rip), %rsi
 	subq	-200(%rbp), %rax
 	cvtsi2sdq	%rax, %xmm0
 	movl	$1, %eax
-	divsd	.LC38(%rip), %xmm0
+	divsd	.LC39(%rip), %xmm0
 	call	__printf_chk@PLT
-	lock addq	$1, 552+__gcov0.runSA(%rip)
+	lock addq	$1, 544+__gcov0.runSA(%rip)
 	xorl	%eax, %eax
 	addq	$184, %rsp
 	popq	%rbx
@@ -1046,20 +950,20 @@ runSA:
 	.cfi_remember_state
 	.cfi_def_cfa 7, 8
 	ret
-.L69:
+.L53:
 	.cfi_restore_state
 	xorl	%r14d, %r14d
-	jmp	.L24
-.L109:
+	jmp	.L15
+.L87:
 	movq	%rax, -152(%rbp)
-.L41:
+.L25:
 	cmpq	$0, -176(%rbp)
-	je	.L111
-	lock addq	$1, 288+__gcov0.runSA(%rip)
+	je	.L89
+	lock addq	$1, 280+__gcov0.runSA(%rip)
 	movl	-64(%rbp), %edi
 	testl	%edi, %edi
-	jle	.L72
-.L68:
+	jle	.L56
+.L52:
 	movq	-104(%rbp), %rax
 	xorl	%r9d, %r9d
 	movl	-64(%rbp), %r14d
@@ -1074,7 +978,7 @@ runSA:
 	movq	%r8, %r12
 	.p2align 4,,10
 	.p2align 3
-.L49:
+.L33:
 	movl	0(%r13), %eax
 	movq	-8(%r12), %rdi
 	addl	$1, %r15d
@@ -1083,76 +987,68 @@ runSA:
 	movslq	0(%r13), %rdx
 	salq	$3, %rdx
 	call	memcpy@PLT
-	lock addq	$1, 296+__gcov0.runSA(%rip)
+	lock addq	$1, 288+__gcov0.runSA(%rip)
 	addq	$16, %r13
 	addq	$16, %r12
 	cmpl	%r15d, %r14d
-	jg	.L49
+	jg	.L33
 	movl	-180(%rbp), %r13d
 	movq	-144(%rbp), %r12
 	movl	-160(%rbp), %r15d
 	movl	%r13d, -144(%rbp)
-	jmp	.L44
-.L110:
-	lock addq	$1, 264+__gcov0.runSA(%rip)
+	jmp	.L28
+.L88:
+	lock addq	$1, 256+__gcov0.runSA(%rip)
 	movq	%rax, -152(%rbp)
-	jmp	.L41
-.L73:
+	jmp	.L25
+.L57:
 	movl	$0, -80(%rbp)
-	jmp	.L54
-.L72:
+	jmp	.L38
+.L56:
 	movl	%r13d, -144(%rbp)
-	jmp	.L44
-.L111:
-	lock addq	$1, 272+__gcov0.runSA(%rip)
+	jmp	.L28
+.L89:
+	lock addq	$1, 264+__gcov0.runSA(%rip)
 	movq	-216(%rbp), %rdi
 	call	malloc@PLT
 	movl	-64(%rbp), %r8d
 	movq	%rax, -176(%rbp)
 	testl	%r8d, %r8d
-	jle	.L46
+	jle	.L30
 	movq	-208(%rbp), %rdi
 	movq	%rax, %rdx
 	movq	%rdx, %r14
 	leaq	16(%rax,%rdi), %rax
 	movq	%rax, -144(%rbp)
-.L47:
+.L31:
 	movq	-192(%rbp), %rdi
 	call	malloc@PLT
 	movl	$0, 8(%r14)
 	movq	%rax, (%r14)
-	lock addq	$1, 280+__gcov0.runSA(%rip)
+	lock addq	$1, 272+__gcov0.runSA(%rip)
 	addq	$16, %r14
 	cmpq	%r14, -144(%rbp)
-	jne	.L47
-	lock addq	$1, 288+__gcov0.runSA(%rip)
-	jmp	.L68
-.L46:
-	lock addq	$1, 288+__gcov0.runSA(%rip)
+	jne	.L31
+	lock addq	$1, 280+__gcov0.runSA(%rip)
+	jmp	.L52
+.L30:
+	lock addq	$1, 280+__gcov0.runSA(%rip)
 	movl	%r13d, -144(%rbp)
-	jmp	.L44
-.L108:
-	call	log2@PLT
-	jmp	.L34
-.L107:
-	movl	%eax, -56(%rbp)
-	call	log2@PLT
-	movl	-56(%rbp), %eax
-	jmp	.L31
+	jmp	.L28
 	.cfi_endproc
-.LFE50:
+.LFE43:
 	.size	runSA, .-runSA
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
 	.type	_sub_I_00100_0, @function
 _sub_I_00100_0:
-.LFB51:
+.LFB44:
 	.cfi_startproc
 	endbr64
 	leaq	.LPBX0(%rip), %rdi
 	jmp	__gcov_init@PLT
 	.cfi_endproc
-.LFE51:
+.LFE44:
 	.size	_sub_I_00100_0, .-_sub_I_00100_0
 	.section	.init_array.00100,"aw"
 	.align 8
@@ -1161,24 +1057,23 @@ _sub_I_00100_0:
 	.p2align 4
 	.type	_sub_D_00100_1, @function
 _sub_D_00100_1:
-.LFB52:
+.LFB45:
 	.cfi_startproc
 	endbr64
 	jmp	__gcov_exit@PLT
 	.cfi_endproc
-.LFE52:
+.LFE45:
 	.size	_sub_D_00100_1, .-_sub_D_00100_1
 	.section	.fini_array.00100,"aw"
 	.align 8
 	.quad	_sub_D_00100_1
 	.section	.data.rel.local,"aw"
-	.align 32
+	.align 16
 	.type	.LPBX1, @object
-	.size	.LPBX1, 32
+	.size	.LPBX1, 24
 .LPBX1:
 	.quad	__gcov_.runSA
 	.quad	__gcov_.print_best_clusters
-	.quad	__gcov_.getEll
 	.quad	__gcov_.getTemperature
 	.align 32
 	.type	__gcov_.getTemperature, @object
@@ -1193,18 +1088,6 @@ __gcov_.getTemperature:
 	.zero	4
 	.quad	__gcov0.getTemperature
 	.align 32
-	.type	__gcov_.getEll, @object
-	.size	__gcov_.getEll, 40
-__gcov_.getEll:
-	.quad	.LPBX0
-	.long	1184119545
-	.long	1464416837
-	.long	-694105602
-	.zero	4
-	.long	3
-	.zero	4
-	.quad	__gcov0.getEll
-	.align 32
 	.type	__gcov_.print_best_clusters, @object
 	.size	__gcov_.print_best_clusters, 40
 __gcov_.print_best_clusters:
@@ -1217,7 +1100,7 @@ __gcov_.print_best_clusters:
 	.zero	4
 	.quad	__gcov0.print_best_clusters
 	.section	.rodata.str1.1
-.LC40:
+.LC41:
 	.string	"/home/mariana/tese/SA/sa.gcda"
 	.section	.data.rel,"aw"
 	.align 32
@@ -1227,9 +1110,9 @@ __gcov_.print_best_clusters:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	-901035710
+	.long	-624015450
 	.zero	4
-	.quad	.LC40
+	.quad	.LC41
 	.quad	__gcov_merge_add
 	.quad	0
 	.quad	0
@@ -1239,7 +1122,7 @@ __gcov_.print_best_clusters:
 	.quad	0
 	.quad	0
 	.quad	0
-	.long	4
+	.long	3
 	.zero	4
 	.quad	.LPBX1
 	.section	.data.rel.local
@@ -1250,19 +1133,17 @@ __gcov_.runSA:
 	.quad	.LPBX0
 	.long	792344964
 	.long	-1567164810
-	.long	-186166888
+	.long	520455762
 	.zero	4
-	.long	70
+	.long	69
 	.zero	4
 	.quad	__gcov0.runSA
 	.local	__gcov0.getTemperature
 	.comm	__gcov0.getTemperature,8,8
-	.local	__gcov0.getEll
-	.comm	__gcov0.getEll,24,16
 	.local	__gcov0.print_best_clusters
 	.comm	__gcov0.print_best_clusters,176,32
 	.local	__gcov0.runSA
-	.comm	__gcov0.runSA,560,32
+	.comm	__gcov0.runSA,552,32
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
 .LC0:
@@ -1277,11 +1158,15 @@ __gcov_.runSA:
 	.long	0
 	.long	1079574528
 	.align 8
-.LC28:
+.LC16:
+	.long	2576980378
+	.long	1068079513
+	.align 8
+.LC29:
 	.long	4290772992
 	.long	1105199103
 	.align 8
-.LC38:
+.LC39:
 	.long	0
 	.long	1093567616
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"

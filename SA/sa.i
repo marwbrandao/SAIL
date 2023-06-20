@@ -1365,8 +1365,70 @@ enum
 # 3 "sa.c" 2
 # 1 "/usr/include/assert.h" 1 3 4
 # 4 "sa.c" 2
-# 1 "/usr/include/bsd/stdlib.h" 1 3 4
-# 32 "/usr/include/bsd/stdlib.h" 3 4
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 34 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 1 3 4
+
+
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 194 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
+# 1 "/usr/include/limits.h" 1 3 4
+# 26 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
+# 27 "/usr/include/limits.h" 2 3 4
+# 183 "/usr/include/limits.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 28 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 161 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 1 3 4
+# 38 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 3 4
+# 1 "/usr/include/linux/limits.h" 1 3 4
+# 39 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 2 3 4
+# 162 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
+# 184 "/usr/include/limits.h" 2 3 4
+
+
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/posix2_lim.h" 1 3 4
+# 188 "/usr/include/limits.h" 2 3 4
+# 195 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 8 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 2 3 4
+# 35 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
+# 6 "sa.c" 2
+# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h" 1
+# 17 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
+# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 1
+# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+    
+# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+   typedef signed char CPXBYTE;
+
+
+
+
+
+    typedef int CPXINT;
+# 78 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+       typedef long long CPXLONG;
+
+
+
+
+
+
+    typedef short CPXSHORT;
+# 134 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef CPXLONG CPXSIZE;
+# 146 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+       typedef unsigned long long CPXULONG;
+# 164 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
 # 1 "/usr/include/stdlib.h" 1 3 4
 # 25 "/usr/include/stdlib.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -1377,6 +1439,8 @@ enum
 
 
 # 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 321 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
+
 # 321 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
 typedef int wchar_t;
 # 32 "/usr/include/stdlib.h" 2 3 4
@@ -2454,8 +2518,8 @@ __attribute__ ((__nothrow__ , __leaf__)) realpath (const char *__restrict __name
   if (__builtin_object_size (__resolved, 2 > 1) != (size_t) -1)
     {
 
-
-
+      if (__builtin_object_size (__resolved, 2 > 1) < 4096)
+ return __realpath_chk_warn (__name, __resolved, __builtin_object_size (__resolved, 2 > 1));
 
       return __realpath_chk (__name, __resolved, __builtin_object_size (__resolved, 2 > 1));
     }
@@ -2575,85 +2639,24 @@ __attribute__ ((__nothrow__ , __leaf__)) wcstombs (char *__restrict __dst, const
 
 
 
-# 33 "/usr/include/bsd/stdlib.h" 2 3 4
+# 165 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 2
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
+# 166 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 2
+# 175 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+
+# 175 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
+typedef int CPXBYTE_TEST[sizeof(CPXBYTE) == 1 ? 1 : -1];
+typedef int CPXSHORT_TEST[sizeof(CPXSHORT) == 2 ? 1 : -1];
+typedef int CPXINT_TEST[sizeof(CPXINT) == 4 ? 1 : -1];
+typedef int CPXLONG_TEST[sizeof(CPXLONG) == 8 ? 1 : -1];
+typedef int CPXULONG_TEST[sizeof(CPXULONG) == 8 ? 1 : -1];
 
 
 
 
 
-
-# 1 "/usr/include/bsd/libutil.h" 1 3 4
-# 45 "/usr/include/bsd/libutil.h" 3 4
-# 1 "/usr/include/bsd/sys/cdefs.h" 1 3 4
-# 46 "/usr/include/bsd/libutil.h" 2 3 4
-
-
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h" 1 3 4
-# 9 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h" 3 4
-# 1 "/usr/include/stdint.h" 1 3 4
-# 26 "/usr/include/stdint.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
-# 27 "/usr/include/stdint.h" 2 3 4
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/wchar.h" 1 3 4
-# 29 "/usr/include/stdint.h" 2 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
-# 30 "/usr/include/stdint.h" 2 3 4
-
-
-
-
-
-
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 1 3 4
-# 24 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3 4
-typedef __uint8_t uint8_t;
-typedef __uint16_t uint16_t;
-typedef __uint32_t uint32_t;
-typedef __uint64_t uint64_t;
-# 38 "/usr/include/stdint.h" 2 3 4
-
-
-
-
-
-typedef __int_least8_t int_least8_t;
-typedef __int_least16_t int_least16_t;
-typedef __int_least32_t int_least32_t;
-typedef __int_least64_t int_least64_t;
-
-
-typedef __uint_least8_t uint_least8_t;
-typedef __uint_least16_t uint_least16_t;
-typedef __uint_least32_t uint_least32_t;
-typedef __uint_least64_t uint_least64_t;
-
-
-
-
-
-typedef signed char int_fast8_t;
-
-typedef long int int_fast16_t;
-typedef long int int_fast32_t;
-typedef long int int_fast64_t;
-# 71 "/usr/include/stdint.h" 3 4
-typedef unsigned char uint_fast8_t;
-
-typedef unsigned long int uint_fast16_t;
-typedef unsigned long int uint_fast32_t;
-typedef unsigned long int uint_fast64_t;
-# 87 "/usr/include/stdint.h" 3 4
-typedef long int intptr_t;
-
-
-typedef unsigned long int uintptr_t;
-# 101 "/usr/include/stdint.h" 3 4
-typedef __intmax_t intmax_t;
-typedef __uintmax_t uintmax_t;
-# 10 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h" 2 3 4
-# 49 "/usr/include/bsd/libutil.h" 2 3 4
+typedef int CPXSIZE_BITS_TEST[sizeof(CPXSIZE) == sizeof(size_t) ? 1 : -1];
+# 194 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
 # 1 "/usr/include/stdio.h" 1 3 4
 # 27 "/usr/include/stdio.h" 3 4
 # 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
@@ -2668,6 +2671,8 @@ typedef __uintmax_t uintmax_t;
 
 
 # 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 1 3 4
+# 40 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 3 4
+
 # 40 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 3 4
 typedef __builtin_va_list __gnuc_va_list;
 # 37 "/usr/include/stdio.h" 2 3 4
@@ -3568,354 +3573,9 @@ fread_unlocked (void *__restrict __ptr, size_t __size, size_t __n,
 
 
 
-# 50 "/usr/include/bsd/libutil.h" 2 3 4
+# 195 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 2
+# 292 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
 
-struct pidfh;
-
-
-int humanize_number(char *buf, size_t len, int64_t bytes,
-    const char *suffix, int scale, int flags);
-int expand_number(const char *_buf, uint64_t *_num);
-
-int flopen(const char *_path, int _flags, ...);
-int flopenat(int dirfd, const char *path, int flags, ...);
-
-struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
-int pidfile_fileno(const struct pidfh *pfh);
-int pidfile_write(struct pidfh *pfh);
-int pidfile_close(struct pidfh *pfh);
-int pidfile_remove(struct pidfh *pfh);
-
-char *fparseln(FILE *, size_t *, size_t *, const char[3], int);
-
-# 40 "/usr/include/bsd/stdlib.h" 2 3 4
-# 48 "/usr/include/bsd/stdlib.h" 3 4
-# 1 "/usr/include/bsd/sys/cdefs.h" 1 3 4
-# 49 "/usr/include/bsd/stdlib.h" 2 3 4
-
-# 1 "/usr/include/x86_64-linux-gnu/sys/stat.h" 1 3 4
-# 99 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/stat.h" 1 3 4
-# 46 "/usr/include/x86_64-linux-gnu/bits/stat.h" 3 4
-struct stat
-  {
-    __dev_t st_dev;
-
-
-
-
-    __ino_t st_ino;
-
-
-
-
-
-
-
-    __nlink_t st_nlink;
-    __mode_t st_mode;
-
-    __uid_t st_uid;
-    __gid_t st_gid;
-
-    int __pad0;
-
-    __dev_t st_rdev;
-
-
-
-
-    __off_t st_size;
-
-
-
-    __blksize_t st_blksize;
-
-    __blkcnt_t st_blocks;
-# 91 "/usr/include/x86_64-linux-gnu/bits/stat.h" 3 4
-    struct timespec st_atim;
-    struct timespec st_mtim;
-    struct timespec st_ctim;
-# 106 "/usr/include/x86_64-linux-gnu/bits/stat.h" 3 4
-    __syscall_slong_t __glibc_reserved[3];
-# 115 "/usr/include/x86_64-linux-gnu/bits/stat.h" 3 4
-  };
-# 102 "/usr/include/x86_64-linux-gnu/sys/stat.h" 2 3 4
-# 205 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int stat (const char *__restrict __file,
-   struct stat *__restrict __buf) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1, 2)));
-
-
-
-extern int fstat (int __fd, struct stat *__buf) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2)));
-# 234 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int fstatat (int __fd, const char *__restrict __file,
-      struct stat *__restrict __buf, int __flag)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2, 3)));
-# 259 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int lstat (const char *__restrict __file,
-    struct stat *__restrict __buf) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1, 2)));
-# 280 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int chmod (const char *__file, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1)));
-
-
-
-
-
-extern int lchmod (const char *__file, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1)));
-
-
-
-
-extern int fchmod (int __fd, __mode_t __mode) __attribute__ ((__nothrow__ , __leaf__));
-
-
-
-
-
-extern int fchmodat (int __fd, const char *__file, __mode_t __mode,
-       int __flag)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2))) __attribute__ ((__warn_unused_result__));
-
-
-
-
-
-
-extern __mode_t umask (__mode_t __mask) __attribute__ ((__nothrow__ , __leaf__));
-# 317 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int mkdir (const char *__path, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1)));
-
-
-
-
-
-extern int mkdirat (int __fd, const char *__path, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2)));
-
-
-
-
-
-
-extern int mknod (const char *__path, __mode_t __mode, __dev_t __dev)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1)));
-
-
-
-
-
-extern int mknodat (int __fd, const char *__path, __mode_t __mode,
-      __dev_t __dev) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2)));
-
-
-
-
-
-extern int mkfifo (const char *__path, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (1)));
-
-
-
-
-
-extern int mkfifoat (int __fd, const char *__path, __mode_t __mode)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2)));
-
-
-
-
-
-extern int utimensat (int __fd, const char *__path,
-        const struct timespec __times[2],
-        int __flags)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2)));
-
-
-
-
-extern int futimens (int __fd, const struct timespec __times[2]) __attribute__ ((__nothrow__ , __leaf__));
-# 395 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int __fxstat (int __ver, int __fildes, struct stat *__stat_buf)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (3)));
-extern int __xstat (int __ver, const char *__filename,
-      struct stat *__stat_buf) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2, 3)));
-extern int __lxstat (int __ver, const char *__filename,
-       struct stat *__stat_buf) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2, 3)));
-extern int __fxstatat (int __ver, int __fildes, const char *__filename,
-         struct stat *__stat_buf, int __flag)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (3, 4)));
-# 438 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern int __xmknod (int __ver, const char *__path, __mode_t __mode,
-       __dev_t *__dev) __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (2, 4)));
-
-extern int __xmknodat (int __ver, int __fd, const char *__path,
-         __mode_t __mode, __dev_t *__dev)
-     __attribute__ ((__nothrow__ , __leaf__)) __attribute__ ((__nonnull__ (3, 5)));
-# 452 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) stat (const char *__path, struct stat *__statbuf)
-{
-  return __xstat (1, __path, __statbuf);
-}
-
-
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) lstat (const char *__path, struct stat *__statbuf)
-{
-  return __lxstat (1, __path, __statbuf);
-}
-
-
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) fstat (int __fd, struct stat *__statbuf)
-{
-  return __fxstat (1, __fd, __statbuf);
-}
-
-
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) fstatat (int __fd, const char *__filename, struct stat *__statbuf, int __flag)
-
-{
-  return __fxstatat (1, __fd, __filename, __statbuf, __flag);
-}
-
-
-
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) mknod (const char *__path, __mode_t __mode, __dev_t __dev)
-{
-  return __xmknod (0, __path, __mode, &__dev);
-}
-
-
-
-extern __inline __attribute__ ((__gnu_inline__)) int
-__attribute__ ((__nothrow__ , __leaf__)) mknodat (int __fd, const char *__path, __mode_t __mode, __dev_t __dev)
-
-{
-  return __xmknodat (0, __fd, __path, __mode, &__dev);
-}
-# 534 "/usr/include/x86_64-linux-gnu/sys/stat.h" 3 4
-
-# 51 "/usr/include/bsd/stdlib.h" 2 3 4
-
-
-
-uint32_t arc4random(void);
-void arc4random_stir(void);
-void arc4random_addrandom(unsigned char *dat, int datlen);
-void arc4random_buf(void *_buf, size_t n);
-uint32_t arc4random_uniform(uint32_t upper_bound);
-
-int dehumanize_number(const char *str, int64_t *size);
-
-const char *getprogname(void);
-void setprogname(const char *);
-
-int heapsort (void *, size_t, size_t, int (*)(const void *, const void *));
-int mergesort(void *base, size_t nmemb, size_t size,
-              int (*cmp)(const void *, const void *));
-int radixsort(const unsigned char **base, int nmemb,
-              const unsigned char *table, unsigned endbyte);
-int sradixsort(const unsigned char **base, int nmemb,
-               const unsigned char *table, unsigned endbyte);
-
-void *reallocf(void *ptr, size_t size);
-
-
-void *reallocarray(void *ptr, size_t nmemb, size_t size);
-
-
-long long strtonum(const char *nptr, long long minval, long long maxval,
-                   const char **errstr);
-
-char *getbsize(int *headerlenp, long *blocksizep);
-
-# 5 "sa.c" 2
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
-# 34 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 1 3 4
-
-
-
-
-
-
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
-# 194 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 3 4
-# 1 "/usr/include/limits.h" 1 3 4
-# 26 "/usr/include/limits.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
-# 27 "/usr/include/limits.h" 2 3 4
-# 183 "/usr/include/limits.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 1 3 4
-# 27 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
-# 28 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
-# 161 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 3 4
-# 1 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 1 3 4
-# 38 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 3 4
-# 1 "/usr/include/linux/limits.h" 1 3 4
-# 39 "/usr/include/x86_64-linux-gnu/bits/local_lim.h" 2 3 4
-# 162 "/usr/include/x86_64-linux-gnu/bits/posix1_lim.h" 2 3 4
-# 184 "/usr/include/limits.h" 2 3 4
-
-
-
-# 1 "/usr/include/x86_64-linux-gnu/bits/posix2_lim.h" 1 3 4
-# 188 "/usr/include/limits.h" 2 3 4
-# 195 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
-# 8 "/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h" 2 3 4
-# 35 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 2 3 4
-# 6 "sa.c" 2
-# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h" 1
-# 17 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cplex.h"
-# 1 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 1
-# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-    
-# 63 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-   typedef signed char CPXBYTE;
-
-
-
-
-
-    typedef int CPXINT;
-# 78 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-       typedef long long CPXLONG;
-
-
-
-
-
-
-    typedef short CPXSHORT;
-# 134 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-typedef CPXLONG CPXSIZE;
-# 146 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-       typedef unsigned long long CPXULONG;
-# 165 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h" 1 3 4
-# 166 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h" 2
-# 175 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
-typedef int CPXBYTE_TEST[sizeof(CPXBYTE) == 1 ? 1 : -1];
-typedef int CPXSHORT_TEST[sizeof(CPXSHORT) == 2 ? 1 : -1];
-typedef int CPXINT_TEST[sizeof(CPXINT) == 4 ? 1 : -1];
-typedef int CPXLONG_TEST[sizeof(CPXLONG) == 8 ? 1 : -1];
-typedef int CPXULONG_TEST[sizeof(CPXULONG) == 8 ? 1 : -1];
-
-
-
-
-
-typedef int CPXSIZE_BITS_TEST[sizeof(CPXSIZE) == sizeof(size_t) ? 1 : -1];
 # 292 "/home/mariana/tese/CPLEX_Studio201/cplex/include/ilcplex/cpxconst.h"
 struct cpxenv;
 typedef struct cpxenv *CPXENVptr;
@@ -7394,36 +7054,13 @@ getTemperature(double cp,
 
   return res;
 }
-
-int
-getEll(double T,
-       unsigned int *pR
-)
-{
-  double c = 1.0;
-
-  *pR = arc4random();
-
-
-  unsigned int R = *pR;
-
-  if (0 != R)
-  {
-    c = log2(-R);
-    c -= log2(R);
-    c /= T;
-    c = round(c);
-  }
-
-  return (int)c;
-}
-
+# 64 "sa.c"
 void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
 {
-  int total_population = 0;
-  double max_population_deviation_percentage = 0.0;
-  double final_population_deviation = 0.0;
-  int total_deviation = 0;
+
+
+
+
   int max_deviation = 0;
   double deviation_percentage = 0.0;
 
@@ -7480,59 +7117,43 @@ int runSA(double Tstart,
   start = clock();
 
   int max = 0;
-  double T = Tstart;
 
   double temperature_population = Tstart;
   double temperature_compactness = Tstart;
   printf("temp start : %f\n", Tstart);
 
-  double Td = Tstop - Tstart;
-  Td /= steps;
-  int ell = 1;
-  unsigned int R;
   int best_energy_population = 0x7fffffff;
   int best_energy_compactness = 
-# 137 "sa.c" 3 4
+# 132 "sa.c" 3 4
                                (-0x7fffffff - 1)
-# 137 "sa.c"
+# 132 "sa.c"
                                       ;
   long long Final_energy_population = 0x7fffffffffffffffL;
   int Final_energy_compactness = 
-# 139 "sa.c" 3 4
+# 134 "sa.c" 3 4
                                 (-0x7fffffff - 1)
-# 139 "sa.c"
+# 134 "sa.c"
                                        ;
   Cluster *stored_state = 
-# 140 "sa.c" 3 4
+# 135 "sa.c" 3 4
                          ((void *)0)
-# 140 "sa.c"
+# 135 "sa.c"
                              ;
+  int numIterations = 20;
 
   double ratio = Tstop / Tstart;
-
-  double exponent = 1.0 / steps;
-
+  double exponent = 1.0 / numIterations;
   double alpha = pow(ratio, exponent);
-
-
 
   int perfect_score = 0;
   int not_as_great_score = 0;
-# 161 "sa.c"
+
   printf("\nSA start!\n\n");
 
-  double startingValue = 1.0;
-  double endingValue = 0.000001;
-  int numIterations = 20;
-
-  double increment = (endingValue - startingValue) / (numIterations - 1);
-
-  int iteration;
-  double value;
   srand(time(
-# 171 "sa.c" 3 4
+# 147 "sa.c" 3 4
             ((void *)0)
-# 171 "sa.c"
+# 147 "sa.c"
                 ));
   FILE *output_file = fopen("output.txt", "w");
   FILE *sa_graph_file = fopen("SA_graph.txt", "w");
@@ -7540,9 +7161,9 @@ int runSA(double Tstart,
 
   Cluster *clusters = first_cluster(units, k, n);
   Cluster *best_clusters = 
-# 177 "sa.c" 3 4
+# 153 "sa.c" 3 4
                           ((void *)0)
-# 177 "sa.c"
+# 153 "sa.c"
                               ;
 
 
@@ -7567,16 +7188,16 @@ int runSA(double Tstart,
   for (int s = 1; s <= numIterations; s++)
   {
 
-    ell = getEll(T, &R);
+
     FILE *fp_out = fopen("cluster_info.txt", "w");
     change_unit(clusters, units, k, n);
-# 232 "sa.c"
+
     int energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
 
      int energy__compactness = energy_compactness(clusters, k);
 
      printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
-# 258 "sa.c"
+
     printf("temperature population: %f, temperature compactness: %f\n", temperature_population, temperature_compactness);
 
 
@@ -7588,9 +7209,9 @@ int runSA(double Tstart,
     double accept_prob = ((accept_prob_population) < (accept_prob_compactness) ? (accept_prob_population) : (accept_prob_compactness));
 
     double random_number = (double)rand() / (double)
-# 268 "sa.c" 3 4
+# 197 "sa.c" 3 4
                                                    2147483647
-# 268 "sa.c"
+# 197 "sa.c"
                                                            ;
     if (random_number < accept_prob)
     {
@@ -7604,9 +7225,9 @@ int runSA(double Tstart,
         Final_energy_population = energy__population;
 
         if (best_clusters == 
-# 280 "sa.c" 3 4
+# 209 "sa.c" 3 4
                             ((void *)0)
-# 280 "sa.c"
+# 209 "sa.c"
                                 )
         {
           best_clusters = malloc(k * sizeof(Cluster));
@@ -7626,14 +7247,11 @@ int runSA(double Tstart,
       if (accept_prob_population > random_number)
     {
         best_energy_population = energy__population;
-
     }
-
 
     if (accept_prob_compactness > random_number)
     {
         best_energy_compactness = energy__compactness;
-
     }
 
       int max_deviation = 0;
@@ -7666,14 +7284,10 @@ int runSA(double Tstart,
 
       stored_state = storeState(clusters, k, n);
     }
-
-
-
-
     if (s % (numIterations/10) == 0)
 {
 
-  printf("Temperature Population: %f, Temperature Compactness: %f, T: %f\n", temperature_population, temperature_compactness, T);
+  printf("Temperature Population: %f, Temperature Compactness: %f, T: \n", temperature_population, temperature_compactness);
 
   printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
 
@@ -7700,22 +7314,16 @@ int runSA(double Tstart,
 
   printf("Borders: %d prob: %f\n\n", current_energy_compactness, current_accept_prob_compactness);
   printf("pop: %d prob: %f\n\n", current_energy_population, current_accept_prob_population);
-
-
-
-
 }
     temperature_population *= alpha;
     temperature_compactness *= alpha;
-    T *= alpha;
 
-    increment = (endingValue - startingValue) / (numIterations - 1);
   }
 
   if (best_clusters != 
-# 385 "sa.c" 3 4
+# 301 "sa.c" 3 4
                       ((void *)0)
-# 385 "sa.c"
+# 301 "sa.c"
                           )
   {
     print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
@@ -7731,9 +7339,9 @@ int runSA(double Tstart,
   printf("SA end!\n");
   end = clock();
   cpu_time_used = ((double) (end - start)) / 
-# 399 "sa.c" 3 4
+# 315 "sa.c" 3 4
                                             ((__clock_t) 1000000)
-# 399 "sa.c"
+# 315 "sa.c"
                                                           ;
 
   printf("Time taken: %f seconds\n", cpu_time_used);

@@ -1,7 +1,7 @@
 #include <time.h>
 #include <math.h>
 #include <assert.h>
-#include <bsd/stdlib.h>
+//#include <bsd/stdlib.h>
 #include <limits.h>
 #include <ilcplex/cplex.h>
 
@@ -38,28 +38,28 @@ getTemperature(double cp, /* complement probability */
   return res;
 }
 
-int                     // Energy delta
-getEll(double T,        /* [in] the temperature */
-       unsigned int *pR /* [out] the random number that was obtained */
-)
-{
-  double c = 1.0;
+// int                     // Energy delta
+// getEll(double T,        /* [in] the temperature */
+//        unsigned int *pR /* [out] the random number that was obtained */
+// )
+// {
+//   double c = 1.0;
 
-  *pR = arc4random();
-  // *pR = myRandom();
-  // randvariavel
-  unsigned int R = *pR;
+//   *pR = arc4random();
+//   // *pR = myRandom();
+//   // randvariavel
+//   unsigned int R = *pR;
 
-  if (0 != R)
-  {
-    c = log2(-R);
-    c -= log2(R);
-    c /= T;
-    c = round(c);
-  }
+//   if (0 != R)
+//   {
+//     c = log2(-R);
+//     c -= log2(R);
+//     c /= T;
+//     c = round(c);
+//   }
 
-  return (int)c; // deltaE
-}
+//   return (int)c; // deltaE
+// }
 
 void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
 {
@@ -174,7 +174,7 @@ int runSA(double Tstart, /* [in] starting temperature */
   for (int s = 1; s <= numIterations; s++)
   { 
 
-    ell = getEll(T, &R); // E(s)
+    //ell = getEll(T, &R); // E(s)
     FILE *fp_out = fopen("cluster_info.txt", "w");
     change_unit(clusters, units, k, n);
 
@@ -265,7 +265,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     if (s % (numIterations/10) == 0)
 {
 
-  printf("Temperature Population: %f, Temperature Compactness: %f, T: %f\n", temperature_population, temperature_compactness, T);
+  printf("Temperature Population: %f, Temperature Compactness: %f, T: \n", temperature_population, temperature_compactness);
 
   printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
   
