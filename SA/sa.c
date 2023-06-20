@@ -179,14 +179,14 @@ int runSA(double Tstart, /* [in] starting temperature */
 
     int energy__compactness = energy_compactness(clusters, k);
 
-    printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
+    //printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
 
-    printf("temperature population: %f, temperature compactness: %f\n", temperature_population, temperature_compactness);
+    //printf("temperature population: %f, temperature compactness: %f\n", temperature_population, temperature_compactness);
 
     double accept_prob_population = fmax(0.0, fmin(1.0, exp((best_energy_population - energy__population) / temperature_population)));
     double accept_prob_compactness =fmax(0.0, fmin(1.0, exp((best_energy_compactness - energy__compactness) / temperature_compactness)));
 
-    printf("---- here:accpet prob pop: %f and ccpet prob comp: %f\n", accept_prob_population, accept_prob_compactness);
+    //printf("---- here:accpet prob pop: %f and ccpet prob comp: %f\n", accept_prob_population, accept_prob_compactness);
 
     double accept_prob = min(accept_prob_population, accept_prob_compactness);
 
