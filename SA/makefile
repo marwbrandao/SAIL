@@ -47,7 +47,7 @@ CFLAGS  += $(PROFILE)
 CFLAGS  += $(OPTIMIZE)
 #CFLAGS  += $(STATIC)
 CFLAGS  += $(THREADS)
-CFLAGS  += -I/home/mariana/tese/CPLEX_Studio201/cplex/include
+CFLAGS  += -I/home/jcortes/ibm/ILOG/CPLEX_Studio201/cplex/include
 
 
 ##  Base Makefile
@@ -72,7 +72,7 @@ coverage: $(COVS)
 ## Linking rule
 $(EXEC): $(OS)
 	@echo Linking: $@
-	$(CC) $(CFLAGS) $(OS) -o $@ -lm -lrt -lbsd -L/home/mariana/tese/CPLEX_Studio201/cplex/lib/x86-64_linux/static_pic -lcplex -lm -lpthread -ldl
+	$(CC) $(CFLAGS) $(OS) -o $@ -lm -lrt -L/home/jcortes/ibm/ILOG/CPLEX_Studio201/cplex/lib/x86-64_linux/static_pic -lcplex -lm -lpthread -ldl
 
 ## Run Preprocessor
 %.i: %.c
