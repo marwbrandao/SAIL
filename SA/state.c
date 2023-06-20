@@ -133,12 +133,13 @@ int compactness(Cluster *cluster) {
     }
     return shared_borders;
 }
+
 // dif entre as frnteiras de populaçao
-long long energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_population) {
+int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_population) {
     int lower_bound, upper_bound;
     population_bounds(units, margin, &lower_bound, &upper_bound, k, n, ideal_population);
     //printf ("lower and upper = [%d, %d]\n", lower_bound, upper_bound);
-    long long total_difference = 0;
+    int total_difference = 0;
     int min_diff = 0;
     //printf("1-- total difference: %d\n", total_difference);
     for (int i = 0; i < k; i++) {
@@ -157,10 +158,10 @@ long long energy_population(TU **units, Cluster *cluster, int margin, int k, int
 
         min_diff = (lower_diff < upper_diff) ? lower_diff : upper_diff;
         //printf("min diff = %d and population = %d\n", min_diff, pop_cluster);
-        total_difference += (min_diff*2);
+        total_difference += (min_diff);
         //printf("2-- total difference: %d\n", total_difference);
     }
-    //printf("3-- total difference: %d\n", total_difference);
+    printf("3-- total difference: %d\n", total_difference);
     return total_difference;
 }
 

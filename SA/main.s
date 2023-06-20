@@ -241,7 +241,7 @@ _sub_D_00100_1:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	-1678059701
+	.long	-901474971
 	.zero	4
 	.quad	.LC5
 	.quad	__gcov_merge_add

@@ -5,6 +5,8 @@
 #include <limits.h>
 #include <ilcplex/cplex.h>
 
+#define min(a,b) ((a) < (b) ? (a) : (b))
+
 #include "ILP.h"
 #include "sa.h"
 #include "state.h"
@@ -61,10 +63,10 @@ getEll(double T,        /* [in] the temperature */
 
 void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
 {
-  int total_population = 0;
-  double max_population_deviation_percentage = 0.0;
-  double final_population_deviation = 0.0;
-  int total_deviation = 0;
+  //int total_population = 0;
+  //double max_population_deviation_percentage = 0.0;
+  //double final_population_deviation = 0.0;
+  //int total_deviation = 0;
   int max_deviation = 0;
   double deviation_percentage = 0.0;
 
@@ -115,45 +117,33 @@ int runSA(double Tstart, /* [in] starting temperature */
           TU **units, int k, int n, int m, int ideal_pop)
 {
 
+  clock_t start, end;
+  double cpu_time_used;
+
+  start = clock();
+
   int max = 0;
-  double T = Tstart;
-  double Td = Tstop - Tstart;
-  Td /= steps;
-  int ell = 1; /* Default value for greedy */
-  unsigned int R;
-  long long best_energy_population = LONG_MAX;
+
+  double temperature_population = Tstart;
+  double temperature_compactness = Tstart;
+  printf("temp start : %f\n", Tstart);
+
+  int best_energy_population = INT_MAX;
   int best_energy_compactness = INT_MIN;
   long long Final_energy_population = LONG_MAX;
   int Final_energy_compactness = INT_MIN;
   Cluster *stored_state = NULL;
+  int numIterations = 20;
 
   double ratio = Tstop / Tstart;
-
-  double exponent = 1.0 / steps;
-
+  double exponent = 1.0 / numIterations;
   double alpha = pow(ratio, exponent);
 
   int perfect_score = 0;
   int not_as_great_score = 0;
-  // popul_test1(units,n,k, ideal_pop);
-
-  //return;
-
-  // Cluster *clusters = runILP(units, k, n, m, ideal_pop, clusters);
-  // FILE *output_file = fopen("output.txt", "w");
-  // print_best_clusters(clusters, units, k, n, output_file, ideal_pop);
-  // return;
 
   printf("\nSA start!\n\n");
 
-  double startingValue = 1.0;
-  double endingValue = 0.000001;
-  int numIterations = 2000000;
-
-  double increment = (endingValue - startingValue) / (numIterations - 1);
-  
-  int iteration;
-  double value;
   srand(time(NULL));
   FILE *output_file = fopen("output.txt", "w");
   FILE *sa_graph_file = fopen("SA_graph.txt", "w");
@@ -188,59 +178,21 @@ int runSA(double Tstart, /* [in] starting temperature */
     FILE *fp_out = fopen("cluster_info.txt", "w");
     change_unit(clusters, units, k, n);
 
-    // if (s % (numIterations/10) == 0)
-    // {
-    //   if (perfect_score == 0)
-    //   {
-
-    //     //accept_prob = 1.0;
-    //     clusters = runILP(units, k, n, m, ideal_pop, clusters);
-    //     //energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
+    int energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
     
-    //     //energy__compactness = energy_compactness(clusters, k);
+     int energy__compactness = energy_compactness(clusters, k);
 
-    //     for (int i = 0; i < k; i++)
-    //     {
-    //       int pop_cluster = 0;        
-    //       printf("..Cluster %d with size %d: ", i, clusters[i].size);
-    //       for (int j = 0; j < clusters[i].size; j++)
-    //       {
-    //         pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-    //         int unit_code = clusters[i].units[j]->code / 1;
-
-    //       }
-    //       printf(" --> população: %d", pop_cluster);
-    //       printf("\n");
-    //     }
-    //   }
-    // }
-
-    long long energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
+     printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
     
-    int energy__compactness = energy_compactness(clusters, k);
-    double accept_prob = 0.0;
-    if (energy__compactness > best_energy_compactness && energy__population == 0)
-    {
-      accept_prob = 1.0;
-      perfect_score++;   
-     }
-    else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
-    {
-       accept_prob = startingValue + (increment * (s - 1));
-      
-    }
-    else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population)
-    {
-      accept_prob = startingValue + (increment * (s - 1));
-      
-    }
-    else
-    {
+    printf("temperature population: %f, temperature compactness: %f\n", temperature_population, temperature_compactness);
 
-      accept_prob = 0.0;
-    }
-    
-    
+
+    double accept_prob_population = exp((best_energy_population - energy__population) / temperature_population);
+    double accept_prob_compactness = exp((best_energy_compactness - energy__compactness) / temperature_compactness);
+
+    printf("---- here:accpet prob pop: %f and ccpet prob comp: %f\n", accept_prob_population, accept_prob_compactness);
+
+    double accept_prob = min(accept_prob_population, accept_prob_compactness);
 
     double random_number = (double)rand() / (double)RAND_MAX;
     if (random_number < accept_prob)
@@ -270,8 +222,15 @@ int runSA(double Tstart, /* [in] starting temperature */
         }
       }
       
-      best_energy_compactness = energy__compactness;
-      best_energy_population = energy__population;
+      if (accept_prob_population > random_number)
+    {
+        best_energy_population = energy__population;
+    }
+
+    if (accept_prob_compactness > random_number)
+    {
+        best_energy_compactness = energy__compactness;
+    }
 
       int max_deviation = 0;
       double deviation_percentage = 0.0;
@@ -299,43 +258,44 @@ int runSA(double Tstart, /* [in] starting temperature */
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
       fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
       
-      fprintf(sa_graph_file, "%d,%f,%f\n", s, deviation_percentage, T);
+      fprintf(sa_graph_file, "%d,%f,%d,%f\n", s, deviation_percentage, best_energy_compactness, accept_prob);
 
       stored_state = storeState(clusters, k, n);
     }
-    // if (accept_prob == 1.0 ) {
-    //   print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
-    // }
+    if (s % (numIterations/10) == 0)
+{
 
-    if (s % (numIterations/15) == 0)
+  printf("Temperature Population: %f, Temperature Compactness: %f, T: %f\n", temperature_population, temperature_compactness, T);
+
+  printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
+  
+  for (int i = 0; i < k; i++)
+  {
+    int pop_cluster = 0;
+    printf("Cluster %d with size %d: ", i, clusters[i].size);
+    
+    for (int j = 0; j < clusters[i].size; j++)
     {
-      printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
-      accept_prob = startingValue + (increment * (s - 1));
-      for (int i = 0; i < k; i++)
-      {
-        int pop_cluster = 0;        printf("Cluster %d with size %d: ", i, clusters[i].size);
-        for (int j = 0; j < clusters[i].size; j++)
-        {
-          pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-          int unit_code = clusters[i].units[j]->code / 1;
-
-        }
-        printf(" --> população: %d", pop_cluster);
-        printf("\n");
-
-      }
-      printf("fronteiras: %d prob: %f\n\n", energy__compactness, accept_prob);
-
-      
-
-
-
-      perfect_score = 0;
-      not_as_great_score = 0;
+      pop_cluster += clusters[i].units[j]->voters;
     }
-    T *= alpha;
-    // T =+ Td;
-    increment = (endingValue - startingValue) / (numIterations - 1);
+    
+    printf(" --> population: %d\n", pop_cluster);
+  }
+  
+  long long current_energy_population = energy_population(units, clusters, m, k, n, ideal_pop);
+  int current_energy_compactness = energy_compactness(clusters, k);
+  
+  double current_accept_prob_population = exp((best_energy_population - current_energy_population) / temperature_population);
+  double current_accept_prob_compactness = exp((best_energy_compactness - current_energy_compactness) / temperature_compactness);
+  
+  double current_accept_prob = min(current_accept_prob_population, current_accept_prob_compactness);
+  
+  printf("Borders: %d prob: %f\n\n", current_energy_compactness, current_accept_prob_compactness);
+  printf("pop: %d prob: %f\n\n", current_energy_population, current_accept_prob_population);
+}
+    temperature_population *= alpha;
+    temperature_compactness *= alpha;
+
   }
 
   if (best_clusters != NULL)
@@ -351,6 +311,10 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   printf("\n");
   printf("SA end!\n");
+  end = clock();
+  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+  printf("Time taken: %f seconds\n", cpu_time_used);
 
   return;
 }

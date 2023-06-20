@@ -337,6 +337,10 @@ compactness:
 	.cfi_endproc
 .LFE44:
 	.size	compactness, .-compactness
+	.section	.rodata.str1.1
+.LC5:
+	.string	"3-- total difference: %d\n"
+	.text
 	.p2align 4
 	.globl	energy_population
 	.type	energy_population, @function
@@ -349,6 +353,9 @@ energy_population:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
+	pushq	%r12
+	subq	$8, %rsp
+	.cfi_offset 12, -24
 1:	call	*mcount@GOTPCREL(%rip)
 	lock addq	$1, __gcov0.energy_population(%rip)
 	imull	%r9d, %edx
@@ -365,7 +372,7 @@ energy_population:
 	jle	.L43
 	leal	-1(%rcx), %eax
 	leaq	8(%rsi), %rdi
-	xorl	%r9d, %r9d
+	xorl	%r12d, %r12d
 	salq	$4, %rax
 	leaq	24(%rsi,%rax), %rsi
 	.p2align 4,,10
@@ -405,16 +412,23 @@ energy_population:
 	xorl	%ecx, %edx
 	subl	%ecx, %edx
 	cmpl	%edx, %eax
-	cmovg	%edx, %eax
-	addl	%eax, %eax
-	cltq
-	addq	%rax, %r9
+	cmovle	%eax, %edx
+	addl	%edx, %r12d
 	lock addq	$1, 32+__gcov0.energy_population(%rip)
 .L41:
 	addq	$16, %rdi
 	cmpq	%rdi, %rsi
 	jne	.L38
-	movq	%r9, %rax
+.L37:
+	movl	%r12d, %edx
+	leaq	.LC5(%rip), %rsi
+	movl	$1, %edi
+	xorl	%eax, %eax
+	call	__printf_chk@PLT
+	lock addq	$1, 40+__gcov0.energy_population(%rip)
+	addq	$8, %rsp
+	movl	%r12d, %eax
+	popq	%r12
 	popq	%rbp
 	.cfi_remember_state
 	.cfi_def_cfa 7, 8
@@ -426,11 +440,8 @@ energy_population:
 	lock addq	$1, 24+__gcov0.energy_population(%rip)
 	jmp	.L41
 .L43:
-	xorl	%r9d, %r9d
-	popq	%rbp
-	.cfi_def_cfa 7, 8
-	movq	%r9, %rax
-	ret
+	xorl	%r12d, %r12d
+	jmp	.L37
 	.cfi_endproc
 .LFE45:
 	.size	energy_population, .-energy_population
@@ -872,12 +883,12 @@ has_neighbor_in_cluster:
 	.size	has_neighbor_in_cluster, .-has_neighbor_in_cluster
 	.section	.rodata.str1.8
 	.align 8
-.LC5:
+.LC6:
 	.string	"Checking if neighbors of unit %d are contiguous\n"
 	.section	.rodata.str1.1
-.LC6:
-	.string	"Found neighbor1: %d\n"
 .LC7:
+	.string	"Found neighbor1: %d\n"
+.LC8:
 	.string	"Found neighbor2: %d\n"
 	.text
 	.p2align 4
@@ -907,7 +918,7 @@ are_neighbors_contiguous00:
 	movq	%rdi, %r15
 	movq	%rsi, %rbx
 	lock addq	$1, __gcov0.are_neighbors_contiguous00(%rip)
-	leaq	.LC5(%rip), %rsi
+	leaq	.LC6(%rip), %rsi
 	xorl	%eax, %eax
 	movl	(%rdi), %edx
 	movl	$1, %edi
@@ -939,7 +950,7 @@ are_neighbors_contiguous00:
 	cmpl	%edi, (%r14)
 	jne	.L121
 	lock addq	$1, 16+__gcov0.are_neighbors_contiguous00(%rip)
-	leaq	.LC6(%rip), %rsi
+	leaq	.LC7(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	movl	(%r14), %edx
@@ -978,7 +989,7 @@ are_neighbors_contiguous00:
 	lock addq	$1, 72+__gcov0.are_neighbors_contiguous00(%rip)
 	movl	$1, %edi
 	xorl	%eax, %eax
-	leaq	.LC7(%rip), %rsi
+	leaq	.LC8(%rip), %rsi
 	movl	(%r12), %edx
 	call	__printf_chk@PLT
 	movl	12(%r14), %edi
@@ -1916,7 +1927,7 @@ change_unit:
 	subl	$1, %ecx
 	xorl	%r11d, %r11d
 	movl	%r9d, -96(%rbp)
-	movsd	.LC8(%rip), %xmm1
+	movsd	.LC9(%rip), %xmm1
 	leaq	8(%r13,%rax,8), %r8
 	xorl	%esi, %esi
 	.p2align 4,,10
@@ -2072,7 +2083,7 @@ change_unit:
 	je	.L277
 	movq	-96(%rbp), %r8
 	leal	-1(%r10), %r13d
-	movsd	.LC10(%rip), %xmm2
+	movsd	.LC11(%rip), %xmm2
 	pxor	%xmm1, %xmm1
 	movq	%r8, %rax
 	leaq	4(%r8,%r13,4), %rcx
@@ -2112,7 +2123,7 @@ change_unit:
 	movl	-80(%rbp), %r9d
 	cvtsi2sdl	%eax, %xmm1
 	xorl	%eax, %eax
-	divsd	.LC11(%rip), %xmm1
+	divsd	.LC12(%rip), %xmm1
 	jmp	.L292
 	.p2align 4,,10
 	.p2align 3
@@ -2554,13 +2565,13 @@ DFS:
 .LFE62:
 	.size	DFS, .-DFS
 	.section	.rodata.str1.1
-.LC12:
-	.string	"Cluster %d with size %d: "
 .LC13:
-	.string	"%d "
+	.string	"Cluster %d with size %d: "
 .LC14:
-	.string	"\n"
+	.string	"%d "
 .LC15:
+	.string	"\n"
+.LC16:
 	.string	"--------------\n"
 	.text
 	.p2align 4
@@ -2632,14 +2643,14 @@ transitionBound:
 	movq	%rax, -64(%rbp)
 	lock addq	$1, 32+__gcov0.transitionBound(%rip)
 	xorl	%r12d, %r12d
-	leaq	.LC13(%rip), %rbx
+	leaq	.LC14(%rip), %rbx
 	leaq	8(%rax), %r15
 	.p2align 4,,10
 	.p2align 3
 .L401:
 	movl	(%r15), %ecx
 	movl	%r12d, %edx
-	leaq	.LC12(%rip), %rsi
+	leaq	.LC13(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	call	__printf_chk@PLT
@@ -2664,7 +2675,7 @@ transitionBound:
 	jg	.L400
 .L399:
 	lock addq	$1, 56+__gcov0.transitionBound(%rip)
-	leaq	.LC14(%rip), %rsi
+	leaq	.LC15(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
@@ -2675,7 +2686,7 @@ transitionBound:
 	jne	.L401
 .L411:
 	lock addq	$1, 72+__gcov0.transitionBound(%rip)
-	leaq	.LC13(%rip), %rbx
+	leaq	.LC14(%rip), %rbx
 	movl	$4, -76(%rbp)
 .L406:
 	movl	-52(%rbp), %r15d
@@ -2686,7 +2697,7 @@ transitionBound:
 	movq	%r14, %rdi
 	call	change_unit
 	lock addq	$1, 80+__gcov0.transitionBound(%rip)
-	leaq	.LC15(%rip), %rsi
+	leaq	.LC16(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
@@ -2700,7 +2711,7 @@ transitionBound:
 .L405:
 	movl	(%r15), %ecx
 	movl	%r12d, %edx
-	leaq	.LC12(%rip), %rsi
+	leaq	.LC13(%rip), %rsi
 	xorl	%eax, %eax
 	movl	$1, %edi
 	call	__printf_chk@PLT
@@ -2725,7 +2736,7 @@ transitionBound:
 	jg	.L404
 .L403:
 	lock addq	$1, 112+__gcov0.transitionBound(%rip)
-	leaq	.LC14(%rip), %rsi
+	leaq	.LC15(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
 	call	__printf_chk@PLT
@@ -2744,14 +2755,14 @@ transitionBound:
 	jle	.L407
 	movq	-64(%rbp), %rax
 	xorl	%r14d, %r14d
-	leaq	.LC13(%rip), %rbx
+	leaq	.LC14(%rip), %rbx
 	leaq	8(%rax), %r15
 	.p2align 4,,10
 	.p2align 3
 .L410:
 	movl	(%r15), %r8d
 	movl	%r14d, %ecx
-	leaq	.LC12(%rip), %rdx
+	leaq	.LC13(%rip), %rdx
 	movq	%r13, %rdi
 	movl	$1, %esi
 	xorl	%eax, %eax
@@ -2778,7 +2789,7 @@ transitionBound:
 	jg	.L409
 .L408:
 	lock addq	$1, 160+__gcov0.transitionBound(%rip)
-	leaq	.LC14(%rip), %rdx
+	leaq	.LC15(%rip), %rdx
 	movl	$1, %esi
 	xorl	%eax, %eax
 	movq	%r13, %rdi
@@ -3024,10 +3035,10 @@ __gcov_.compactness:
 __gcov_.energy_population:
 	.quad	.LPBX0
 	.long	279141317
-	.long	1873177470
-	.long	141739543
+	.long	1701974286
+	.long	906614804
 	.zero	4
-	.long	5
+	.long	6
 	.zero	4
 	.quad	__gcov0.energy_population
 	.align 32
@@ -3036,7 +3047,7 @@ __gcov_.energy_population:
 __gcov_.energy_compactness:
 	.quad	.LPBX0
 	.long	652034717
-	.long	-1093909491
+	.long	-396109377
 	.long	-1192601709
 	.zero	4
 	.long	2
@@ -3048,7 +3059,7 @@ __gcov_.energy_compactness:
 __gcov_.is_neighbor:
 	.quad	.LPBX0
 	.long	1021019482
-	.long	-1315714286
+	.long	-1981376267
 	.long	-1562846356
 	.zero	4
 	.long	3
@@ -3060,7 +3071,7 @@ __gcov_.is_neighbor:
 __gcov_.first_cluster:
 	.quad	.LPBX0
 	.long	457686930
-	.long	335829849
+	.long	505402112
 	.long	-380827576
 	.zero	4
 	.long	19
@@ -3072,7 +3083,7 @@ __gcov_.first_cluster:
 __gcov_.reset_visited:
 	.quad	.LPBX0
 	.long	875338645
-	.long	-1671335148
+	.long	-1770325171
 	.long	-1192601709
 	.zero	4
 	.long	2
@@ -3084,7 +3095,7 @@ __gcov_.reset_visited:
 __gcov_.has_neighbor_in_cluster:
 	.quad	.LPBX0
 	.long	742552788
-	.long	357901970
+	.long	1626038309
 	.long	513426919
 	.zero	4
 	.long	4
@@ -3096,7 +3107,7 @@ __gcov_.has_neighbor_in_cluster:
 __gcov_.are_neighbors_contiguous00:
 	.quad	.LPBX0
 	.long	616900872
-	.long	1090591683
+	.long	1408223380
 	.long	2046284110
 	.zero	4
 	.long	14
@@ -3108,7 +3119,7 @@ __gcov_.are_neighbors_contiguous00:
 __gcov_.dfs_check_neighbors:
 	.quad	.LPBX0
 	.long	523918190
-	.long	1330510660
+	.long	-2101235727
 	.long	-875698785
 	.zero	4
 	.long	7
@@ -3120,7 +3131,7 @@ __gcov_.dfs_check_neighbors:
 __gcov_.are_neighbors_contiguousd:
 	.quad	.LPBX0
 	.long	436150292
-	.long	787536631
+	.long	-1261996190
 	.long	1376482055
 	.zero	4
 	.long	6
@@ -3132,7 +3143,7 @@ __gcov_.are_neighbors_contiguousd:
 __gcov_.are_neighbors_contiguousss:
 	.quad	.LPBX0
 	.long	1663749854
-	.long	-1768119143
+	.long	-1582313120
 	.long	1920027796
 	.zero	4
 	.long	9
@@ -3144,7 +3155,7 @@ __gcov_.are_neighbors_contiguousss:
 __gcov_.dfs_contiguity_check:
 	.quad	.LPBX0
 	.long	61974017
-	.long	71439541
+	.long	548924636
 	.long	-875698785
 	.zero	4
 	.long	7
@@ -3156,7 +3167,7 @@ __gcov_.dfs_contiguity_check:
 __gcov_.are_neighbors_contiguous:
 	.quad	.LPBX0
 	.long	591483435
-	.long	-230032877
+	.long	-1149355105
 	.long	1376482055
 	.zero	4
 	.long	6
@@ -3168,7 +3179,7 @@ __gcov_.are_neighbors_contiguous:
 __gcov_.dfs_contiguity_exclude:
 	.quad	.LPBX0
 	.long	1182882833
-	.long	-9680878
+	.long	-50345473
 	.long	-2055710150
 	.zero	4
 	.long	8
@@ -3180,7 +3191,7 @@ __gcov_.dfs_contiguity_exclude:
 __gcov_.are_remaining_units_contiguous:
 	.quad	.LPBX0
 	.long	2080394562
-	.long	1703779025
+	.long	-1832959645
 	.long	-1582968321
 	.zero	4
 	.long	6
@@ -3192,7 +3203,7 @@ __gcov_.are_remaining_units_contiguous:
 __gcov_.contains:
 	.quad	.LPBX0
 	.long	214954695
-	.long	2017912689
+	.long	1068575152
 	.long	-1562846356
 	.zero	4
 	.long	3
@@ -3204,7 +3215,7 @@ __gcov_.contains:
 __gcov_.change_unit:
 	.quad	.LPBX0
 	.long	785053420
-	.long	909450109
+	.long	568732192
 	.long	-1938118044
 	.zero	4
 	.long	32
@@ -3216,7 +3227,7 @@ __gcov_.change_unit:
 __gcov_.is_contiguous_after_removal:
 	.quad	.LPBX0
 	.long	1047737186
-	.long	-2134013457
+	.long	730676977
 	.long	2103658024
 	.zero	4
 	.long	11
@@ -3228,7 +3239,7 @@ __gcov_.is_contiguous_after_removal:
 __gcov_.DFS:
 	.quad	.LPBX0
 	.long	2095234574
-	.long	-899119135
+	.long	946351495
 	.long	1464906663
 	.zero	4
 	.long	13
@@ -3240,7 +3251,7 @@ __gcov_.DFS:
 __gcov_.transitionBound:
 	.quad	.LPBX0
 	.long	1434185528
-	.long	832755161
+	.long	-199550827
 	.long	826105140
 	.zero	4
 	.long	24
@@ -3248,7 +3259,7 @@ __gcov_.transitionBound:
 	.quad	__gcov0.transitionBound
 	.section	.rodata.str1.8
 	.align 8
-.LC16:
+.LC17:
 	.string	"/home/mariana/tese/SA/state.gcda"
 	.section	.data.rel,"aw"
 	.align 32
@@ -3258,9 +3269,9 @@ __gcov_.transitionBound:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	-1681997158
+	.long	-901475538
 	.zero	4
-	.quad	.LC16
+	.quad	.LC17
 	.quad	__gcov_merge_add
 	.quad	0
 	.quad	0
@@ -3280,7 +3291,7 @@ __gcov_.transitionBound:
 __gcov_.storeState:
 	.quad	.LPBX0
 	.long	1521594313
-	.long	1787655345
+	.long	789472702
 	.long	449688241
 	.zero	4
 	.long	3
@@ -3297,7 +3308,7 @@ __gcov_.storeState:
 	.local	__gcov0.compactness
 	.comm	__gcov0.compactness,48,32
 	.local	__gcov0.energy_population
-	.comm	__gcov0.energy_population,40,32
+	.comm	__gcov0.energy_population,48,32
 	.local	__gcov0.energy_compactness
 	.comm	__gcov0.energy_compactness,16,16
 	.local	__gcov0.is_neighbor
@@ -3369,15 +3380,15 @@ CSWTCH.8:
 	.long	858993459
 	.long	1072378675
 	.align 8
-.LC8:
+.LC9:
 	.long	4294967295
 	.long	2146435071
 	.align 8
-.LC10:
+.LC11:
 	.long	0
 	.long	1072693248
 	.align 8
-.LC11:
+.LC12:
 	.long	4290772992
 	.long	1105199103
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"

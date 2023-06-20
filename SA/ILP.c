@@ -818,7 +818,8 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     CPXENVptr env = NULL;
     CPXLPptr lp = NULL;
     int status;
-
+    double start_time, end_time;
+    
     env = CPXopenCPLEX(&status);
     if (env == NULL)
     {
@@ -832,15 +833,16 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
         fprintf(stderr, "Could not create LP problem.\n");
         exit(1);
     }
-
+    CPXgettime(env, &start_time);
+    printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    //double time_limit = 60.0 * 10;  // Time limit in seconds
-    // status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
-    // if (status) {
-    //     fprintf(stderr, "Failed to set time limit parameter.\n");
-    //     exit(1);
-    // }
+    double time_limit = 60.0 * 40;  // Time limit in seconds
+    status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
+    if (status) {
+        fprintf(stderr, "Failed to set time limit parameter.\n");
+        exit(1);
+    }
 
     create_code_index(units, n);
     create_neighbor_index(units, n);
@@ -959,7 +961,11 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     
     free(solution);
     clusters = create_initial_clusters(units, k, n);
-
+    status = CPXmipopt(env, lp);
+    CPXgettime(env, &end_time);
+    printf("end = == = %f\n", end_time);
+    double time_taken = end_time - start_time;
+    printf("Time taken: %f seconds\n", time_taken);
     status = CPXfreeprob(env, &lp);
     if (status != 0)
     {
