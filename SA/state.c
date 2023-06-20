@@ -161,7 +161,7 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, in
         total_difference += (min_diff);
         //printf("2-- total difference: %d\n", total_difference);
     }
-    printf("3-- total difference: %d\n", total_difference);
+    //printf("3-- total difference: %d\n", total_difference);
     return total_difference;
 }
 
