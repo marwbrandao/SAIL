@@ -116,7 +116,10 @@ int runSA(double Tstart, /* [in] starting temperature */
           TU **units, int k, int n, int m, int ideal_pop)
 {
 
- 
+ clock_t start, end;
+  double cpu_time_used;
+
+  start = clock();
 
   int max = 0;
   //double T = Tstart;
@@ -184,7 +187,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     fprintf(output_file, "\n");
   }
    printf("\nSA start!\n\n");
-  for (int s = 1; s <= 20000000; s++)
+  for (int s = 1; s <= numIterations; s++)
   { 
     // if (s == 10) 
     //   printf("hi\n");
@@ -232,7 +235,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     }
     // if (s%100000==0)
     // printf("%d ", s);
-    if (s % 1000000 == 0)
+    if (s % (numIterations / 10) == 0)
     {
       // printf("%d ", s);
       printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
@@ -358,6 +361,11 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   printf("\n");
   printf("SA end!\n");
+  end = clock();
+  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+  printf("Time taken: %f seconds\n", cpu_time_used);
+
 
   return;
 }
