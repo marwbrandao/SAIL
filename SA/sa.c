@@ -336,7 +336,7 @@ int runSA(double Tstart, /* [in] starting temperature */
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
       fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
       
-      fprintf(sa_graph_file, "%d,%f,%f\n", s, deviation_percentage, T);
+      //fprintf(sa_graph_file, "%d,%f,%f\n", s, deviation_percentage, T);
 
       stored_state = storeState(clusters, k, n);
     }
