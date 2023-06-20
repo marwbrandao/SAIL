@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <ilcplex/cplex.h>
 
-#define min(a,b) ((a) < (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 
 #include "ILP.h"
 #include "sa.h"
@@ -63,10 +63,10 @@ getTemperature(double cp, /* complement probability */
 
 void print_best_clusters(Cluster *best_clusters, TU **units, int k, int n, FILE *output_file, int ideal_population)
 {
-  //int total_population = 0;
-  //double max_population_deviation_percentage = 0.0;
-  //double final_population_deviation = 0.0;
-  //int total_deviation = 0;
+  // int total_population = 0;
+  // double max_population_deviation_percentage = 0.0;
+  // double final_population_deviation = 0.0;
+  // int total_deviation = 0;
   int max_deviation = 0;
   double deviation_percentage = 0.0;
 
@@ -133,7 +133,7 @@ int runSA(double Tstart, /* [in] starting temperature */
   long long Final_energy_population = LONG_MAX;
   int Final_energy_compactness = INT_MIN;
   Cluster *stored_state = NULL;
-  int numIterations = 20;
+  int numIterations = 20000000;
 
   double ratio = Tstop / Tstart;
   double exponent = 1.0 / numIterations;
@@ -148,14 +148,12 @@ int runSA(double Tstart, /* [in] starting temperature */
   FILE *output_file = fopen("output.txt", "w");
   FILE *sa_graph_file = fopen("SA_graph.txt", "w");
   fprintf(output_file, "%d;%d;%d\n", k, n, steps);
-  
+
   Cluster *clusters = first_cluster(units, k, n);
   Cluster *best_clusters = NULL;
 
-
-
   for (int i = 0; i < k; i++)
-  { 
+  {
     int pop_cluster = 0;
     fprintf(output_file, "0,%d:", i);
     printf("Cluster %d with size %d: ", i, clusters[i].size);
@@ -172,23 +170,21 @@ int runSA(double Tstart, /* [in] starting temperature */
   }
 
   for (int s = 1; s <= numIterations; s++)
-  { 
+  {
 
-    //ell = getEll(T, &R); // E(s)
     FILE *fp_out = fopen("cluster_info.txt", "w");
     change_unit(clusters, units, k, n);
 
     int energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
-    
-     int energy__compactness = energy_compactness(clusters, k);
 
-     printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
-    
+    int energy__compactness = energy_compactness(clusters, k);
+
+    printf("best energy pop: %d, energy pop: %d \nbest energy comp: %d, energy comp: %d\n", best_energy_population, energy__population, best_energy_compactness, energy__compactness);
+
     printf("temperature population: %f, temperature compactness: %f\n", temperature_population, temperature_compactness);
 
-
-    double accept_prob_population = exp((best_energy_population - energy__population) / temperature_population);
-    double accept_prob_compactness = exp((best_energy_compactness - energy__compactness) / temperature_compactness);
+    double accept_prob_population = fmax(0.0, fmin(1.0, exp((best_energy_population - energy__population) / temperature_population)));
+    double accept_prob_compactness =fmax(0.0, fmin(1.0, exp((best_energy_compactness - energy__compactness) / temperature_compactness)));
 
     printf("---- here:accpet prob pop: %f and ccpet prob comp: %f\n", accept_prob_population, accept_prob_compactness);
 
@@ -198,7 +194,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     if (random_number < accept_prob)
     {
       if (accept_prob != 1.0)
-        not_as_great_score++; 
+        not_as_great_score++;
 
       if ((energy__compactness > Final_energy_compactness && energy__population <= Final_energy_population) ||
           (energy__compactness >= Final_energy_compactness && energy__population < Final_energy_population))
@@ -221,16 +217,16 @@ int runSA(double Tstart, /* [in] starting temperature */
           memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
         }
       }
-      
-      if (accept_prob_population > random_number)
-    {
-        best_energy_population = energy__population;
-    }
 
-    if (accept_prob_compactness > random_number)
-    {
+      if (accept_prob_population > random_number)
+      {
+        best_energy_population = energy__population;
+      }
+
+      if (accept_prob_compactness > random_number)
+      {
         best_energy_compactness = energy__compactness;
-    }
+      }
 
       int max_deviation = 0;
       double deviation_percentage = 0.0;
@@ -247,7 +243,7 @@ int runSA(double Tstart, /* [in] starting temperature */
         }
         fprintf(output_file, " --> população: %d", pop_cluster);
         fprintf(output_file, "\n");
-        
+
         int deviation = abs(pop_cluster - ideal_pop);
         if (deviation > max_deviation)
         {
@@ -257,45 +253,44 @@ int runSA(double Tstart, /* [in] starting temperature */
       deviation_percentage = ((double)max_deviation / ideal_pop) * 100.0;
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
       fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
-      
+
       fprintf(sa_graph_file, "%d,%f,%d,%f\n", s, deviation_percentage, best_energy_compactness, accept_prob);
 
       stored_state = storeState(clusters, k, n);
     }
-    if (s % (numIterations/10) == 0)
-{
-
-  printf("Temperature Population: %f, Temperature Compactness: %f, T: \n", temperature_population, temperature_compactness);
-
-  printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
-  
-  for (int i = 0; i < k; i++)
-  {
-    int pop_cluster = 0;
-    printf("Cluster %d with size %d: ", i, clusters[i].size);
-    
-    for (int j = 0; j < clusters[i].size; j++)
+    if (s % (numIterations / 10) == 0)
     {
-      pop_cluster += clusters[i].units[j]->voters;
+
+      printf("Temperature Population: %f, Temperature Compactness: %f, T: \n", temperature_population, temperature_compactness);
+
+      printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
+
+      for (int i = 0; i < k; i++)
+      {
+        int pop_cluster = 0;
+        printf("Cluster %d with size %d: ", i, clusters[i].size);
+
+        for (int j = 0; j < clusters[i].size; j++)
+        {
+          pop_cluster += clusters[i].units[j]->voters;
+        }
+
+        printf(" --> population: %d\n", pop_cluster);
+      }
+
+      long long current_energy_population = energy_population(units, clusters, m, k, n, ideal_pop);
+      int current_energy_compactness = energy_compactness(clusters, k);
+
+      double current_accept_prob_population = exp((best_energy_population - current_energy_population) / temperature_population);
+      double current_accept_prob_compactness = exp((best_energy_compactness - current_energy_compactness) / temperature_compactness);
+
+      double current_accept_prob = min(current_accept_prob_population, current_accept_prob_compactness);
+
+      printf("Borders: %d prob: %f\n\n", current_energy_compactness, current_accept_prob_compactness);
+      printf("pop: %d prob: %f\n\n", current_energy_population, current_accept_prob_population);
     }
-    
-    printf(" --> population: %d\n", pop_cluster);
-  }
-  
-  long long current_energy_population = energy_population(units, clusters, m, k, n, ideal_pop);
-  int current_energy_compactness = energy_compactness(clusters, k);
-  
-  double current_accept_prob_population = exp((best_energy_population - current_energy_population) / temperature_population);
-  double current_accept_prob_compactness = exp((best_energy_compactness - current_energy_compactness) / temperature_compactness);
-  
-  double current_accept_prob = min(current_accept_prob_population, current_accept_prob_compactness);
-  
-  printf("Borders: %d prob: %f\n\n", current_energy_compactness, current_accept_prob_compactness);
-  printf("pop: %d prob: %f\n\n", current_energy_population, current_accept_prob_population);
-}
     temperature_population *= alpha;
     temperature_compactness *= alpha;
-
   }
 
   if (best_clusters != NULL)
@@ -312,7 +307,7 @@ int runSA(double Tstart, /* [in] starting temperature */
   printf("\n");
   printf("SA end!\n");
   end = clock();
-  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 
   printf("Time taken: %f seconds\n", cpu_time_used);
 
