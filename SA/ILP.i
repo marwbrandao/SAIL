@@ -7816,7 +7816,7 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 ;
+    double time_limit = 60.0 *2;
     status = CPXsetdblparam(env, 1039, time_limit);
     if (status) {
         fprintf(

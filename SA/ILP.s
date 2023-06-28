@@ -4774,7 +4774,7 @@ __gcov_.add_fixed_cluster_constraints:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	-491838976
+	.long	-58915132
 	.zero	4
 	.quad	.LC54
 	.quad	__gcov_merge_add
@@ -4888,7 +4888,7 @@ __gcov_.runILP:
 	.align 8
 .LC38:
 	.long	0
-	.long	1078853632
+	.long	1079902208
 	.align 8
 .LC50:
 	.long	0

@@ -96,25 +96,6 @@ void population_bounds(TU **units, int margin, int *lower_bound, int *upper_boun
 }
 
 
-int compactness_s(Cluster *cluster) {
-    int shared_borders = 0;
-    for (int i = 0; i < cluster->size; i++) {
-        TU *unit = cluster->units[i];
-        //printf("shared borders = %d\n",cluster->size);
-        for (int j = 0; j < unit->num_neighbors; j++) {
-            for (int k = 0; k < cluster->size; k++) {
-                if (unit->neighbor_codes[j] == cluster->units[k]->code) {
-
-                    shared_borders += unit->border_sizes[j];
-                    break;
-                }
-            }
-        }
-    }
-
-    return shared_borders;
-}
-
 int compactness(Cluster *cluster) {
     int shared_borders = 0;
     for (int i = 0; i < cluster->size; i++) {
@@ -265,39 +246,6 @@ int has_neighbor_in_cluster(TU *unit, Cluster *cluster) {
     return 0;
 }
 
-
-int are_neighbors_contiguous00(TU *unit, Cluster *cluster) {
-    printf("Checking if neighbors of unit %d are contiguous\n", unit->code);
-    for (int i = 0; i < unit->num_neighbors; i++) {
-        TU *neighbor1 = NULL;
-        for (int j = 0; j < cluster->size; j++) {
-            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
-                neighbor1 = cluster->units[j];
-                break;
-            }
-        }
-        if (!neighbor1) continue;
-        printf("Found neighbor1: %d\n", neighbor1->code);
-        for (int j = i + 1; j < unit->num_neighbors; j++) {
-            TU *neighbor2 = NULL;
-            for (int k = 0; k < cluster->size; k++) {
-                if (cluster->units[k]->code == unit->neighbor_codes[j]) {
-                    neighbor2 = cluster->units[k];
-                    break;
-                }
-            }
-            if (!neighbor2) continue;
-            printf("Found neighbor2: %d\n", neighbor2->code);
-            for (int k = 0; k < neighbor1->num_neighbors; k++) {
-                if (neighbor1->neighbor_codes[k] == neighbor2->code) {
-                    return 1;
-                }
-            }
-        }
-    }
-    return 0;
-}
-
 void dfs_check_neighbors(int unit_index, Cluster *cluster, int *visited) {
     TU *unit = cluster->units[unit_index];
     visited[unit_index] = 1;
@@ -317,71 +265,6 @@ void dfs_check_neighbors(int unit_index, Cluster *cluster, int *visited) {
     }
 }
 
-int are_neighbors_contiguousd(TU *unit, Cluster *cluster, int n) {
-    int *visited = calloc(n, sizeof(int));
-    int num_visited = 0;
-
-    // Find the index of the unit in the cluster
-    int unit_index = -1;
-    
-    for (int i = 0; i < cluster->size; i++) {
-        if (cluster->units[i]->code == unit->code) {
-            unit_index = i;
-            break;
-        }
-    }
-
-    // Run DFS starting from the unit
-    dfs_check_neighbors(unit_index, cluster, visited);
-    
-    // Count the number of visited units in the cluster
-    for (int i = 0; i < cluster->size; i++) {
-        //printf("here??, unit_id: %d\n", visited[i]);
-        if (visited[i]) {
-            num_visited++;
-        }
-    }
-   //  printf("here??, unit_id: %d and %d\n", num_visited, );
-    // free(visited);
-    return num_visited == cluster->size;
-}
-
-
-int are_neighbors_contiguousss(TU *unit, Cluster *cluster, int n) {
-    int *visited = calloc(n, sizeof(int));
-    int num_visited = 0;
-     // printf("1 Checking if neighbors of unit %d are contiguous\n", unit->code);
-     for (int i = 0; i < unit->num_neighbors; i++) {
-        TU *neighbor = NULL;
-        int neighbor_index = -1;
-        
-        for (int j = 0; j < cluster->size; j++) {
-            // printf("2 Checking if neighbors of unit %d are contiguous j = %d, unit %d\n", cluster->size, j, cluster->units[j]->code);
-            if (cluster->units[j]->code == unit->neighbor_codes[i]) {
-                neighbor = cluster->units[j];
-                neighbor_index = j;
-                // printf("3 Checking if neighbors of unit %d are contiguous %d\n", cluster->units[j]->code, unit->neighbor_codes[i]);
-                break;
-            }
-        }
-        
-        if (neighbor && !visited[neighbor_index]) {
-            
-            // printf("---> here?, %d neigh: \n", neighbor->code);
-            dfs_check_neighbors(neighbor_index, cluster, visited);
-        }
-    }
-
-    
-    for (int i = 0; i < cluster->size; i++) {
-        if (cluster->units[i]->code != unit->code  ) {
-            num_visited++;
-        }
-    }
-
-    //free(visited);
-    return num_visited == cluster->size - 1;
-}
 
 void dfs_contiguity_check(int unit_index, Cluster *cluster, int *visited) {
     TU *unit = cluster->units[unit_index];
@@ -431,108 +314,6 @@ int are_neighbors_contiguous(TU *unit, Cluster *cluster) {
     //free(visited);
     return num_visited == cluster->size - 1;
 }
-
-
-
-// }
-
-// void change_unit__(Cluster *clusters, TU **units, int k, int n) {
-//     int cluster_idx = 0;
-    
-//     long long max_population = -1;
-//     for (int i = 0; i < k; i++) {
-//         long long cluster_population = 0;
-//         for (int j = 0; j < clusters[i].size; j++) {
-//             cluster_population += clusters[i].units[j]->voters;
-//         }
-
-//         if (cluster_population > max_population) {
-//             max_population = cluster_population;
-//             cluster_idx = i;
-//         }
-//     }
-//     Cluster *cluster = &clusters[cluster_idx];
-  
-//     while (cluster->size == 1) {
-//         cluster_idx = rand() % k;
-//         cluster = &clusters[cluster_idx];
-//     }
-
-//     // Find border units and their neighboring clusters
-//     int *border_units = malloc(cluster->size * sizeof(int));
-//     int *neighboring_clusters = malloc(cluster->size * sizeof(int));
-//     int num_border_units = 0;
-//     for (int i = 0; i < cluster->size; i++) {
-//         TU *current_unit = cluster->units[i];
-//         for (int j = 0; j < current_unit->num_neighbors; j++) {
-//             TU *neighbor = NULL;
-//             for (int k = 0; k < n; k++) {
-//                 if (units[k]->code == current_unit->neighbor_codes[j]) {
-//                     neighbor = units[k];
-//                     break;
-//                 }
-//             }
-//             if (!neighbor) continue;
-
-//             if (neighbor->cluster_id != cluster_idx) {
-//                 border_units[num_border_units] = i;
-                
-//                 neighboring_clusters[num_border_units] = neighbor->cluster_id;
-//                 //printf("%d:border units: %d \n",cluster_idx,  neighbor->code);
-//                 num_border_units++;
-//                 break;
-//             }
-//         }
-//     }
-//     // printf("Number of border units in cluster %d: %d\n",cluster_idx, num_border_units);
-//     // printf("Border units: ");
-//     // for (int i = 0; i < num_border_units; i++) {
-//     //     printf("%d ", border_units[i]);
-//     // }
-//     // printf("\n");
-
-//     // printf("Neighboring clusters: ");
-//     // for (int i = 0; i < num_border_units; i++) {
-//     //     printf("%d ", neighboring_clusters[i]);
-//     // }
-//     // printf("\n");
-
-//     // Find the neighboring cluster with the least voters
-//     int min_voters_cluster_idx = neighboring_clusters[0];
-//     int min_voters = INT_MAX;
-//     for (int i = 0; i < num_border_units; i++) {
-//         int current_cluster_idx = neighboring_clusters[i];
-//         Cluster *current_cluster = &clusters[current_cluster_idx];
-//         int current_voters = 0;
-//         for (int j = 0; j < current_cluster->size; j++) {
-//             current_voters += current_cluster->units[j]->voters;
-//         }
-//         if (current_voters < min_voters) {
-//             min_voters = current_voters;
-//             min_voters_cluster_idx = current_cluster_idx;
-//         }
-//     }
-
-//     // Select a random border unit
-//     int unit_idx = border_units[rand() % num_border_units];
-//     TU *unit = cluster->units[unit_idx];
-//     free(border_units);
-//     free(neighboring_clusters);
-
-//     // Move the border unit to the neighboring cluster with the least voters
-//     if (is_contiguous_after_removal(cluster, unit) != 0) {
-//         Cluster *new_cluster = &clusters[min_voters_cluster_idx];
-//         new_cluster->units[new_cluster->size] = unit;
-//         new_cluster->size++;
-//         unit->cluster_id = min_voters_cluster_idx;
-
-//         // Remove unit from current cluster
-//         for (int i = unit_idx; i < cluster->size - 1; i++) {
-//             cluster->units[i] = cluster->units[i+1];
-//         }
-//         cluster->size--;
-//     }
-// }
 
 
 void dfs_contiguity_exclude(int index, int exclude_index, Cluster *cluster, int *visited) {
@@ -598,9 +379,6 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
     }
     // int cluster_idx = rand() % k;
 
-   
-
-
     Cluster *cluster = &clusters[cluster_idx];
 
     // If the cluster has only one unit, keep searching for another cluster
@@ -646,8 +424,20 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
         }
     }
 
+    double best_probability = 0.5; // You can adjust this value based on your needs
+    double random_value_p = (double)rand() / (double)RAND_MAX;
+    int selected_unit_idx;
+
+    if(random_value_p <= best_probability) {
+        // With 80% chance select the best unit
+        selected_unit_idx = best_unit_idx;
+    } else {
+        // With 20% chance select a random border unit
+        selected_unit_idx = border_units[rand() % num_border_units];
+    }
+
     // The selected unit is the one that minimizes the difference
-    int selected_unit_idx = best_unit_idx;
+    //int selected_unit_idx = best_unit_idx;
     TU *selected_unit = cluster->units[selected_unit_idx];
 
 
@@ -750,121 +540,6 @@ void change_unit(Cluster *clusters, TU **units, int k, int n) {
 }
 
 
-
-// void change_unit_xx(Cluster *clusters, TU **units, int k, int n) {
-    
-//     //int cluster_idx = rand() % k;
-//     int cluster_idx = 0;
-    
-    
-//     long long max_population = -1;
-//     for (int i = 0; i < k; i++) {
-//         long long cluster_population = 0;
-//         for (int j = 0; j < clusters[i].size; j++) {
-//             cluster_population += clusters[i].units[j]->voters;
-//         }
-
-//         if (cluster_population > max_population) {
-//             max_population = cluster_population;
-//             cluster_idx = i;
-//             //printf("cluster id: %d, cluster pop: %d\n", cluster_idx, cluster_population);
-//         }
-//     }
-//     Cluster *cluster = &clusters[cluster_idx];
-  
-//     while (cluster->size == 1) {
-        
-        
-//         cluster_idx = rand() % k;
-//         cluster = &clusters[cluster_idx];
-        
-//     }
-//     //printf("final one ---> cluster id: %d, cluster size: %d\n", cluster_idx, cluster->size);
-//     // Find border units
-//     int *border_units = malloc(cluster->size * sizeof(int));
-//     int num_border_units = 0;
-//     for (int i = 0; i < cluster->size; i++) {
-//         TU *current_unit = cluster->units[i];
-//         for (int j = 0; j < current_unit->num_neighbors; j++) {
-//             TU *neighbor = NULL;
-//             for (int k = 0; k < n; k++) {
-//                 if (units[k]->code == current_unit->neighbor_codes[j]) {
-//                     neighbor = units[k];
-//                     break;
-//                 }
-//             }
-//             if (!neighbor) continue;
-
-//             if (neighbor->cluster_id != cluster_idx) {
-//                 border_units[num_border_units++] = i;
-//                 break;
-//             }
-//         }
-//     }
-
-//     // Select a random border unit
-//     int unit_idx = border_units[rand() % num_border_units];
-//     TU *unit = cluster->units[unit_idx];
-//     //printf("unit to change: %d\n", unit_idx);
-//     free(border_units);
-
-
-//     bool is_contiguous = false;
-//     int new_cluster_idx = -1;
-
-//     // Shuffle the neighbor units to select a random neighbor.
-//     int num_neighbors = unit->num_neighbors;
-//     int *shuffled_indices = malloc(num_neighbors * sizeof(int));
-//     for (int i = 0; i < num_neighbors; i++) {
-//         shuffled_indices[i] = i;
-
-//     }
-//     for (int i = num_neighbors - 1; i > 0; i--) {
-//         int j = rand() % (i + 1);
-//         int temp = shuffled_indices[i];
-//         shuffled_indices[i] = shuffled_indices[j];
-//         shuffled_indices[j] = temp;
-//     }
-
-//     for (int i = 0; i < num_neighbors; i++) {
-//         TU *neighbor = NULL;
-//         for (int j = 0; j < n; j++) {
-//             if (units[j]->code == unit->neighbor_codes[shuffled_indices[i]]) {
-//                 neighbor = units[j];
-//                 break;
-//             }
-//         }
-//         if (!neighbor) continue;
-
-//         int other_cluster_idx = neighbor->cluster_id;
-//         if (other_cluster_idx != cluster_idx) {
-//             is_contiguous = true;
-//             new_cluster_idx = other_cluster_idx;
-//             //printf("clk to change to : %d\n", new_cluster_idx);
-//             break;
-//         }
-//     }
-
-//     free(shuffled_indices);
-
-//     if (is_contiguous  && is_contiguous_after_removal(cluster, unit) != 0)  {
-//        Cluster *new_cluster = &clusters[new_cluster_idx];
-//         new_cluster->units[new_cluster->size] = unit;
-//         new_cluster->size++;
-//         unit->cluster_id = new_cluster_idx;
-
-//         // Remove unit from current cluster
-//         for (int i = unit_idx; i < cluster->size - 1; i++) {
-//             cluster->units[i] = cluster->units[i+1];
-//         }
-//         cluster->size--;
-//     }
-//     else {
-
-//     }
- 
-// }
-//  // && is_contiguous_after_removal(cluster, unit) != 0
 
 int is_contiguous_after_removal(Cluster *cluster, TU *unit_to_remove) {
     if (cluster->size <= 1) {
@@ -1020,201 +695,3 @@ Cluster** storeState(Cluster *clusters, int k, int n)
     return stored_state;
 }
 
-
-
-// void change_unitt(Cluster *clusters, TU **units, int k, int n) {
-//     int cluster_idx = rand() % k; // Randomly select source cluster
-//     Cluster *cluster = &clusters[cluster_idx];
-//     int target_cluster_idx;
-//     // If the cluster has only one unit, keep searching for another cluster
-//     while (cluster->size == 1) {
-//         cluster_idx = rand() % k;
-//         cluster = &clusters[cluster_idx];
-//     }
-//     printf("cluster rand: %d\n", cluster_idx);
-
-//     // Find border units and their neighboring clusters
-//     int *border_units = malloc(cluster->size * sizeof(int));
-//     int *neighboring_clusters = malloc(cluster->size * sizeof(int));
-//     int num_border_units = 0;
-//     for (int i = 0; i < cluster->size; i++) {
-//         TU *current_unit = cluster->units[i];
-//         for (int j = 0; j < current_unit->num_neighbors; j++) {
-//             TU *neighbor = NULL;
-//             for (int k = 0; k < n; k++) {
-//                 if (units[k]->code == current_unit->neighbor_codes[j]) {
-//                     neighbor = units[k];
-//                     break;
-//                 }
-//             }
-//             if (!neighbor) continue;
-
-//             if (neighbor->cluster_id != cluster_idx) {
-//                 border_units[num_border_units] = i;
-                
-//                 neighboring_clusters[num_border_units] = neighbor->cluster_id;
-//                 //printf("%d:border units: %d \n",cluster_idx,  neighbor->code);
-//                 num_border_units++;
-//                 break;
-//             }
-//         }
-//     }
-
-//     // Create a list of contiguous neighboring clusters
-//     int *contiguous_neighboring_clusters = malloc(num_border_units * sizeof(int));
-//     int num_contiguous_neighboring_clusters = 0;
-//     for (int i = 0; i < num_border_units; i++) {
-//         target_cluster_idx = neighboring_clusters[i];
-//         if (is_contiguous_after_removal(cluster, cluster->units[border_units[i]]) != 0) {
-//             contiguous_neighboring_clusters[num_contiguous_neighboring_clusters++] = target_cluster_idx;
-//         }
-//     }
-
-//     // ... (Select a contiguous neighboring cluster, and select a random border unit)
-//     int unit_idx = border_units[rand() % num_border_units];
-//     TU *unit = cluster->units[unit_idx];
-//     // free(border_units);
-//     // free(neighboring_clusters);
-//     printf("unit rand: %d\n", unit_idx);
-
-//     reset_visited(cluster);
-//     if (!are_neighbors_contiguous(unit, cluster)) {
-//         free(border_units);
-//         free(neighboring_clusters);
-//         printf("is here??\n");
-//         return;
-//     }
-
-//     // Remove unit from current cluster
-//     for (int i = unit_idx; i < cluster->size - 1; i++) {
-//         cluster->units[i] = cluster->units[i+1];
-//     }
-//     cluster->size--;
-
-//     // Move the border unit to the randomly selected contiguous neighboring cluster
-//     int random_contiguous_neighbor = rand() % num_contiguous_neighboring_clusters;
-//     Cluster *new_cluster = &clusters[contiguous_neighboring_clusters[random_contiguous_neighbor]];
-//     new_cluster->units[new_cluster->size] = unit;
-//     new_cluster->size++;
-//     unit->cluster_id = target_cluster_idx;
-
-//     // free(border_units);
-//     // free(neighboring_clusters);
-//     // free(contiguous_neighboring_clusters);
-// int are_neighbors_contiguous(TU *unit, Cluster *cluster) {
-//     int num_neighbors_in_cluster = 0;
-//     int *neighbors_in_cluster = malloc(unit->num_neighbors * sizeof(int));
-
-//     for (int i = 0; i < unit->num_neighbors; i++) {
-//         for (int j = 0; j < cluster->size; j++) {
-//             if (cluster->units[j]->code == unit->neighbor_codes[i]) {
-//                 neighbors_in_cluster[num_neighbors_in_cluster++] = j;
-//                 break;
-//             }
-//         }
-//     }
-
-//     if (num_neighbors_in_cluster == 0) {
-//         free(neighbors_in_cluster);
-//         return 0;
-//     }
-
-//     reset_visited(cluster);
-//     dfs(cluster->units[neighbors_in_cluster[0]], cluster);
-
-//     int all_contiguous = 1;
-//     for (int i = 0; i < num_neighbors_in_cluster; i++) {
-//         if (!cluster->units[neighbors_in_cluster[i]]->visited) {
-//             all_contiguous = 0;
-//             break;
-//         }
-//     }
-
-//     free(neighbors_in_cluster);
-//     return all_contiguous;
-// }
-
-// void dfs(TU *unit, Cluster *cluster, int *num_visited) {
-//     unit->visited = 1;
-//     (*num_visited)++;
-
-//     for (int i = 0; i < unit->num_neighbors; i++) {
-//         TU *neighbor = NULL;
-//         for (int j = 0; j < cluster->size; j++) {
-//             if (cluster->units[j]->code == unit->neighbor_codes[i] && !cluster->units[j]->visited) {
-//                 neighbor = cluster->units[j];
-//                 break;
-//             }
-//         }
-//         if (neighbor) {
-//             dfs(neighbor, cluster, num_visited);
-//         }
-//     }
-// }
-
-// int are_neighbors_contiguous(TU *unit, Cluster *cluster) {
-//     TU *first_neighbor_in_cluster = NULL;
-//     for (int i = 0; i < unit->num_neighbors; i++) {
-//         for (int j = 0; j < cluster->size; j++) {
-//             if (unit->neighbor_codes[i] == cluster->units[j]->code) {
-//                 first_neighbor_in_cluster = cluster->units[j];
-//                 break;
-//             }
-//         }
-//         if (first_neighbor_in_cluster) break;
-//     }
-
-//     if (!first_neighbor_in_cluster) return 1;
-
-//     int num_visited = 0;
-//     dfs(first_neighbor_in_cluster, cluster, &num_visited);
-
-//     return num_visited == cluster->size - 1;
-// }
-
-
-
-// void change_unit_x(Cluster *clusters, TU **units, int k, int n) {
-//     int cluster_idx = rand() % k;
-//     //printf("old size %d\n", clusters[cluster_idx].size);
-//     Cluster *cluster = &clusters[cluster_idx];
-
-//     int unit_idx = rand() % cluster->size;
-//     //printf("unit_idx = %d\n", unit_idx);
-//     TU *unit = cluster->units[unit_idx];
-
-//     // Check if unit is contiguous with at least one unit in other clusters
-//     bool is_contiguous = false;
-//     int new_cluster_idx = -1;
-//     for (int i = 0; i < k; i++) {
-//         if (i == cluster_idx) {
-//             continue;  // Skip current cluster
-//         }
-//         Cluster *other_cluster = &clusters[i];
-//         for (int j = 0; j < other_cluster->size; j++) {
-//             TU *other_unit = other_cluster->units[j];
-//             if (is_neighbor(unit, other_unit)) {
-//                 is_contiguous = true;
-//                 new_cluster_idx = i;
-//                 break;
-//             }
-//         }
-//         if (is_contiguous) {
-//             break;
-//         }
-//     }
-
-//     // If unit is contiguous with at least one unit in another cluster, move it there
-//     if (is_contiguous) {
-//         Cluster *new_cluster = &clusters[new_cluster_idx];
-//         new_cluster->units[new_cluster->size] = unit;
-//         new_cluster->size++;
-//         unit->cluster_id = new_cluster_idx;
-
-//         // Remove unit from current cluster
-//         for (int i = unit_idx; i < cluster->size - 1; i++) {
-//             cluster->units[i] = cluster->units[i+1];
-//         }
-//         cluster->size--;
-//     }
-// }
