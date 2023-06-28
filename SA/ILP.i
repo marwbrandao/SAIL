@@ -7697,13 +7697,17 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
     }
     int t = 0;
     int cluster_id = 0;
+
     for (int i = 0; i < n; i++) {
+
         TU* unit = units[i];
 
 
 
         int cluster_id = unit->cluster_id;
+
         clusters[cluster_id].units[clusters[cluster_id].size] = unit;
+
 
         clusters[cluster_id].size++;
 
@@ -7713,7 +7717,7 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
 
     return clusters;
 }
-# 776 "ILP.c"
+# 780 "ILP.c"
 void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int max_population) {
     for (int c = 0; c < num_clusters; c++) {
         Cluster* cluster = &clusters[c];
@@ -7731,9 +7735,9 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
                 int status = CPXgetcolindex(env, lp, var_name, &idx);
                 if (status) {
                     fprintf(
-# 792 "ILP.c" 3 4
+# 796 "ILP.c" 3 4
                            stderr
-# 792 "ILP.c"
+# 796 "ILP.c"
                                  , "Failed to get index for variable %s.\n", var_name);
                     exit(1);
                 }
@@ -7747,19 +7751,19 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
                 double rmatval[1] = {1.0};
 
                 status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, 
-# 804 "ILP.c" 3 4
+# 808 "ILP.c" 3 4
                                                                                             ((void *)0)
-# 804 "ILP.c"
+# 808 "ILP.c"
                                                                                                 , 
-# 804 "ILP.c" 3 4
+# 808 "ILP.c" 3 4
                                                                                                   ((void *)0)
-# 804 "ILP.c"
+# 808 "ILP.c"
                                                                                                       );
                 if (status) {
                     fprintf(
-# 806 "ILP.c" 3 4
+# 810 "ILP.c" 3 4
                            stderr
-# 806 "ILP.c"
+# 810 "ILP.c"
                                  , "Failed to add fixed cluster constraint for unit %d.\n", i);
                     exit(1);
                 }
@@ -7767,48 +7771,48 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
         }
     }
 }
-# 821 "ILP.c"
+# 825 "ILP.c"
 Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters)
 {
     CPXENVptr env = 
-# 823 "ILP.c" 3 4
+# 827 "ILP.c" 3 4
                    ((void *)0)
-# 823 "ILP.c"
+# 827 "ILP.c"
                        ;
     CPXLPptr lp = 
-# 824 "ILP.c" 3 4
+# 828 "ILP.c" 3 4
                  ((void *)0)
-# 824 "ILP.c"
+# 828 "ILP.c"
                      ;
     int status;
     double start_time, end_time;
 
     env = CPXopenCPLEX(&status);
     if (env == 
-# 829 "ILP.c" 3 4
+# 833 "ILP.c" 3 4
               ((void *)0)
-# 829 "ILP.c"
+# 833 "ILP.c"
                   )
     {
         fprintf(
-# 831 "ILP.c" 3 4
+# 835 "ILP.c" 3 4
                stderr
-# 831 "ILP.c"
+# 835 "ILP.c"
                      , "Could not open CPLEX environment.\n");
         exit(1);
     }
 
     lp = CPXcreateprob(env, &status, "districting");
     if (lp == 
-# 836 "ILP.c" 3 4
+# 840 "ILP.c" 3 4
              ((void *)0)
-# 836 "ILP.c"
+# 840 "ILP.c"
                  )
     {
         fprintf(
-# 838 "ILP.c" 3 4
+# 842 "ILP.c" 3 4
                stderr
-# 838 "ILP.c"
+# 842 "ILP.c"
                      , "Could not create LP problem.\n");
         exit(1);
     }
@@ -7816,13 +7820,13 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 *2;
+    double time_limit = 60.0 *4;
     status = CPXsetdblparam(env, 1039, time_limit);
     if (status) {
         fprintf(
-# 848 "ILP.c" 3 4
+# 852 "ILP.c" 3 4
                stderr
-# 848 "ILP.c"
+# 852 "ILP.c"
                      , "Failed to set time limit parameter.\n");
         exit(1);
     }
@@ -7854,24 +7858,24 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 878 "ILP.c" 3 4
+# 882 "ILP.c" 3 4
                stderr
-# 878 "ILP.c"
+# 882 "ILP.c"
                      , "Failed to optimize the ILP problem.\n");
 
     }
 
     status = CPXwriteprob(env, lp, "model.lp", 
-# 882 "ILP.c" 3 4
+# 886 "ILP.c" 3 4
                                               ((void *)0)
-# 882 "ILP.c"
+# 886 "ILP.c"
                                                   );
 
     if (status) {
         fprintf(
-# 885 "ILP.c" 3 4
+# 889 "ILP.c" 3 4
                stderr
-# 885 "ILP.c"
+# 889 "ILP.c"
                      , "Failed to write problem to file.\n");
 
     }
@@ -7889,13 +7893,16 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 901 "ILP.c" 3 4
+# 905 "ILP.c" 3 4
                stderr
-# 901 "ILP.c"
+# 905 "ILP.c"
                      , "Failed to get objective value.\n");
 
     }
     printf("Objective value: %.2f\n", objval);
+
+    if(solstat != 101)
+        return clusters;
 
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
@@ -7904,9 +7911,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 912 "ILP.c" 3 4
+# 919 "ILP.c" 3 4
                stderr
-# 912 "ILP.c"
+# 919 "ILP.c"
                      , "Failed to get optimal solution.\n");
 
     }
@@ -7916,6 +7923,17 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
 
 
+
+    int *cluster_unit_counts = calloc(k, sizeof(int));
+    
+# 930 "ILP.c" 3 4
+   _Bool 
+# 930 "ILP.c"
+        *processed_clusters = calloc(k, sizeof(
+# 930 "ILP.c" 3 4
+                                               _Bool
+# 930 "ILP.c"
+                                                   ));
 
     for (int i = 0; i < num_vars; i++)
     {
@@ -7936,27 +7954,27 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
         if (solution[i] >= 0.5) {
                 unit->assigned = 
-# 940 "ILP.c" 3 4
+# 950 "ILP.c" 3 4
                                 1
-# 940 "ILP.c"
+# 950 "ILP.c"
                                     ;
                 unit->cluster_id = cluster_id;
 
         } else {
                 unit->assigned = 
-# 944 "ILP.c" 3 4
+# 954 "ILP.c" 3 4
                                 0
-# 944 "ILP.c"
+# 954 "ILP.c"
                                      ;
         }
         unit->assigned = solution[i] >= 0.5 ? 
-# 946 "ILP.c" 3 4
+# 956 "ILP.c" 3 4
                                              1 
-# 946 "ILP.c"
+# 956 "ILP.c"
                                                   : 
-# 946 "ILP.c" 3 4
+# 956 "ILP.c" 3 4
                                                     0
-# 946 "ILP.c"
+# 956 "ILP.c"
                                                          ;
 
 
@@ -7966,18 +7984,35 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
             unit->cluster_id = cluster_id;
             unit->unit_id = unit_id;
+            cluster_unit_counts[cluster_id]++;
+            processed_clusters[cluster_id] = 
+# 966 "ILP.c" 3 4
+                                            1
+# 966 "ILP.c"
+                                                ;
 
 
         }
         units[i] = unit;
+        for (int i = 0; i < k; i++) {
 
+        if (processed_clusters[i] && (cluster_unit_counts[i] == 0 )) {
+
+            fprintf(
+# 975 "ILP.c" 3 4
+                   stderr
+# 975 "ILP.c"
+                         , "Cluster %d is empty or invalid.\n", i);
+            return clusters;
+        }
+}
 
         if (status)
         {
             fprintf(
-# 963 "ILP.c" 3 4
+# 982 "ILP.c" 3 4
                    stderr
-# 963 "ILP.c"
+# 982 "ILP.c"
                          , "Failed to get variable name for column %d.\n", i);
 
         }
@@ -7988,6 +8023,7 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
     free(solution);
     clusters = create_initial_clusters(units, k, n);
+
     printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
@@ -7998,9 +8034,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status != 0)
     {
         fprintf(
-# 982 "ILP.c" 3 4
+# 1002 "ILP.c" 3 4
                stderr
-# 982 "ILP.c"
+# 1002 "ILP.c"
                      , "Failed to free the problem.\n");
         exit(1);
     }
@@ -8008,9 +8044,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status != 0)
     {
         fprintf(
-# 988 "ILP.c" 3 4
+# 1008 "ILP.c" 3 4
                stderr
-# 988 "ILP.c"
+# 1008 "ILP.c"
                      , "Failed to close CPLEX environment.\n");
         exit(1);
     }

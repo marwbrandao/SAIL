@@ -734,17 +734,21 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
     }
     int t = 0;
     int  cluster_id = 0;
+    //printf("111AHYO\n");
     for (int i = 0; i < n; i++) {
+        //printf("1111AHYO\n");
         TU* unit = units[i];       
          //printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
         //if (unit->assigned) {
            
         int cluster_id = unit->cluster_id;
+        //printf("11111AHYO clut: %d\n", cluster_id);
         clusters[cluster_id].units[clusters[cluster_id].size] = unit;
+        //printf("111111AHYO\n");
         //printf("clust %d and size %d\n", cluster_id, clusters[cluster_id].size);
         clusters[cluster_id].size++;
         //}
-      
+        
         
     }
     
@@ -842,7 +846,7 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     //printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 *2;  // Time limit in seconds
+    double time_limit = 60.0 *4;  // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status) {
         fprintf(stderr, "Failed to set time limit parameter.\n");
@@ -903,6 +907,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     }
     printf("Objective value: %.2f\n", objval);
 
+    if(solstat != 101)
+        return clusters;
+
     
     double *solution = (double *)malloc(num_vars * sizeof(double));
 
@@ -919,6 +926,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     //num_vars = CPXgetnumcols(env, lp);
 
     // Print the optimal solution
+    int *cluster_unit_counts = calloc(k, sizeof(int)); // Assuming k is the number of clusters
+    bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
+
     for (int i = 0; i < num_vars; i++)
     {
         
@@ -930,7 +940,7 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
         status = CPXgetcolname(env, lp, colname, namestore, storespace, &surplus, i, i);
         int cluster_id, unit_id;
         parse_var_name(*colname, &cluster_id, &unit_id);
-
+        
         // Create a new unit and set its properties
         //TU* unit = (TU*)malloc(sizeof(TU));
         TU* unit= units[unit_id];
@@ -952,11 +962,20 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
             //printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
             unit->cluster_id = cluster_id;
             unit->unit_id = unit_id;
+            cluster_unit_counts[cluster_id]++;
+            processed_clusters[cluster_id] = true;
             
         
         }
         units[i] = unit;
-        
+        for (int i = 0; i < k; i++) {
+        // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
+        if (processed_clusters[i] && (cluster_unit_counts[i] == 0 )) { // replace is_valid_cluster with your own validity check function
+            // Handle this case as per your needs
+            fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
+            return clusters; // or some other error handling / default return
+        }
+}
 
         if (status)
         {
@@ -970,6 +989,7 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     
     free(solution);
     clusters = create_initial_clusters(units, k, n);
+    //printf("22AHYO\n");
     printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);

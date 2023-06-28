@@ -134,7 +134,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   double startingValue = 1.0;
   double endingValue = 0.000001;
-  int numIterations = 1000000;
+  int numIterations = 100000;
 
   double increment = (endingValue - startingValue) / (numIterations - 1);
 
@@ -163,7 +163,8 @@ int runSA(double Tstart, /* [in] starting temperature */
     FILE *fp_out = fopen("cluster_info.txt", "w");
 
     change_unit(clusters, units, k, n);
- 
+    // if(s == 20001)
+    //   printf("11HI!!\n");
     long long energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
     
     int energy__compactness = energy_compactness(clusters, k);
@@ -326,11 +327,11 @@ int runSA(double Tstart, /* [in] starting temperature */
       if (perfect_score == 0)
       {
         clusters = runILP(units, k, n, m, ideal_pop, clusters);
-        
+        //printf("HI!!\n");
         for (int i = 0; i < k; i++)
         {
           int pop_cluster = 0;
-
+          //printf("2HI!!\n");
           for (int j = 0; j < clusters[i].size; j++)
           {
 
@@ -340,22 +341,25 @@ int runSA(double Tstart, /* [in] starting temperature */
           printf(" --> população: %d", pop_cluster);
           printf("\n");
         }
-        
+        //printf("3HI!!\n");
         energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
         energy__compactness = energy_compactness(clusters, k);
         fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
         //printf("HERE____ %d\n",best_clusters[0].size);
         
-        for (int i = 0; i < k; i++)
-        {
-            
-            best_clusters[i].size = clusters[i].size;
-            
-            memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+        
+        if (energy__population == 0){
+            for (int i = 0; i < k; i++)
+          {
+              
+              best_clusters[i].size = clusters[i].size;
+              
+              memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+          } 
+          best_energy_compactness = energy__compactness;
+          best_energy_population = energy__population;
         }
-        best_energy_compactness = energy__compactness;
-        best_energy_population = energy__population;
-        printf("HERE!\n");
+        //printf("HERE!\n");
         //stored_state = storeState(clusters, k, n);
       }
     }
