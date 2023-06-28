@@ -2788,7 +2788,7 @@ runSA(double Tstart,
       double Tstop,
       int batch,
       int steps,
-      TU** units, int k, int n, int m, int populacao_ideal
+      TU** units, int k, int n, int m, int populacao_ideal, int d
       );
 # 9 "main.c" 2
 # 1 "state.h" 1
@@ -2879,7 +2879,7 @@ main(int argc,
    getTemperature(cp_start, d_start),
    getTemperature(cp_end, d_end),
    1<<bp,
-   1<<sp , units, k, n, m, populacao_ideal
+   1<<sp , units, k, n, m, populacao_ideal, d
 
    );
 # 72 "main.c"

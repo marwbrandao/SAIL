@@ -56,7 +56,7 @@ main(int argc,
 	  getTemperature(cp_start, d_start),
 	  getTemperature(cp_end, d_end),
 	  1<<bp, /* Batch size */
-	  1<<sp /* Number of steps */, units, k, n, m, populacao_ideal
+	  1<<sp /* Number of steps */, units, k, n, m, populacao_ideal, d
     
 	  );
 

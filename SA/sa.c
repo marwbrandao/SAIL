@@ -87,7 +87,7 @@ int runSA(double Tstart, /* [in] starting temperature */
           double Tstop,  /* [in] stopping temperature */
           int batch,     /* [in] number of iterations in a batch */
           int steps,     /* [in] number of steps to execute */
-          TU **units, int k, int n, int m, int ideal_pop)
+          TU **units, int k, int n, int m, int ideal_pop, int d)
 {
 
   clock_t start, end;
@@ -126,7 +126,9 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   srand(time(NULL));
   FILE *output_file = fopen("output.txt", "w");
-  FILE *sa_graph_file = fopen("SA_graph.csv", "w");
+  char filename[50];  // adjust size as needed
+  sprintf(filename, "SA_graph_%d.csv", d);
+  FILE *sa_graph_file = fopen(filename, "w");
   fprintf(output_file, "%d;%d;%d\n", k, n, steps);
 
   Cluster *clusters = first_cluster(units, k, n);
@@ -134,7 +136,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   double startingValue = 1.0;
   double endingValue = 0.000001;
-  int numIterations = 100000;
+  int numIterations = 10000000;
 
   double increment = (endingValue - startingValue) / (numIterations - 1);
 

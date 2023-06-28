@@ -25,7 +25,7 @@ main:
 	pushq	%r13
 	pushq	%r12
 	pushq	%rbx
-	subq	$88, %rsp
+	subq	$104, %rsp
 	.cfi_offset 15, -24
 	.cfi_offset 14, -32
 	.cfi_offset 13, -40
@@ -127,15 +127,17 @@ main:
 	call	__printf_chk@PLT
 	lock addq	$1, 80+__gcov0.main(%rip)
 	movl	-92(%rbp), %ecx
+	movl	-88(%rbp), %eax
 	movl	-76(%rbp), %r9d
 	movl	-80(%rbp), %r8d
 	movl	-100(%rbp), %edi
 	movsd	-64(%rbp), %xmm0
 	movl	-84(%rbp), %r15d
 	movl	%ebx, %r14d
-	movl	%r9d, -128(%rbp)
+	movl	%eax, -132(%rbp)
 	sall	%cl, %r14d
 	movl	-96(%rbp), %ecx
+	movl	%r9d, -128(%rbp)
 	movl	%r8d, -124(%rbp)
 	sall	%cl, %ebx
 	call	getTemperature@PLT
@@ -145,10 +147,11 @@ main:
 	movsd	-72(%rbp), %xmm0
 	call	getTemperature@PLT
 	lock addq	$1, 96+__gcov0.main(%rip)
+	movl	-132(%rbp), %eax
 	movl	-128(%rbp), %r9d
 	movl	-124(%rbp), %r8d
 	movsd	-120(%rbp), %xmm1
-	subq	$8, %rsp
+	pushq	%rax
 	movl	%r15d, %ecx
 	movq	%r12, %rdx
 	movl	%r14d, %esi
@@ -232,7 +235,7 @@ _sub_D_00100_1:
 	.section	.rodata.str1.8,"aMS",@progbits,1
 	.align 8
 .LC5:
-	.string	"/home/mariana/tese/SA/main.gcda"
+	.string	"/mnt/c/Users/maria/OneDrive/Ambiente de Trabalho/SA_COPY/SA_copy/SA/main.gcda"
 	.section	.data.rel,"aw"
 	.align 32
 	.type	.LPBX0, @object
@@ -241,7 +244,7 @@ _sub_D_00100_1:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	-901474971
+	.long	71110137
 	.zero	4
 	.quad	.LC5
 	.quad	__gcov_merge_add
