@@ -120,9 +120,9 @@ int runSA(double Tstart, /* [in] starting temperature */
   popul_test1(units, n, k, ideal_pop);
 
   // Uncomment to run only ILP
-  //  Cluster *clusters = runILP(units, k, n, m, ideal_pop);
+  runILP_only(units, k, n, m, ideal_pop);
 
-  // return;
+  return;
 
   srand(time(NULL));
   FILE *output_file = fopen("output.txt", "w");
@@ -136,7 +136,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   double startingValue = 1.0;
   double endingValue = 0.000001;
-  int numIterations = 10000000;
+  int numIterations = 100000;
 
   double increment = (endingValue - startingValue) / (numIterations - 1);
 
@@ -178,17 +178,18 @@ int runSA(double Tstart, /* [in] starting temperature */
       accept_prob = 1.0;
       if(energy__compactness > best_energy_compactness)
         perfect_score++;
-      fprintf(sa_graph_file, "%d,%d,1.0\n", s, best_energy_compactness);
+      fprintf(sa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
     }
     else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
     {
       accept_prob = startingValue + (increment * (s - 1));
       not_as_great_score++;
     }
-    else if (energy__compactness < best_energy_compactness && (energy__population < best_energy_population || energy__population == 0))
+    else if (energy__compactness < best_energy_compactness && energy__population < best_energy_population  )
     {
+      //fprintf(sa_graph_file, "%d,%d,1.0\n", s, best_energy_compactness);|| energy__population==0 )
       if (energy__population == 0)
-        fprintf(sa_graph_file, "%d,%d,1.0\n", s, best_energy_compactness);
+        fprintf(sa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
       accept_prob = startingValue + (increment * (s - 1));
       not_as_great_score++;
     }
@@ -271,12 +272,9 @@ int runSA(double Tstart, /* [in] starting temperature */
             best_clusters[i].size = clusters[i].size;
             memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
           }
-        }
-        best_energy_compactness = energy__compactness;
-        best_energy_population = energy__population;
-
-        
-        
+          best_energy_compactness = energy__compactness;
+          best_energy_population = energy__population;
+        }   
       }
       else
       {
@@ -344,13 +342,15 @@ int runSA(double Tstart, /* [in] starting temperature */
           printf("\n");
         }
         //printf("3HI!!\n");
-        energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
-        energy__compactness = energy_compactness(clusters, k);
+        
+        
+        
+        
+        if (energy_population(units, clusters, m, k, n, ideal_pop) == 0){
+          energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
+          energy__compactness = energy_compactness(clusters, k);
         fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
         //printf("HERE____ %d\n",best_clusters[0].size);
-        
-        
-        if (energy__population == 0){
             for (int i = 0; i < k; i++)
           {
               
@@ -358,8 +358,10 @@ int runSA(double Tstart, /* [in] starting temperature */
               
               memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
           } 
+          if (best_energy_compactness < energy__compactness){
           best_energy_compactness = energy__compactness;
           best_energy_population = energy__population;
+          }
         }
         //printf("HERE!\n");
         //stored_state = storeState(clusters, k, n);

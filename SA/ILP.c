@@ -98,33 +98,39 @@ int get_var_index(int i, int j, CPXENVptr env, CPXLPptr lp)
 
 //
 
-void init_adjMatrix(TU **units, int n, int adjMatrix[n][n]) {
+void init_adjMatrix(TU **units, int n, int adjMatrix[n][n])
+{
     // Initialize adjacency matrix with 0
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             adjMatrix[i][j] = 0;
         }
     }
-    
+
     // Fill adjacency matrix according to neighbors
-    for (int i = 0; i < n; i++) {
-        //printf("hi %d, %d \n", i, units[i]->num_neighbors);
-        for (int j = 0; j < units[i]->num_neighbors; j++) {
-            //printf("hi %d, %d\n", j, units[i]->neighbor_ids[j]);
+    for (int i = 0; i < n; i++)
+    {
+        // printf("hi %d, %d \n", i, units[i]->num_neighbors);
+        for (int j = 0; j < units[i]->num_neighbors; j++)
+        {
+            // printf("hi %d, %d\n", j, units[i]->neighbor_ids[j]);
             int neighbor_id = units[i]->neighbor_ids[j];
-            
+
             adjMatrix[i][neighbor_id] = 1;
             adjMatrix[neighbor_id][i] = 1;
         }
     }
-    
 }
 
-
-void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
+void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n])
+{
     // Initialize the distance matrix with the adjacency matrix
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             if (i == j)
                 distMatrix[i][j] = 0;
             else if (adjMatrix[i][j])
@@ -135,10 +141,14 @@ void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
     }
 
     // Apply Floyd-Warshall algorithm
-    for (int k = 0; k < n; k++) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (distMatrix[i][k] != INT_MAX && distMatrix[k][j] != INT_MAX) {
+    for (int k = 0; k < n; k++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (distMatrix[i][k] != INT_MAX && distMatrix[k][j] != INT_MAX)
+                {
                     int newDistance = distMatrix[i][k] + distMatrix[k][j];
                     if (newDistance < distMatrix[i][j])
                         distMatrix[i][j] = newDistance;
@@ -148,14 +158,13 @@ void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
     }
 }
 
-
 void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp, int ideal_population)
 {
     for (int cluster = 0; cluster < k; cluster++)
     {
         int *indices = (int *)malloc(n * sizeof(int));
         double *values = (double *)malloc(n * sizeof(double));
-        //printf("ideal pop = %d\n", ideal_population);
+        // printf("ideal pop = %d\n", ideal_population);
         for (int unit = 0; unit < n; unit++)
         {
             char var_name[32];
@@ -170,7 +179,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             }
             indices[unit] = col_index;
             values[unit] = units[unit]->voters; // number of voters in this unit
-            //printf("id = %d, values = %f\n",indices[unit], values[unit]);
+            // printf("id = %d, values = %f\n",indices[unit], values[unit]);
         }
 
         double rhs_upper = 1.15 * ideal_population; // upper bound (115% of ideal population)
@@ -293,23 +302,27 @@ void create_b_vars(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp)
 void create_c_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
 {
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < units[j]->num_neighbors; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < units[j]->num_neighbors; l++)
+            {
                 int j_prime = units[j]->neighbor_ids[l];
-                
+
                 char var_name[64];
                 snprintf(var_name, sizeof(var_name), "c_%d_%d_%d", i, j, j_prime);
-                //printf("c_%d_%d_%d\n", i, j, j_prime);
+                // printf("c_%d_%d_%d\n", i, j, j_prime);
                 double lb = 0.0;  // Lower bound is 0
                 double ub = 1.0;  // Upper bound is 1
                 double obj = 0.0; // Coefficient in the objective function
-                char type = 'B';   // 'B' for binary variables
-                
+                char type = 'B';  // 'B' for binary variables
+
                 char *var_names[1] = {var_name};
                 int status = CPXnewcols(env, lp, 1, &obj, &lb, &ub, &type, var_names);
-                //printf("herewwwww\n");
-                if (status) {
+                // printf("herewwwww\n");
+                if (status)
+                {
                     fprintf(stderr, "Failed to create variable %s.\n", var_name);
                     exit(1);
                 }
@@ -326,22 +339,27 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
     int matind[3];
     double matval[3];
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < units[j]->num_neighbors; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < units[j]->num_neighbors; l++)
+            {
                 int j_prime = units[j]->neighbor_ids[l];
-                if (j_prime != j) {
+                if (j_prime != j)
+                {
                     char x_name_j[32], x_name_j_prime[32], c_name[64];
                     snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                     snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
                     snprintf(c_name, sizeof(c_name), "c_%d_%d_%d", i, j, j_prime);
 
                     int x_index_j, x_index_j_prime, c_index;
-                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, c_name, &c_index)) {
+                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, c_name, &c_index))
+                    {
                         fprintf(stderr, "Failed to get variable index.\n");
                         exit(1);
                     }
-                    //printf("%d,\n", c_index);
+                    // printf("%d,\n", c_index);
 
                     // Constraints
                     // 1. b[i][j][j'] <= x[i][j]
@@ -351,14 +369,16 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     matind[1] = x_index_j;
                     matval[0] = 1.0;
                     matval[1] = -1.0;
-                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
 
                     // 2. b[i][j][j'] <= x[i][j']
                     matind[1] = x_index_j_prime;
-                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -372,14 +392,15 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     matval[0] = -1.0;
                     matval[1] = -1.0;
                     matval[2] = 1.0;
-                    if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
 
                     int *indices = (int *)malloc(k * sizeof(int));
                     double *values = (double *)malloc(k * sizeof(double));
-                    
+
                     for (int i = 0; i < k; i++)
                     {
                         char var_name[64];
@@ -409,7 +430,6 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
     }
 }
 
-
 void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
 {
     // Loop over clusters
@@ -421,13 +441,14 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
             // Loop over neighbors of the current unit
             for (int l = 0; l < units[j]->num_neighbors; l++)
             {
-                int j_prime = units[j]->neighbor_ids[l];     // Neighbor of j
-                if (j < j_prime ) {
+                int j_prime = units[j]->neighbor_ids[l]; // Neighbor of j
+                if (j < j_prime)
+                {
                     int border_size = units[j]->border_sizes[l]; // Border size with the neighbor
-                    //printf("b_%d_%d_%d = %d\n", i, j, j_prime, border_size);
-                    // Retrieve the `b` variable for this cluster, unit, and neighbor pair
+                    // printf("b_%d_%d_%d = %d\n", i, j, j_prime, border_size);
+                    //  Retrieve the `b` variable for this cluster, unit, and neighbor pair
                     char var_name[64];
-                    
+
                     snprintf(var_name, sizeof(var_name), "c_%d_%d_%d", i, j, j_prime);
 
                     int col_index;
@@ -454,7 +475,6 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
     // We want to maximize the sum of border lengths between TUs in the same cluster
     CPXchgobjsen(env, lp, CPX_MAX);
 }
-
 
 void add_force_assignment_constraint(CPXENVptr env, CPXLPptr lp, int n, int k)
 {
@@ -565,25 +585,31 @@ void add_at_least_one_unit_per_cluster_constraints(CPXENVptr env, CPXLPptr lp, i
         free(values);
     }
 }
-void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp) {
+void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp)
+{
     double rhs[1];
     char sense[1];
     int matbeg[1] = {0};
     int matind[3];
     double matval[3];
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < n; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < n; l++)
+            {
                 int j_prime = l;
-                if (j_prime != j) {
+                if (j_prime != j)
+                {
                     char x_name_j[32], x_name_j_prime[32], b_name[64];
                     snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                     snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
                     snprintf(b_name, sizeof(b_name), "b_%d_%d_%d", i, j, j_prime);
 
                     int x_index_j, x_index_j_prime, b_index;
-                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, b_name, &b_index)) {
+                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, b_name, &b_index))
+                    {
                         fprintf(stderr, "Failed to get variable index.\n");
                         exit(1);
                     }
@@ -596,14 +622,16 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
                     matind[1] = x_index_j;
                     matval[0] = 1.0;
                     matval[1] = -1.0;
-                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
 
                     // 2. b[i][j][j'] <= x[i][j']
                     matind[1] = x_index_j_prime;
-                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -617,7 +645,8 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
                     matval[0] = -1.0;
                     matval[1] = -1.0;
                     matval[2] = 1.0;
-                    if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+                    if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                    {
                         fprintf(stderr, "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -626,46 +655,59 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
         }
     }
 }
-void print_adjMatrix(int n, int adjMatrix[n][n]) {
+void print_adjMatrix(int n, int adjMatrix[n][n])
+{
     printf("Adjacency Matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             printf("%d ", adjMatrix[i][j]);
         }
         printf("\n");
     }
 }
 
-void print_distMatrix(int n, int distMatrix[n][n]) {
+void print_distMatrix(int n, int distMatrix[n][n])
+{
     printf("Distance Matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             printf("%d ", distMatrix[i][j]);
         }
         printf("\n");
     }
 }
 
-
-void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n], CPXENVptr env, CPXLPptr lp) {
+void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n], CPXENVptr env, CPXLPptr lp)
+{
     char sense[1];
     int matbeg[1] = {0};
-    
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int j_prime = 0; j_prime < n; j_prime++) {
-                if (j != j_prime && !are_neighbors(units[j], units[j_prime])) {
-                    
+
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int j_prime = 0; j_prime < n; j_prime++)
+            {
+                if (j != j_prime && !are_neighbors(units[j], units[j_prime]))
+                {
+
                     int x_index_j_prime_prime[n];
                     double matval_j_prime_prime[n];
                     int num_j_prime_prime = 0;
-                    
-                    for (int j_double_prime = 0; j_double_prime < n; j_double_prime++) {
-                        if (j_double_prime != j && j_double_prime != j_prime && are_neighbors(units[j_double_prime], units[j_prime]) && distMatrix[j][j_double_prime] < distMatrix[j][j_prime]) {
+
+                    for (int j_double_prime = 0; j_double_prime < n; j_double_prime++)
+                    {
+                        if (j_double_prime != j && j_double_prime != j_prime && are_neighbors(units[j_double_prime], units[j_prime]) && distMatrix[j][j_double_prime] < distMatrix[j][j_prime])
+                        {
                             char x_name_j_double_prime[32];
                             snprintf(x_name_j_double_prime, sizeof(x_name_j_double_prime), "x_%d_%d", i, j_double_prime);
 
-                            if (CPXgetcolindex(env, lp, x_name_j_double_prime, &x_index_j_prime_prime[num_j_prime_prime])) {
+                            if (CPXgetcolindex(env, lp, x_name_j_double_prime, &x_index_j_prime_prime[num_j_prime_prime]))
+                            {
                                 fprintf(stderr, "Failed to get variable index.\n");
                                 exit(1);
                             }
@@ -674,36 +716,40 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
                             num_j_prime_prime++;
                         }
                     }
-                    
-                    if (num_j_prime_prime > 0) {
+
+                    if (num_j_prime_prime > 0)
+                    {
                         char x_name_j[32], x_name_j_prime[32];
                         snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                         snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
 
                         int x_index_j, x_index_j_prime;
-                        if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime)) {
+                        if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime))
+                        {
                             fprintf(stderr, "Failed to get variable index.\n");
                             exit(1);
                         }
 
                         int matind[num_j_prime_prime + 2];
                         double matval[num_j_prime_prime + 2];
-                        
+
                         matind[0] = x_index_j;
                         matind[1] = x_index_j_prime;
                         matval[0] = -1.0;
                         matval[1] = -1.0;
-                        
-                        for (int t = 0; t < num_j_prime_prime; t++) {
+
+                        for (int t = 0; t < num_j_prime_prime; t++)
+                        {
                             matind[t + 2] = x_index_j_prime_prime[t];
                             matval[t + 2] = matval_j_prime_prime[t];
                         }
-                        
+
                         // Constraint: -x[i][j] - x[i][j'] + sum_j''(x[i][j'']) >= -1
                         double rhs[1] = {-1.0};
                         sense[0] = 'G';
-                        
-                        if (CPXaddrows(env, lp, 0, 1, num_j_prime_prime + 2, rhs, sense, matbeg, matind, matval, NULL, NULL)) {
+
+                        if (CPXaddrows(env, lp, 0, 1, num_j_prime_prime + 2, rhs, sense, matbeg, matind, matval, NULL, NULL))
+                        {
                             fprintf(stderr, "Failed to add constraint.\n");
                             exit(1);
                         }
@@ -714,44 +760,46 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
     }
 }
 
-void parse_var_name(char* var_name, int* cluster_id, int* unit_id) {
+void parse_var_name(char *var_name, int *cluster_id, int *unit_id)
+{
     // Scan the variable name
     int status = sscanf(var_name, "x_%d_%d", cluster_id, unit_id);
 
     // Check if we successfully scanned 2 numbers
-    if (status != 2) {
+    if (status != 2)
+    {
         fprintf(stderr, "Failed to parse variable name: %s\n", var_name);
         exit(1);
     }
 }
 
-Cluster** create_initial_clusters(TU **units, int k, int n) {
+Cluster **create_initial_clusters(TU **units, int k, int n)
+{
     Cluster *clusters = malloc(k * sizeof(Cluster));
-    for (int j = 0; j< k; j++)
+    for (int j = 0; j < k; j++)
     {
         clusters[j].units = malloc(n * sizeof(TU *));
         clusters[j].size = 0;
     }
     int t = 0;
-    int  cluster_id = 0;
-    //printf("111AHYO\n");
-    for (int i = 0; i < n; i++) {
-        //printf("1111AHYO\n");
-        TU* unit = units[i];       
-         //printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
-        //if (unit->assigned) {
-           
+    int cluster_id = 0;
+    // printf("111AHYO\n");
+    for (int i = 0; i < n; i++)
+    {
+        // printf("1111AHYO\n");
+        TU *unit = units[i];
+        // printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
+        // if (unit->assigned) {
+
         int cluster_id = unit->cluster_id;
-        //printf("11111AHYO clut: %d\n", cluster_id);
+        // printf("11111AHYO clut: %d\n", cluster_id);
         clusters[cluster_id].units[clusters[cluster_id].size] = unit;
-        //printf("111111AHYO\n");
-        //printf("clust %d and size %d\n", cluster_id, clusters[cluster_id].size);
+        // printf("111111AHYO\n");
+        // printf("clust %d and size %d\n", cluster_id, clusters[cluster_id].size);
         clusters[cluster_id].size++;
         //}
-        
-        
     }
-    
+
     return clusters;
 }
 
@@ -769,35 +817,40 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
 //             int cluster_id = unit->cluster_id;
 //             clusters[cluster_id].units[clusters[cluster_id].size] = unit;
 //             clusters[cluster_id].size++;
-            
+
 //         }
 //     }
-    
 
 //     return clusters;
 // }
 
-void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int max_population) {
-    for (int c = 0; c < num_clusters; c++) {
-        Cluster* cluster = &clusters[c];
+void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population)
+{
+    for (int c = 0; c < num_clusters; c++)
+    {
+        Cluster *cluster = &clusters[c];
         int cluster_population = 0;
-        for (int i = 0; i < cluster->size; i++) {
+        for (int i = 0; i < cluster->size; i++)
+        {
             cluster_population += cluster->units[i]->voters;
         }
-        //printf("cluster %d population %d\n", c, cluster_population);
-        if (cluster_population <= max_population) {
-            for (int i = 0; i < cluster->size; i++) {
-                TU* unit = cluster->units[i];
+        // printf("cluster %d population %d\n", c, cluster_population);
+        if (cluster_population <= max_population)
+        {
+            for (int i = 0; i < cluster->size; i++)
+            {
+                TU *unit = cluster->units[i];
                 char var_name[32];
                 sprintf(var_name, "x_%d_%d", c, unit->unit_id);
                 int idx;
                 int status = CPXgetcolindex(env, lp, var_name, &idx);
-                if (status) {
+                if (status)
+                {
                     fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
                     exit(1);
                 }
 
-                //printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
+                // printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
 
                 double rhs[1] = {1.0};
                 char sense[1] = {'E'};
@@ -806,7 +859,8 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
                 double rmatval[1] = {1.0};
 
                 status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, NULL, NULL);
-                if (status) {
+                if (status)
+                {
                     fprintf(stderr, "Failed to add fixed cluster constraint for unit %d.\n", i);
                     exit(1);
                 }
@@ -815,20 +869,16 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
     }
 }
 
+// lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
+// quiarta as 16
 
-
-//lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
-//quiarta as 16
-
-
-
-Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters)
+Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *clusters)
 {
     CPXENVptr env = NULL;
     CPXLPptr lp = NULL;
     int status;
     double start_time, end_time;
-    
+
     env = CPXopenCPLEX(&status);
     if (env == NULL)
     {
@@ -843,12 +893,13 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
         exit(1);
     }
     CPXgettime(env, &start_time);
-    //printf("star = == = %f\n", start_time);
+    // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 *4;  // Time limit in seconds
+    double time_limit = 60.0 * 4; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
-    if (status) {
+    if (status)
+    {
         fprintf(stderr, "Failed to set time limit parameter.\n");
         exit(1);
     }
@@ -857,22 +908,22 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     create_neighbor_index(units, n);
     int num_vars = create_decision_variables(units, k, n, env, lp);
 
-    //create_b_vars(units, k, n, env, lp);
+    // create_b_vars(units, k, n, env, lp);
     create_c_variables(units, n, k, env, lp);
-    
+
     init_adjMatrix(units, n, adjMatrix);
     floydWarshall(n, adjMatrix, distMatrix);
 
-    //print_adjMatrix(n, adjMatrix);
-    //print_distMatrix(n, distMatrix);
+    // print_adjMatrix(n, adjMatrix);
+    // print_distMatrix(n, distMatrix);
 
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
-    //add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
+    // add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
 
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
-    add_contiguity_constraints2(units, k, n, distMatrix,  env, lp);
+    add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
     add_c_constraints(units, n, k, env, lp);
     add_objective_function(units, n, k, env, lp);
 
@@ -880,58 +931,57 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(stderr, "Failed to optimize the ILP problem.\n");
-        //exit(1);
+        // exit(1);
     }
-    
+
     status = CPXwriteprob(env, lp, "model.lp", NULL);
-    //printf("here\n");
-    if (status) {
+    // printf("here\n");
+    if (status)
+    {
         fprintf(stderr, "Failed to write problem to file.\n");
-        //exit(1);
+        // exit(1);
     }
 
     int solstat = CPXgetstat(env, lp);
     printf("Solution status: %d\n", solstat);
-    
+
     double objval;
     status = CPXgetobjval(env, lp, &objval);
 
     char statstring[CPXMESSAGEBUFSIZE];
     CPXgetstatstring(env, solstat, statstring);
     printf("%s\n", statstring);
-    
+
     if (status)
     {
         fprintf(stderr, "Failed to get objective value.\n");
-        //exit(1);
+        // exit(1);
     }
     printf("Objective value: %.2f\n", objval);
 
-    if(solstat != 101)
+    if (solstat == 103 || solstat == 108)
         return clusters;
 
-    
     double *solution = (double *)malloc(num_vars * sizeof(double));
 
     status = CPXgetx(env, lp, solution, 0, num_vars - 1);
     if (status)
     {
         fprintf(stderr, "Failed to get optimal solution.\n");
-        //exit(1);
+        // exit(1);
     }
 
-
-//     printf("Conflict written to conflict.lp.\n");
-// }int 
-    //num_vars = CPXgetnumcols(env, lp);
+    //     printf("Conflict written to conflict.lp.\n");
+    // }int
+    // num_vars = CPXgetnumcols(env, lp);
 
     // Print the optimal solution
-    int *cluster_unit_counts = calloc(k, sizeof(int)); // Assuming k is the number of clusters
+    int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
     bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
 
     for (int i = 0; i < num_vars; i++)
     {
-        
+
         char var_name[32];
         int storespace = 32; // Adjust as needed
         char **colname = (char **)malloc(sizeof(char *));
@@ -940,60 +990,63 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
         status = CPXgetcolname(env, lp, colname, namestore, storespace, &surplus, i, i);
         int cluster_id, unit_id;
         parse_var_name(*colname, &cluster_id, &unit_id);
-        
+
         // Create a new unit and set its properties
-        //TU* unit = (TU*)malloc(sizeof(TU));
-        TU* unit= units[unit_id];
-        //printf("hi unit id %d, and pop %d\n", unit->unit_id, unit->voters);
-        
-        if (solution[i] >= 0.5) {
-                unit->assigned = true;
-                unit->cluster_id = cluster_id;
-                //printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
-        } else {
-                unit->assigned = false;
+        // TU* unit = (TU*)malloc(sizeof(TU));
+        TU *unit = units[unit_id];
+        // printf("hi unit id %d, and pop %d\n", unit->unit_id, unit->voters);
+
+        if (solution[i] >= 0.5)
+        {
+            unit->assigned = true;
+            unit->cluster_id = cluster_id;
+            // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
+        }
+        else
+        {
+            unit->assigned = false;
         }
         unit->assigned = solution[i] >= 0.5 ? true : false; //
-            
-         
-        if (unit->assigned) { // Only add the unit to the cluster if it is assigned
-        
-            //printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
-            //printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
+
+        if (unit->assigned)
+        { // Only add the unit to the cluster if it is assigned
+
+            // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
+            // printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
             unit->cluster_id = cluster_id;
             unit->unit_id = unit_id;
             cluster_unit_counts[cluster_id]++;
             processed_clusters[cluster_id] = true;
-            
-        
         }
         units[i] = unit;
-        for (int i = 0; i < k; i++) {
-        // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
-        if (processed_clusters[i] && (cluster_unit_counts[i] == 0 )) { // replace is_valid_cluster with your own validity check function
-            // Handle this case as per your needs
-            fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
-            return clusters; // or some other error handling / default return
+        for (int i = 0; i < k; i++)
+        {
+            // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
+            if (processed_clusters[i] && (cluster_unit_counts[i] == 0))
+            { // replace is_valid_cluster with your own validity check function
+                // Handle this case as per your needs
+                fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
+                return clusters; // or some other error handling / default return
+            }
         }
-}
 
         if (status)
         {
             fprintf(stderr, "Failed to get variable name for column %d.\n", i);
-            //exit(1);
+            // exit(1);
         }
-        //printf("%s: %.2f\n", *colname, solution[i]);
+        // printf("%s: %.2f\n", *colname, solution[i]);
         free(colname);
         free(namestore);
     }
-    
+
     free(solution);
     clusters = create_initial_clusters(units, k, n);
-    //printf("22AHYO\n");
+    // printf("22AHYO\n");
     printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
-    //printf("end = == = %f\n", end_time);
+    // printf("end = == = %f\n", end_time);
     double time_taken = end_time - start_time;
     printf("Time taken: %f seconds\n", time_taken);
     status = CPXfreeprob(env, &lp);
@@ -1010,4 +1063,152 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     }
 
     return clusters;
+}
+
+void runILP_only(TU **units, int k, int n, int m, int ideal_pop)
+{
+    CPXENVptr env = NULL;
+    CPXLPptr lp = NULL;
+    int status;
+    double start_time, end_time;
+
+    env = CPXopenCPLEX(&status);
+    if (env == NULL)
+    {
+        fprintf(stderr, "Could not open CPLEX environment.\n");
+        exit(1);
+    }
+
+    lp = CPXcreateprob(env, &status, "districting");
+    if (lp == NULL)
+    {
+        fprintf(stderr, "Could not create LP problem.\n");
+        exit(1);
+    }
+    CPXgettime(env, &start_time);
+    // printf("star = == = %f\n", start_time);
+    int adjMatrix[n][n];
+    int distMatrix[n][n];
+    double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
+    status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
+    if (status)
+    {
+        fprintf(stderr, "Failed to set time limit parameter.\n");
+        exit(1);
+    }
+
+    create_code_index(units, n);
+    create_neighbor_index(units, n);
+    int num_vars = create_decision_variables(units, k, n, env, lp);
+
+    // create_b_vars(units, k, n, env, lp);
+    create_c_variables(units, n, k, env, lp);
+
+    init_adjMatrix(units, n, adjMatrix);
+    floydWarshall(n, adjMatrix, distMatrix);
+
+    // print_adjMatrix(n, adjMatrix);
+    // print_distMatrix(n, distMatrix);
+
+    add_basic_constraints(env, lp, n, k);
+    add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
+    // add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
+
+    add_population_constraints(units, n, k, env, lp, ideal_pop);
+
+    add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
+    add_c_constraints(units, n, k, env, lp);
+    add_objective_function(units, n, k, env, lp);
+
+    status = CPXmipopt(env, lp);
+    if (status)
+    {
+        fprintf(stderr, "Failed to optimize the ILP problem.\n");
+        // exit(1);
+    }
+
+    status = CPXwriteprob(env, lp, "model.lp", NULL);
+    // printf("here\n");
+    if (status)
+    {
+        fprintf(stderr, "Failed to write problem to file.\n");
+        // exit(1);
+    }
+
+    int solstat = CPXgetstat(env, lp);
+    printf("Solution status: %d\n", solstat);
+
+    double objval;
+    status = CPXgetobjval(env, lp, &objval);
+
+    char statstring[CPXMESSAGEBUFSIZE];
+    CPXgetstatstring(env, solstat, statstring);
+    printf("%s\n", statstring);
+
+    if (status)
+    {
+        fprintf(stderr, "Failed to get objective value.\n");
+        // exit(1);
+    }
+    printf("Objective value: %.2f\n", objval);
+
+    double *solution = (double *)malloc(num_vars * sizeof(double));
+
+    status = CPXgetx(env, lp, solution, 0, num_vars - 1);
+    if (status)
+    {
+        fprintf(stderr, "Failed to get optimal solution.\n");
+        // exit(1);
+    }
+
+    //     printf("Conflict written to conflict.lp.\n");
+    // }int
+    // num_vars = CPXgetnumcols(env, lp);
+
+    // Print the optimal solution
+    int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
+    bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
+
+    for (int i = 0; i < num_vars; i++)
+    {
+
+        char var_name[32];
+        int storespace = 32; // Adjust as needed
+        char **colname = (char **)malloc(sizeof(char *));
+        char *namestore = (char *)malloc(storespace * sizeof(char));
+        int surplus;
+        status = CPXgetcolname(env, lp, colname, namestore, storespace, &surplus, i, i);
+        int cluster_id, unit_id;
+        parse_var_name(*colname, &cluster_id, &unit_id);
+
+        // Create a new unit and set its properties
+        // TU* unit = (TU*)malloc(sizeof(TU));
+        // printf("hi unit id %d, and pop %d\n", unit->unit_id, unit->voters);
+    }
+
+    
+    // printf("%s: %.2f\n", *colname, solution[i]);
+
+
+free(solution);
+
+status = CPXmipopt(env, lp);
+CPXgettime(env, &end_time);
+// printf("end = == = %f\n", end_time);
+double time_taken = end_time - start_time;
+printf("Time taken: %f seconds\n", time_taken);
+status = CPXfreeprob(env, &lp);
+if (status != 0)
+{
+    fprintf(stderr, "Failed to free the problem.\n");
+    exit(1);
+}
+status = CPXcloseCPLEX(&env);
+if (status != 0)
+{
+    fprintf(stderr, "Failed to close CPLEX environment.\n");
+    exit(1);
+}
+
+return;
 }

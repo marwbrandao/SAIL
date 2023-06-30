@@ -6717,6 +6717,8 @@ int create_decision_variables(TU **units,int k, int n, CPXENVptr env, CPXLPptr l
 void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int ideal_pop);
 
 Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters);
+
+void runILP_only(TU **units, int k, int n, int m, int ideal_pop);
 # 10 "ILP.c" 2
 
 typedef struct Mapping;
@@ -6829,18 +6831,23 @@ int get_var_index(int i, int j, CPXENVptr env, CPXLPptr lp)
 
 
 
-void init_adjMatrix(TU **units, int n, int adjMatrix[n][n]) {
+void init_adjMatrix(TU **units, int n, int adjMatrix[n][n])
+{
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             adjMatrix[i][j] = 0;
         }
     }
 
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
 
-        for (int j = 0; j < units[i]->num_neighbors; j++) {
+        for (int j = 0; j < units[i]->num_neighbors; j++)
+        {
 
             int neighbor_id = units[i]->neighbor_ids[j];
 
@@ -6848,14 +6855,15 @@ void init_adjMatrix(TU **units, int n, int adjMatrix[n][n]) {
             adjMatrix[neighbor_id][i] = 1;
         }
     }
-
 }
 
+void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n])
+{
 
-void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             if (i == j)
                 distMatrix[i][j] = 0;
             else if (adjMatrix[i][j])
@@ -6866,10 +6874,14 @@ void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
     }
 
 
-    for (int k = 0; k < n; k++) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (distMatrix[i][k] != 0x7fffffff && distMatrix[k][j] != 0x7fffffff) {
+    for (int k = 0; k < n; k++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if (distMatrix[i][k] != 0x7fffffff && distMatrix[k][j] != 0x7fffffff)
+                {
                     int newDistance = distMatrix[i][k] + distMatrix[k][j];
                     if (newDistance < distMatrix[i][j])
                         distMatrix[i][j] = newDistance;
@@ -6878,7 +6890,6 @@ void floydWarshall(int n, int adjMatrix[n][n], int distMatrix[n][n]) {
         }
     }
 }
-
 
 void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp, int ideal_population)
 {
@@ -6897,9 +6908,9 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             if (status)
             {
                 fprintf(
-# 168 "ILP.c" 3 4
+# 177 "ILP.c" 3 4
                        stderr
-# 168 "ILP.c"
+# 177 "ILP.c"
                              , "Failed to get column index for %s.\n", var_name);
                 exit(1);
             }
@@ -6912,20 +6923,20 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
         char sense_upper = 'L';
         int matbeg = 0;
         int status_upper = CPXaddrows(env, lp, 0, 1, n, &rhs_upper, &sense_upper, &matbeg, indices, values, 
-# 179 "ILP.c" 3 4
+# 188 "ILP.c" 3 4
                                                                                                            ((void *)0)
-# 179 "ILP.c"
+# 188 "ILP.c"
                                                                                                                , 
-# 179 "ILP.c" 3 4
+# 188 "ILP.c" 3 4
                                                                                                                  ((void *)0)
-# 179 "ILP.c"
+# 188 "ILP.c"
                                                                                                                      );
         if (status_upper)
         {
             fprintf(
-# 182 "ILP.c" 3 4
+# 191 "ILP.c" 3 4
                    stderr
-# 182 "ILP.c"
+# 191 "ILP.c"
                          , "Failed to add upper population constraint for cluster %d.\n", cluster);
             exit(1);
         }
@@ -6933,20 +6944,20 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
         double rhs_lower = 0.85 * ideal_population;
         char sense_lower = 'G';
         int status_lower = CPXaddrows(env, lp, 0, 1, n, &rhs_lower, &sense_lower, &matbeg, indices, values, 
-# 188 "ILP.c" 3 4
+# 197 "ILP.c" 3 4
                                                                                                            ((void *)0)
-# 188 "ILP.c"
+# 197 "ILP.c"
                                                                                                                , 
-# 188 "ILP.c" 3 4
+# 197 "ILP.c" 3 4
                                                                                                                  ((void *)0)
-# 188 "ILP.c"
+# 197 "ILP.c"
                                                                                                                      );
         if (status_lower)
         {
             fprintf(
-# 191 "ILP.c" 3 4
+# 200 "ILP.c" 3 4
                    stderr
-# 191 "ILP.c"
+# 200 "ILP.c"
                          , "Failed to add lower population constraint for cluster %d.\n", cluster);
             exit(1);
         }
@@ -6979,9 +6990,9 @@ int create_decision_variables(TU **units, int k, int n, CPXENVptr env, CPXLPptr 
             if (status)
             {
                 fprintf(
-# 222 "ILP.c" 3 4
+# 231 "ILP.c" 3 4
                        stderr
-# 222 "ILP.c"
+# 231 "ILP.c"
                              , "Failed to create decision variable x_%d_%d.\n", i, j);
                 exit(1);
             }
@@ -7004,9 +7015,9 @@ int create_decision_variables(TU **units, int k, int n, CPXENVptr env, CPXLPptr 
             if (status)
             {
                 fprintf(
-# 243 "ILP.c" 3 4
+# 252 "ILP.c" 3 4
                        stderr
-# 243 "ILP.c"
+# 252 "ILP.c"
                              , "Failed to get column index for %s.\n", var_name);
                 exit(1);
             }
@@ -7017,20 +7028,20 @@ int create_decision_variables(TU **units, int k, int n, CPXENVptr env, CPXLPptr 
         int matbeg = 0;
         char sense = 'E';
         int status = CPXaddrows(env, lp, 0, 1, k, &rhs, &sense, &matbeg, indices, values, 
-# 252 "ILP.c" 3 4
+# 261 "ILP.c" 3 4
                                                                                          ((void *)0)
-# 252 "ILP.c"
+# 261 "ILP.c"
                                                                                              , 
-# 252 "ILP.c" 3 4
+# 261 "ILP.c" 3 4
                                                                                                ((void *)0)
-# 252 "ILP.c"
+# 261 "ILP.c"
                                                                                                    );
         if (status)
         {
             fprintf(
-# 255 "ILP.c" 3 4
+# 264 "ILP.c" 3 4
                    stderr
-# 255 "ILP.c"
+# 264 "ILP.c"
                          , "Failed to add constraint for unit %d.\n", units[j]->unit_id);
             exit(1);
         }
@@ -7062,9 +7073,9 @@ void create_b_vars(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp)
                 if (status)
                 {
                     fprintf(
-# 285 "ILP.c" 3 4
+# 294 "ILP.c" 3 4
                            stderr
-# 285 "ILP.c"
+# 294 "ILP.c"
                                  , "Failed to create decision variable %s.\n", var_name);
                     exit(1);
                 }
@@ -7076,9 +7087,12 @@ void create_b_vars(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp)
 void create_c_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
 {
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < units[j]->num_neighbors; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < units[j]->num_neighbors; l++)
+            {
                 int j_prime = units[j]->neighbor_ids[l];
 
                 char var_name[64];
@@ -7092,11 +7106,12 @@ void create_c_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                 char *var_names[1] = {var_name};
                 int status = CPXnewcols(env, lp, 1, &obj, &lb, &ub, &type, var_names);
 
-                if (status) {
+                if (status)
+                {
                     fprintf(
-# 313 "ILP.c" 3 4
+# 326 "ILP.c" 3 4
                            stderr
-# 313 "ILP.c"
+# 326 "ILP.c"
                                  , "Failed to create variable %s.\n", var_name);
                     exit(1);
                 }
@@ -7113,22 +7128,27 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
     int matind[3];
     double matval[3];
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < units[j]->num_neighbors; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < units[j]->num_neighbors; l++)
+            {
                 int j_prime = units[j]->neighbor_ids[l];
-                if (j_prime != j) {
+                if (j_prime != j)
+                {
                     char x_name_j[32], x_name_j_prime[32], c_name[64];
                     snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                     snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
                     snprintf(c_name, sizeof(c_name), "c_%d_%d_%d", i, j, j_prime);
 
                     int x_index_j, x_index_j_prime, c_index;
-                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, c_name, &c_index)) {
+                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, c_name, &c_index))
+                    {
                         fprintf(
-# 341 "ILP.c" 3 4
+# 359 "ILP.c" 3 4
                                stderr
-# 341 "ILP.c"
+# 359 "ILP.c"
                                      , "Failed to get variable index.\n");
                         exit(1);
                     }
@@ -7143,18 +7163,19 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     matval[0] = 1.0;
                     matval[1] = -1.0;
                     if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, 
-# 354 "ILP.c" 3 4
+# 372 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 354 "ILP.c"
+# 372 "ILP.c"
                                                                                             , 
-# 354 "ILP.c" 3 4
+# 372 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 354 "ILP.c"
-                                                                                                  )) {
+# 372 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 355 "ILP.c" 3 4
+# 374 "ILP.c" 3 4
                                stderr
-# 355 "ILP.c"
+# 374 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7162,18 +7183,19 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
 
                     matind[1] = x_index_j_prime;
                     if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, 
-# 361 "ILP.c" 3 4
+# 380 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 361 "ILP.c"
+# 380 "ILP.c"
                                                                                             , 
-# 361 "ILP.c" 3 4
+# 380 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 361 "ILP.c"
-                                                                                                  )) {
+# 380 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 362 "ILP.c" 3 4
+# 382 "ILP.c" 3 4
                                stderr
-# 362 "ILP.c"
+# 382 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7188,18 +7210,19 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     matval[1] = -1.0;
                     matval[2] = 1.0;
                     if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, 
-# 375 "ILP.c" 3 4
+# 395 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 375 "ILP.c"
+# 395 "ILP.c"
                                                                                             , 
-# 375 "ILP.c" 3 4
+# 395 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 375 "ILP.c"
-                                                                                                  )) {
+# 395 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 376 "ILP.c" 3 4
+# 397 "ILP.c" 3 4
                                stderr
-# 376 "ILP.c"
+# 397 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7216,9 +7239,9 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                         if (status)
                         {
                             fprintf(
-# 391 "ILP.c" 3 4
+# 412 "ILP.c" 3 4
                                    stderr
-# 391 "ILP.c"
+# 412 "ILP.c"
                                          , "Failed to get column index for %s.\n", var_name);
                             exit(1);
                         }
@@ -7229,20 +7252,20 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     int matbeg = 0;
                     char sense = 'L';
                     int status = CPXaddrows(env, lp, 0, 1, k, &rhs, &sense, &matbeg, indices, values, 
-# 400 "ILP.c" 3 4
+# 421 "ILP.c" 3 4
                                                                                                      ((void *)0)
-# 400 "ILP.c"
+# 421 "ILP.c"
                                                                                                          , 
-# 400 "ILP.c" 3 4
+# 421 "ILP.c" 3 4
                                                                                                            ((void *)0)
-# 400 "ILP.c"
+# 421 "ILP.c"
                                                                                                                );
                     if (status)
                     {
                         fprintf(
-# 403 "ILP.c" 3 4
+# 424 "ILP.c" 3 4
                                stderr
-# 403 "ILP.c"
+# 424 "ILP.c"
                                      , "Failed to add constraint for units %d and %d.\n", j, j_prime);
                         exit(1);
                     }
@@ -7251,7 +7274,6 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
         }
     }
 }
-
 
 void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
 {
@@ -7265,7 +7287,8 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
             for (int l = 0; l < units[j]->num_neighbors; l++)
             {
                 int j_prime = units[j]->neighbor_ids[l];
-                if (j < j_prime ) {
+                if (j < j_prime)
+                {
                     int border_size = units[j]->border_sizes[l];
 
 
@@ -7278,9 +7301,9 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
                     if (status)
                     {
                         fprintf(
-# 437 "ILP.c" 3 4
+# 458 "ILP.c" 3 4
                                stderr
-# 437 "ILP.c"
+# 458 "ILP.c"
                                      , "Failed to get column index for %s.\n", var_name);
                         exit(1);
                     }
@@ -7291,9 +7314,9 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
                     if (status)
                     {
                         fprintf(
-# 446 "ILP.c" 3 4
+# 467 "ILP.c" 3 4
                                stderr
-# 446 "ILP.c"
+# 467 "ILP.c"
                                      , "Failed to change objective function.\n");
                         exit(1);
                     }
@@ -7305,7 +7328,6 @@ void add_objective_function(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp
 
     CPXchgobjsen(env, lp, -1);
 }
-
 
 void add_force_assignment_constraint(CPXENVptr env, CPXLPptr lp, int n, int k)
 {
@@ -7322,9 +7344,9 @@ void add_force_assignment_constraint(CPXENVptr env, CPXLPptr lp, int n, int k)
             if (status)
             {
                 fprintf(
-# 473 "ILP.c" 3 4
+# 493 "ILP.c" 3 4
                        stderr
-# 473 "ILP.c"
+# 493 "ILP.c"
                              , "Failed to get column index for %s.\n", var_name);
                 exit(1);
             }
@@ -7335,20 +7357,20 @@ void add_force_assignment_constraint(CPXENVptr env, CPXLPptr lp, int n, int k)
         char sense = 'E';
         int matbeg = 0;
         int status = CPXaddrows(env, lp, 0, 1, k, &rhs, &sense, &matbeg, indices, values, 
-# 482 "ILP.c" 3 4
+# 502 "ILP.c" 3 4
                                                                                          ((void *)0)
-# 482 "ILP.c"
+# 502 "ILP.c"
                                                                                              , 
-# 482 "ILP.c" 3 4
+# 502 "ILP.c" 3 4
                                                                                                ((void *)0)
-# 482 "ILP.c"
+# 502 "ILP.c"
                                                                                                    );
         if (status)
         {
             fprintf(
-# 485 "ILP.c" 3 4
+# 505 "ILP.c" 3 4
                    stderr
-# 485 "ILP.c"
+# 505 "ILP.c"
                          , "Failed to add force assignment constraint for node %d.\n", i);
             exit(1);
         }
@@ -7374,9 +7396,9 @@ void add_basic_constraints(CPXENVptr env, CPXLPptr lp, int n, int k)
             if (status)
             {
                 fprintf(
-# 509 "ILP.c" 3 4
+# 529 "ILP.c" 3 4
                        stderr
-# 509 "ILP.c"
+# 529 "ILP.c"
                              , "Failed to get column index for %s.\n", var_name);
                 exit(1);
             }
@@ -7388,20 +7410,20 @@ void add_basic_constraints(CPXENVptr env, CPXLPptr lp, int n, int k)
         char sense = 'G';
         int matbeg = 0;
         int status = CPXaddrows(env, lp, 0, 1, k, &rhs, &sense, &matbeg, indices, values, 
-# 519 "ILP.c" 3 4
+# 539 "ILP.c" 3 4
                                                                                          ((void *)0)
-# 519 "ILP.c"
+# 539 "ILP.c"
                                                                                              , 
-# 519 "ILP.c" 3 4
+# 539 "ILP.c" 3 4
                                                                                                ((void *)0)
-# 519 "ILP.c"
+# 539 "ILP.c"
                                                                                                    );
         if (status)
         {
             fprintf(
-# 522 "ILP.c" 3 4
+# 542 "ILP.c" 3 4
                    stderr
-# 522 "ILP.c"
+# 542 "ILP.c"
                          , "Failed to add basic constraint for unit %d.\n", unit);
             exit(1);
         }
@@ -7428,9 +7450,9 @@ void add_at_least_one_unit_per_cluster_constraints(CPXENVptr env, CPXLPptr lp, i
             if (status)
             {
                 fprintf(
-# 547 "ILP.c" 3 4
+# 567 "ILP.c" 3 4
                        stderr
-# 547 "ILP.c"
+# 567 "ILP.c"
                              , "Failed to get column index for %s.\n", var_name);
                 exit(1);
             }
@@ -7442,20 +7464,20 @@ void add_at_least_one_unit_per_cluster_constraints(CPXENVptr env, CPXLPptr lp, i
         char sense = 'G';
         int matbeg = 0;
         int status = CPXaddrows(env, lp, 0, 1, n, &rhs, &sense, &matbeg, indices, values, 
-# 557 "ILP.c" 3 4
+# 577 "ILP.c" 3 4
                                                                                          ((void *)0)
-# 557 "ILP.c"
+# 577 "ILP.c"
                                                                                              , 
-# 557 "ILP.c" 3 4
+# 577 "ILP.c" 3 4
                                                                                                ((void *)0)
-# 557 "ILP.c"
+# 577 "ILP.c"
                                                                                                    );
         if (status)
         {
             fprintf(
-# 560 "ILP.c" 3 4
+# 580 "ILP.c" 3 4
                    stderr
-# 560 "ILP.c"
+# 580 "ILP.c"
                          , "Failed to add cluster constraint for cluster %d.\n", cluster);
             exit(1);
         }
@@ -7464,29 +7486,35 @@ void add_at_least_one_unit_per_cluster_constraints(CPXENVptr env, CPXLPptr lp, i
         free(values);
     }
 }
-void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp) {
+void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXLPptr lp)
+{
     double rhs[1];
     char sense[1];
     int matbeg[1] = {0};
     int matind[3];
     double matval[3];
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int l = 0; l < n; l++) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int l = 0; l < n; l++)
+            {
                 int j_prime = l;
-                if (j_prime != j) {
+                if (j_prime != j)
+                {
                     char x_name_j[32], x_name_j_prime[32], b_name[64];
                     snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                     snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
                     snprintf(b_name, sizeof(b_name), "b_%d_%d_%d", i, j, j_prime);
 
                     int x_index_j, x_index_j_prime, b_index;
-                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, b_name, &b_index)) {
+                    if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, b_name, &b_index))
+                    {
                         fprintf(
-# 587 "ILP.c" 3 4
+# 613 "ILP.c" 3 4
                                stderr
-# 587 "ILP.c"
+# 613 "ILP.c"
                                      , "Failed to get variable index.\n");
                         exit(1);
                     }
@@ -7500,18 +7528,19 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
                     matval[0] = 1.0;
                     matval[1] = -1.0;
                     if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, 
-# 599 "ILP.c" 3 4
+# 625 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 599 "ILP.c"
+# 625 "ILP.c"
                                                                                             , 
-# 599 "ILP.c" 3 4
+# 625 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 599 "ILP.c"
-                                                                                                  )) {
+# 625 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 600 "ILP.c" 3 4
+# 627 "ILP.c" 3 4
                                stderr
-# 600 "ILP.c"
+# 627 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7519,18 +7548,19 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
 
                     matind[1] = x_index_j_prime;
                     if (CPXaddrows(env, lp, 0, 1, 2, rhs, sense, matbeg, matind, matval, 
-# 606 "ILP.c" 3 4
+# 633 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 606 "ILP.c"
+# 633 "ILP.c"
                                                                                             , 
-# 606 "ILP.c" 3 4
+# 633 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 606 "ILP.c"
-                                                                                                  )) {
+# 633 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 607 "ILP.c" 3 4
+# 635 "ILP.c" 3 4
                                stderr
-# 607 "ILP.c"
+# 635 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7545,18 +7575,19 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
                     matval[1] = -1.0;
                     matval[2] = 1.0;
                     if (CPXaddrows(env, lp, 0, 1, 3, rhs, sense, matbeg, matind, matval, 
-# 620 "ILP.c" 3 4
+# 648 "ILP.c" 3 4
                                                                                         ((void *)0)
-# 620 "ILP.c"
+# 648 "ILP.c"
                                                                                             , 
-# 620 "ILP.c" 3 4
+# 648 "ILP.c" 3 4
                                                                                               ((void *)0)
-# 620 "ILP.c"
-                                                                                                  )) {
+# 648 "ILP.c"
+                                                                                                  ))
+                    {
                         fprintf(
-# 621 "ILP.c" 3 4
+# 650 "ILP.c" 3 4
                                stderr
-# 621 "ILP.c"
+# 650 "ILP.c"
                                      , "Failed to add constraint.\n");
                         exit(1);
                     }
@@ -7565,50 +7596,63 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
         }
     }
 }
-void print_adjMatrix(int n, int adjMatrix[n][n]) {
+void print_adjMatrix(int n, int adjMatrix[n][n])
+{
     printf("Adjacency Matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             printf("%d ", adjMatrix[i][j]);
         }
         printf("\n");
     }
 }
 
-void print_distMatrix(int n, int distMatrix[n][n]) {
+void print_distMatrix(int n, int distMatrix[n][n])
+{
     printf("Distance Matrix:\n");
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             printf("%d ", distMatrix[i][j]);
         }
         printf("\n");
     }
 }
 
-
-void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n], CPXENVptr env, CPXLPptr lp) {
+void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n], CPXENVptr env, CPXLPptr lp)
+{
     char sense[1];
     int matbeg[1] = {0};
 
-    for (int i = 0; i < k; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int j_prime = 0; j_prime < n; j_prime++) {
-                if (j != j_prime && !are_neighbors(units[j], units[j_prime])) {
+    for (int i = 0; i < k; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int j_prime = 0; j_prime < n; j_prime++)
+            {
+                if (j != j_prime && !are_neighbors(units[j], units[j_prime]))
+                {
 
                     int x_index_j_prime_prime[n];
                     double matval_j_prime_prime[n];
                     int num_j_prime_prime = 0;
 
-                    for (int j_double_prime = 0; j_double_prime < n; j_double_prime++) {
-                        if (j_double_prime != j && j_double_prime != j_prime && are_neighbors(units[j_double_prime], units[j_prime]) && distMatrix[j][j_double_prime] < distMatrix[j][j_prime]) {
+                    for (int j_double_prime = 0; j_double_prime < n; j_double_prime++)
+                    {
+                        if (j_double_prime != j && j_double_prime != j_prime && are_neighbors(units[j_double_prime], units[j_prime]) && distMatrix[j][j_double_prime] < distMatrix[j][j_prime])
+                        {
                             char x_name_j_double_prime[32];
                             snprintf(x_name_j_double_prime, sizeof(x_name_j_double_prime), "x_%d_%d", i, j_double_prime);
 
-                            if (CPXgetcolindex(env, lp, x_name_j_double_prime, &x_index_j_prime_prime[num_j_prime_prime])) {
+                            if (CPXgetcolindex(env, lp, x_name_j_double_prime, &x_index_j_prime_prime[num_j_prime_prime]))
+                            {
                                 fprintf(
-# 669 "ILP.c" 3 4
+# 711 "ILP.c" 3 4
                                        stderr
-# 669 "ILP.c"
+# 711 "ILP.c"
                                              , "Failed to get variable index.\n");
                                 exit(1);
                             }
@@ -7618,17 +7662,19 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
                         }
                     }
 
-                    if (num_j_prime_prime > 0) {
+                    if (num_j_prime_prime > 0)
+                    {
                         char x_name_j[32], x_name_j_prime[32];
                         snprintf(x_name_j, sizeof(x_name_j), "x_%d_%d", i, j);
                         snprintf(x_name_j_prime, sizeof(x_name_j_prime), "x_%d_%d", i, j_prime);
 
                         int x_index_j, x_index_j_prime;
-                        if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime)) {
+                        if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime))
+                        {
                             fprintf(
-# 685 "ILP.c" 3 4
+# 729 "ILP.c" 3 4
                                    stderr
-# 685 "ILP.c"
+# 729 "ILP.c"
                                          , "Failed to get variable index.\n");
                             exit(1);
                         }
@@ -7641,7 +7687,8 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
                         matval[0] = -1.0;
                         matval[1] = -1.0;
 
-                        for (int t = 0; t < num_j_prime_prime; t++) {
+                        for (int t = 0; t < num_j_prime_prime; t++)
+                        {
                             matind[t + 2] = x_index_j_prime_prime[t];
                             matval[t + 2] = matval_j_prime_prime[t];
                         }
@@ -7651,18 +7698,19 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
                         sense[0] = 'G';
 
                         if (CPXaddrows(env, lp, 0, 1, num_j_prime_prime + 2, rhs, sense, matbeg, matind, matval, 
-# 706 "ILP.c" 3 4
+# 751 "ILP.c" 3 4
                                                                                                                 ((void *)0)
-# 706 "ILP.c"
+# 751 "ILP.c"
                                                                                                                     , 
-# 706 "ILP.c" 3 4
+# 751 "ILP.c" 3 4
                                                                                                                       ((void *)0)
-# 706 "ILP.c"
-                                                                                                                          )) {
+# 751 "ILP.c"
+                                                                                                                          ))
+                        {
                             fprintf(
-# 707 "ILP.c" 3 4
+# 753 "ILP.c" 3 4
                                    stderr
-# 707 "ILP.c"
+# 753 "ILP.c"
                                          , "Failed to add constraint.\n");
                             exit(1);
                         }
@@ -7673,24 +7721,27 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
     }
 }
 
-void parse_var_name(char* var_name, int* cluster_id, int* unit_id) {
+void parse_var_name(char *var_name, int *cluster_id, int *unit_id)
+{
 
     int status = sscanf(var_name, "x_%d_%d", cluster_id, unit_id);
 
 
-    if (status != 2) {
+    if (status != 2)
+    {
         fprintf(
-# 723 "ILP.c" 3 4
+# 771 "ILP.c" 3 4
                stderr
-# 723 "ILP.c"
+# 771 "ILP.c"
                      , "Failed to parse variable name: %s\n", var_name);
         exit(1);
     }
 }
 
-Cluster** create_initial_clusters(TU **units, int k, int n) {
+Cluster **create_initial_clusters(TU **units, int k, int n)
+{
     Cluster *clusters = malloc(k * sizeof(Cluster));
-    for (int j = 0; j< k; j++)
+    for (int j = 0; j < k; j++)
     {
         clusters[j].units = malloc(n * sizeof(TU *));
         clusters[j].size = 0;
@@ -7698,9 +7749,10 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
     int t = 0;
     int cluster_id = 0;
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
 
-        TU* unit = units[i];
+        TU *unit = units[i];
 
 
 
@@ -7711,33 +7763,37 @@ Cluster** create_initial_clusters(TU **units, int k, int n) {
 
         clusters[cluster_id].size++;
 
-
-
     }
 
     return clusters;
 }
-# 780 "ILP.c"
-void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int max_population) {
-    for (int c = 0; c < num_clusters; c++) {
-        Cluster* cluster = &clusters[c];
+# 827 "ILP.c"
+void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population)
+{
+    for (int c = 0; c < num_clusters; c++)
+    {
+        Cluster *cluster = &clusters[c];
         int cluster_population = 0;
-        for (int i = 0; i < cluster->size; i++) {
+        for (int i = 0; i < cluster->size; i++)
+        {
             cluster_population += cluster->units[i]->voters;
         }
 
-        if (cluster_population <= max_population) {
-            for (int i = 0; i < cluster->size; i++) {
-                TU* unit = cluster->units[i];
+        if (cluster_population <= max_population)
+        {
+            for (int i = 0; i < cluster->size; i++)
+            {
+                TU *unit = cluster->units[i];
                 char var_name[32];
                 sprintf(var_name, "x_%d_%d", c, unit->unit_id);
                 int idx;
                 int status = CPXgetcolindex(env, lp, var_name, &idx);
-                if (status) {
+                if (status)
+                {
                     fprintf(
-# 796 "ILP.c" 3 4
+# 849 "ILP.c" 3 4
                            stderr
-# 796 "ILP.c"
+# 849 "ILP.c"
                                  , "Failed to get index for variable %s.\n", var_name);
                     exit(1);
                 }
@@ -7751,19 +7807,20 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
                 double rmatval[1] = {1.0};
 
                 status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, 
-# 808 "ILP.c" 3 4
+# 861 "ILP.c" 3 4
                                                                                             ((void *)0)
-# 808 "ILP.c"
+# 861 "ILP.c"
                                                                                                 , 
-# 808 "ILP.c" 3 4
+# 861 "ILP.c" 3 4
                                                                                                   ((void *)0)
-# 808 "ILP.c"
+# 861 "ILP.c"
                                                                                                       );
-                if (status) {
+                if (status)
+                {
                     fprintf(
-# 810 "ILP.c" 3 4
+# 864 "ILP.c" 3 4
                            stderr
-# 810 "ILP.c"
+# 864 "ILP.c"
                                  , "Failed to add fixed cluster constraint for unit %d.\n", i);
                     exit(1);
                 }
@@ -7771,48 +7828,51 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
         }
     }
 }
-# 825 "ILP.c"
-Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters)
+
+
+
+
+Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *clusters)
 {
     CPXENVptr env = 
-# 827 "ILP.c" 3 4
+# 877 "ILP.c" 3 4
                    ((void *)0)
-# 827 "ILP.c"
+# 877 "ILP.c"
                        ;
     CPXLPptr lp = 
-# 828 "ILP.c" 3 4
+# 878 "ILP.c" 3 4
                  ((void *)0)
-# 828 "ILP.c"
+# 878 "ILP.c"
                      ;
     int status;
     double start_time, end_time;
 
     env = CPXopenCPLEX(&status);
     if (env == 
-# 833 "ILP.c" 3 4
+# 883 "ILP.c" 3 4
               ((void *)0)
-# 833 "ILP.c"
+# 883 "ILP.c"
                   )
     {
         fprintf(
-# 835 "ILP.c" 3 4
+# 885 "ILP.c" 3 4
                stderr
-# 835 "ILP.c"
+# 885 "ILP.c"
                      , "Could not open CPLEX environment.\n");
         exit(1);
     }
 
     lp = CPXcreateprob(env, &status, "districting");
     if (lp == 
-# 840 "ILP.c" 3 4
+# 890 "ILP.c" 3 4
              ((void *)0)
-# 840 "ILP.c"
+# 890 "ILP.c"
                  )
     {
         fprintf(
-# 842 "ILP.c" 3 4
+# 892 "ILP.c" 3 4
                stderr
-# 842 "ILP.c"
+# 892 "ILP.c"
                      , "Could not create LP problem.\n");
         exit(1);
     }
@@ -7820,13 +7880,14 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 *4;
+    double time_limit = 60.0 * 4;
     status = CPXsetdblparam(env, 1039, time_limit);
-    if (status) {
+    if (status)
+    {
         fprintf(
-# 852 "ILP.c" 3 4
+# 903 "ILP.c" 3 4
                stderr
-# 852 "ILP.c"
+# 903 "ILP.c"
                      , "Failed to set time limit parameter.\n");
         exit(1);
     }
@@ -7858,24 +7919,25 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 882 "ILP.c" 3 4
+# 933 "ILP.c" 3 4
                stderr
-# 882 "ILP.c"
+# 933 "ILP.c"
                      , "Failed to optimize the ILP problem.\n");
 
     }
 
     status = CPXwriteprob(env, lp, "model.lp", 
-# 886 "ILP.c" 3 4
+# 937 "ILP.c" 3 4
                                               ((void *)0)
-# 886 "ILP.c"
+# 937 "ILP.c"
                                                   );
 
-    if (status) {
+    if (status)
+    {
         fprintf(
-# 889 "ILP.c" 3 4
+# 941 "ILP.c" 3 4
                stderr
-# 889 "ILP.c"
+# 941 "ILP.c"
                      , "Failed to write problem to file.\n");
 
     }
@@ -7893,17 +7955,16 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 905 "ILP.c" 3 4
+# 957 "ILP.c" 3 4
                stderr
-# 905 "ILP.c"
+# 957 "ILP.c"
                      , "Failed to get objective value.\n");
 
     }
     printf("Objective value: %.2f\n", objval);
 
-    if(solstat != 101)
+    if (solstat == 103 || solstat == 108)
         return clusters;
-
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
 
@@ -7911,9 +7972,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status)
     {
         fprintf(
-# 919 "ILP.c" 3 4
+# 970 "ILP.c" 3 4
                stderr
-# 919 "ILP.c"
+# 970 "ILP.c"
                      , "Failed to get optimal solution.\n");
 
     }
@@ -7923,16 +7984,15 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
 
 
-
     int *cluster_unit_counts = calloc(k, sizeof(int));
     
-# 930 "ILP.c" 3 4
+# 980 "ILP.c" 3 4
    _Bool 
-# 930 "ILP.c"
+# 980 "ILP.c"
         *processed_clusters = calloc(k, sizeof(
-# 930 "ILP.c" 3 4
+# 980 "ILP.c" 3 4
                                                _Bool
-# 930 "ILP.c"
+# 980 "ILP.c"
                                                    ));
 
     for (int i = 0; i < num_vars; i++)
@@ -7949,36 +8009,39 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
 
 
 
-        TU* unit= units[unit_id];
+        TU *unit = units[unit_id];
 
 
-        if (solution[i] >= 0.5) {
-                unit->assigned = 
-# 950 "ILP.c" 3 4
-                                1
-# 950 "ILP.c"
-                                    ;
-                unit->cluster_id = cluster_id;
+        if (solution[i] >= 0.5)
+        {
+            unit->assigned = 
+# 1001 "ILP.c" 3 4
+                            1
+# 1001 "ILP.c"
+                                ;
+            unit->cluster_id = cluster_id;
 
-        } else {
-                unit->assigned = 
-# 954 "ILP.c" 3 4
-                                0
-# 954 "ILP.c"
-                                     ;
+        }
+        else
+        {
+            unit->assigned = 
+# 1007 "ILP.c" 3 4
+                            0
+# 1007 "ILP.c"
+                                 ;
         }
         unit->assigned = solution[i] >= 0.5 ? 
-# 956 "ILP.c" 3 4
+# 1009 "ILP.c" 3 4
                                              1 
-# 956 "ILP.c"
+# 1009 "ILP.c"
                                                   : 
-# 956 "ILP.c" 3 4
+# 1009 "ILP.c" 3 4
                                                     0
-# 956 "ILP.c"
+# 1009 "ILP.c"
                                                          ;
 
-
-        if (unit->assigned) {
+        if (unit->assigned)
+        {
 
 
 
@@ -7986,33 +8049,33 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
             unit->unit_id = unit_id;
             cluster_unit_counts[cluster_id]++;
             processed_clusters[cluster_id] = 
-# 966 "ILP.c" 3 4
+# 1019 "ILP.c" 3 4
                                             1
-# 966 "ILP.c"
+# 1019 "ILP.c"
                                                 ;
-
-
         }
         units[i] = unit;
-        for (int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++)
+        {
 
-        if (processed_clusters[i] && (cluster_unit_counts[i] == 0 )) {
+            if (processed_clusters[i] && (cluster_unit_counts[i] == 0))
+            {
 
-            fprintf(
-# 975 "ILP.c" 3 4
-                   stderr
-# 975 "ILP.c"
-                         , "Cluster %d is empty or invalid.\n", i);
-            return clusters;
+                fprintf(
+# 1028 "ILP.c" 3 4
+                       stderr
+# 1028 "ILP.c"
+                             , "Cluster %d is empty or invalid.\n", i);
+                return clusters;
+            }
         }
-}
 
         if (status)
         {
             fprintf(
-# 982 "ILP.c" 3 4
+# 1035 "ILP.c" 3 4
                    stderr
-# 982 "ILP.c"
+# 1035 "ILP.c"
                          , "Failed to get variable name for column %d.\n", i);
 
         }
@@ -8034,9 +8097,9 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status != 0)
     {
         fprintf(
-# 1002 "ILP.c" 3 4
+# 1055 "ILP.c" 3 4
                stderr
-# 1002 "ILP.c"
+# 1055 "ILP.c"
                      , "Failed to free the problem.\n");
         exit(1);
     }
@@ -8044,12 +8107,224 @@ Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* cluste
     if (status != 0)
     {
         fprintf(
-# 1008 "ILP.c" 3 4
+# 1061 "ILP.c" 3 4
                stderr
-# 1008 "ILP.c"
+# 1061 "ILP.c"
                      , "Failed to close CPLEX environment.\n");
         exit(1);
     }
 
     return clusters;
+}
+
+void runILP_only(TU **units, int k, int n, int m, int ideal_pop)
+{
+    CPXENVptr env = 
+# 1070 "ILP.c" 3 4
+                   ((void *)0)
+# 1070 "ILP.c"
+                       ;
+    CPXLPptr lp = 
+# 1071 "ILP.c" 3 4
+                 ((void *)0)
+# 1071 "ILP.c"
+                     ;
+    int status;
+    double start_time, end_time;
+
+    env = CPXopenCPLEX(&status);
+    if (env == 
+# 1076 "ILP.c" 3 4
+              ((void *)0)
+# 1076 "ILP.c"
+                  )
+    {
+        fprintf(
+# 1078 "ILP.c" 3 4
+               stderr
+# 1078 "ILP.c"
+                     , "Could not open CPLEX environment.\n");
+        exit(1);
+    }
+
+    lp = CPXcreateprob(env, &status, "districting");
+    if (lp == 
+# 1083 "ILP.c" 3 4
+             ((void *)0)
+# 1083 "ILP.c"
+                 )
+    {
+        fprintf(
+# 1085 "ILP.c" 3 4
+               stderr
+# 1085 "ILP.c"
+                     , "Could not create LP problem.\n");
+        exit(1);
+    }
+    CPXgettime(env, &start_time);
+
+    int adjMatrix[n][n];
+    int distMatrix[n][n];
+    double time_limit = 60.0 * 60.0 * 5.0;
+    status = CPXsetdblparam(env, 1039, time_limit);
+    if (status)
+    {
+        fprintf(
+# 1096 "ILP.c" 3 4
+               stderr
+# 1096 "ILP.c"
+                     , "Failed to set time limit parameter.\n");
+        exit(1);
+    }
+
+    create_code_index(units, n);
+    create_neighbor_index(units, n);
+    int num_vars = create_decision_variables(units, k, n, env, lp);
+
+
+    create_c_variables(units, n, k, env, lp);
+
+    init_adjMatrix(units, n, adjMatrix);
+    floydWarshall(n, adjMatrix, distMatrix);
+
+
+
+
+    add_basic_constraints(env, lp, n, k);
+    add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
+
+
+    add_population_constraints(units, n, k, env, lp, ideal_pop);
+
+    add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
+    add_c_constraints(units, n, k, env, lp);
+    add_objective_function(units, n, k, env, lp);
+
+    status = CPXmipopt(env, lp);
+    if (status)
+    {
+        fprintf(
+# 1126 "ILP.c" 3 4
+               stderr
+# 1126 "ILP.c"
+                     , "Failed to optimize the ILP problem.\n");
+
+    }
+
+    status = CPXwriteprob(env, lp, "model.lp", 
+# 1130 "ILP.c" 3 4
+                                              ((void *)0)
+# 1130 "ILP.c"
+                                                  );
+
+    if (status)
+    {
+        fprintf(
+# 1134 "ILP.c" 3 4
+               stderr
+# 1134 "ILP.c"
+                     , "Failed to write problem to file.\n");
+
+    }
+
+    int solstat = CPXgetstat(env, lp);
+    printf("Solution status: %d\n", solstat);
+
+    double objval;
+    status = CPXgetobjval(env, lp, &objval);
+
+    char statstring[1024];
+    CPXgetstatstring(env, solstat, statstring);
+    printf("%s\n", statstring);
+
+    if (status)
+    {
+        fprintf(
+# 1150 "ILP.c" 3 4
+               stderr
+# 1150 "ILP.c"
+                     , "Failed to get objective value.\n");
+
+    }
+    printf("Objective value: %.2f\n", objval);
+
+    double *solution = (double *)malloc(num_vars * sizeof(double));
+
+    status = CPXgetx(env, lp, solution, 0, num_vars - 1);
+    if (status)
+    {
+        fprintf(
+# 1160 "ILP.c" 3 4
+               stderr
+# 1160 "ILP.c"
+                     , "Failed to get optimal solution.\n");
+
+    }
+
+
+
+
+
+
+    int *cluster_unit_counts = calloc(k, sizeof(int));
+    
+# 1170 "ILP.c" 3 4
+   _Bool 
+# 1170 "ILP.c"
+        *processed_clusters = calloc(k, sizeof(
+# 1170 "ILP.c" 3 4
+                                               _Bool
+# 1170 "ILP.c"
+                                                   ));
+
+    for (int i = 0; i < num_vars; i++)
+    {
+
+        char var_name[32];
+        int storespace = 32;
+        char **colname = (char **)malloc(sizeof(char *));
+        char *namestore = (char *)malloc(storespace * sizeof(char));
+        int surplus;
+        status = CPXgetcolname(env, lp, colname, namestore, storespace, &surplus, i, i);
+        int cluster_id, unit_id;
+        parse_var_name(*colname, &cluster_id, &unit_id);
+
+
+
+
+    }
+
+
+
+
+
+free(solution);
+
+status = CPXmipopt(env, lp);
+CPXgettime(env, &end_time);
+
+double time_taken = end_time - start_time;
+printf("Time taken: %f seconds\n", time_taken);
+status = CPXfreeprob(env, &lp);
+if (status != 0)
+{
+    fprintf(
+# 1203 "ILP.c" 3 4
+           stderr
+# 1203 "ILP.c"
+                 , "Failed to free the problem.\n");
+    exit(1);
+}
+status = CPXcloseCPLEX(&env);
+if (status != 0)
+{
+    fprintf(
+# 1209 "ILP.c" 3 4
+           stderr
+# 1209 "ILP.c"
+                 , "Failed to close CPLEX environment.\n");
+    exit(1);
+}
+
+return;
 }

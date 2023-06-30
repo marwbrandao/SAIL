@@ -3896,17 +3896,17 @@ runILP:
 1:	call	*mcount@GOTPCREL(%rip)
 	movl	%r8d, -1160(%rbp)
 	movq	%rdi, %r12
-	movl	%esi, %r13d
-	movl	%edx, %r14d
-	movq	%r9, -1168(%rbp)
+	movl	%esi, %ebx
+	movl	%edx, %r13d
+	movq	%r9, -1176(%rbp)
 	movq	%fs:40, %rax
 	movq	%rax, -56(%rbp)
 	xorl	%eax, %eax
 	lock addq	$1, __gcov0.runILP(%rip)
-	leaq	-1140(%rbp), %r15
+	leaq	-1140(%rbp), %r14
 	movq	$0, -1128(%rbp)
 	movq	$0, -1120(%rbp)
-	movq	%r15, %rdi
+	movq	%r14, %rdi
 	call	CPXopenCPLEX@PLT
 	movq	%rax, %rdi
 	lock addq	$1, 8+__gcov0.runILP(%rip)
@@ -3914,26 +3914,26 @@ runILP:
 	testq	%rax, %rax
 	je	.L469
 	leaq	.LC36(%rip), %rdx
-	movq	%r15, %rsi
+	movq	%r14, %rsi
 	call	CPXcreateprob@PLT
-	lock addq	$1, 32+__gcov0.runILP(%rip)
 	movq	%rax, -1120(%rbp)
 	testq	%rax, %rax
 	je	.L470
+	lock addq	$1, 40+__gcov0.runILP(%rip)
 	movq	-1128(%rbp), %rdi
 	leaq	-1112(%rbp), %rsi
 	call	CPXgettime@PLT
 	lock addq	$1, 56+__gcov0.runILP(%rip)
-	movslq	%r14d, %rax
-	movq	%rsp, %rbx
+	movslq	%r13d, %rax
+	movq	%rsp, %rsi
 	imulq	%rax, %rax
 	leaq	15(,%rax,4), %rax
 	movq	%rax, %rcx
 	movq	%rax, %rdx
 	andq	$-4096, %rcx
 	andq	$-16, %rdx
-	subq	%rcx, %rbx
-	movq	%rbx, %rcx
+	subq	%rcx, %rsi
+	movq	%rsi, %rcx
 	cmpq	%rcx, %rsp
 	je	.L411
 .L471:
@@ -3950,7 +3950,7 @@ runILP:
 	movq	%rax, %rdx
 	movq	%rsp, %rsi
 	andq	$-4096, %rax
-	movq	%rsp, %rbx
+	movq	%rsp, %r14
 	subq	%rax, %rsi
 	andq	$-16, %rdx
 	movq	%rsi, %rax
@@ -3975,9 +3975,9 @@ runILP:
 	movl	%eax, -1140(%rbp)
 	testl	%eax, %eax
 	jne	.L416
-	leal	-1(%r14), %ecx
+	leal	-1(%r13), %ecx
 	xorl	%eax, %eax
-	testl	%r14d, %r14d
+	testl	%r13d, %r13d
 	jle	.L421
 	.p2align 4,,10
 	.p2align 3
@@ -3991,74 +3991,74 @@ runILP:
 	jne	.L420
 .L421:
 	lock addq	$1, 88+__gcov0.runILP(%rip)
-	movl	%r14d, %esi
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	create_neighbor_index
 	lock addq	$1, 96+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %r8
 	movq	-1128(%rbp), %rcx
-	movl	%r14d, %edx
-	movl	%r13d, %esi
+	movl	%r13d, %edx
+	movl	%ebx, %esi
 	movq	%r12, %rdi
 	call	create_decision_variables
-	movl	%eax, -1176(%rbp)
+	movl	%eax, -1168(%rbp)
 	lock addq	$1, 104+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %r8
 	movq	-1128(%rbp), %rcx
-	movl	%r13d, %edx
-	movl	%r14d, %esi
+	movl	%ebx, %edx
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	create_c_variables
 	lock addq	$1, 112+__gcov0.runILP(%rip)
-	movq	%rbx, %rdx
-	movl	%r14d, %esi
+	movq	%r14, %rdx
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	init_adjMatrix
 	lock addq	$1, 120+__gcov0.runILP(%rip)
 	movq	%r15, %rdx
-	movq	%rbx, %rsi
-	movl	%r14d, %edi
+	movq	%r14, %rsi
+	movl	%r13d, %edi
 	call	floydWarshall
 	lock addq	$1, 128+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %rsi
 	movq	-1128(%rbp), %rdi
-	movl	%r13d, %ecx
-	movl	%r14d, %edx
+	movl	%ebx, %ecx
+	movl	%r13d, %edx
 	call	add_basic_constraints
 	lock addq	$1, 136+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %rsi
 	movq	-1128(%rbp), %rdi
-	movl	%r13d, %ecx
-	movl	%r14d, %edx
+	movl	%ebx, %ecx
+	movl	%r13d, %edx
 	call	add_at_least_one_unit_per_cluster_constraints
 	lock addq	$1, 144+__gcov0.runILP(%rip)
 	movl	-1160(%rbp), %r9d
 	movq	-1120(%rbp), %r8
 	movq	-1128(%rbp), %rcx
-	movl	%r13d, %edx
-	movl	%r14d, %esi
+	movl	%ebx, %edx
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	add_population_constraints
 	lock addq	$1, 152+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %r9
 	movq	-1128(%rbp), %r8
 	movq	%r15, %rcx
-	movl	%r14d, %edx
-	movl	%r13d, %esi
+	movl	%r13d, %edx
+	movl	%ebx, %esi
 	movq	%r12, %rdi
 	call	add_contiguity_constraints2
 	lock addq	$1, 160+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %r8
 	movq	-1128(%rbp), %rcx
-	movl	%r13d, %edx
-	movl	%r14d, %esi
+	movl	%ebx, %edx
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	add_c_constraints
 	lock addq	$1, 168+__gcov0.runILP(%rip)
 	movq	-1120(%rbp), %r8
 	movq	-1128(%rbp), %rcx
-	movl	%r13d, %edx
-	movl	%r14d, %esi
+	movl	%ebx, %edx
+	movl	%r13d, %esi
 	movq	%r12, %rdi
 	call	add_objective_function
 	lock addq	$1, 176+__gcov0.runILP(%rip)
@@ -4083,7 +4083,7 @@ runILP:
 	movq	-1120(%rbp), %rsi
 	movq	-1128(%rbp), %rdi
 	call	CPXgetstat@PLT
-	movl	%eax, %ebx
+	movl	%eax, %r15d
 	lock addq	$1, 232+__gcov0.runILP(%rip)
 	leaq	.LC43(%rip), %rsi
 	movl	$1, %edi
@@ -4097,16 +4097,16 @@ runILP:
 	call	CPXgetobjval@PLT
 	lock addq	$1, 248+__gcov0.runILP(%rip)
 	movq	-1128(%rbp), %rdi
-	leaq	-1088(%rbp), %r15
-	movl	%ebx, %esi
+	leaq	-1088(%rbp), %r14
+	movl	%r15d, %esi
 	movl	%eax, -1140(%rbp)
-	movq	%r15, %rdx
+	movq	%r14, %rdx
 	call	CPXgetstatstring@PLT
 	lock addq	$1, 256+__gcov0.runILP(%rip)
 	leaq	.LC44(%rip), %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
-	movq	%r15, %rdx
+	movq	%r14, %rdx
 	call	__printf_chk@PLT
 	lock addq	$1, 264+__gcov0.runILP(%rip)
 	movl	-1140(%rbp), %r8d
@@ -4119,78 +4119,46 @@ runILP:
 	leaq	.LC46(%rip), %rsi
 	call	__printf_chk@PLT
 	lock addq	$1, 288+__gcov0.runILP(%rip)
-	cmpl	$101, %ebx
-	je	.L478
-.L424:
-	movq	-56(%rbp), %rax
-	xorq	%fs:40, %rax
-	jne	.L479
-	movq	-1168(%rbp), %rax
-	leaq	-40(%rbp), %rsp
-	popq	%rbx
-	popq	%r12
-	popq	%r13
-	popq	%r14
-	popq	%r15
-	popq	%rbp
-	.cfi_remember_state
-	.cfi_def_cfa 7, 8
-	ret
-	.p2align 4,,10
-	.p2align 3
-.L472:
-	.cfi_restore_state
-	orq	$0, -8(%rsp,%rdx)
-	jmp	.L412
-	.p2align 4,,10
-	.p2align 3
-.L475:
-	lock addq	$1, 192+__gcov0.runILP(%rip)
-	movq	stderr(%rip), %rdi
-	leaq	.LC40(%rip), %rdx
-	xorl	%eax, %eax
-	movl	$1, %esi
-	call	__fprintf_chk@PLT
-	lock addq	$1, 200+__gcov0.runILP(%rip)
-	jmp	.L419
-	.p2align 4,,10
-	.p2align 3
-.L478:
+	cmpl	$103, %r15d
+	je	.L424
+	cmpl	$108, %r15d
+	je	.L424
 	lock addq	$1, 296+__gcov0.runILP(%rip)
-	movslq	-1176(%rbp), %rdi
-	movq	%rdi, %rbx
+	movslq	-1168(%rbp), %rdi
+	movq	%rdi, %r14
 	salq	$3, %rdi
-	subl	$1, %ebx
 	call	malloc@PLT
+	leal	-1(%r14), %edi
 	movq	-1120(%rbp), %rsi
-	movq	-1128(%rbp), %rdi
 	xorl	%ecx, %ecx
-	movl	%ebx, %r8d
+	movl	%edi, -1192(%rbp)
+	movl	%edi, %r8d
 	movq	%rax, %rdx
+	movq	-1128(%rbp), %rdi
 	movq	%rax, -1184(%rbp)
 	call	CPXgetx@PLT
 	lock addq	$1, 304+__gcov0.runILP(%rip)
 	movl	%eax, -1140(%rbp)
 	testl	%eax, %eax
-	jne	.L480
+	jne	.L478
 .L425:
-	movslq	%r13d, %rax
+	movslq	%ebx, %r14
 	movl	$4, %esi
-	movq	%rax, %r15
-	movq	%rax, %rdi
+	movq	%r14, %rdi
 	call	calloc@PLT
-	movq	%r15, %rdi
+	movq	%r14, %rdi
 	movl	$1, %esi
 	movq	%rax, -1160(%rbp)
 	call	calloc@PLT
-	movl	-1176(%rbp), %edi
+	movl	-1168(%rbp), %edi
 	movq	-1160(%rbp), %r11
 	movq	%rax, %r15
 	testl	%edi, %edi
-	jle	.L481
-	movl	%ebx, %eax
-	movl	%r13d, -1196(%rbp)
-	xorl	%ebx, %ebx
+	jle	.L479
+	movl	-1192(%rbp), %eax
+	movq	%r12, -1160(%rbp)
+	xorl	%r14d, %r14d
+	movl	%r13d, -1228(%rbp)
 	movq	%rax, -1224(%rbp)
 	leaq	-1104(%rbp), %rax
 	movq	%rax, -1192(%rbp)
@@ -4198,48 +4166,47 @@ runILP:
 	movq	%rax, -1208(%rbp)
 	leaq	-1132(%rbp), %rax
 	movq	%rax, -1216(%rbp)
-	movl	%r14d, -1228(%rbp)
-	movq	%r12, -1160(%rbp)
-	movq	%r11, %r12
+	movl	%ebx, -1196(%rbp)
+	movq	%r11, %rbx
 .L441:
 	movl	$8, %edi
-	movl	%ebx, -1200(%rbp)
+	movl	%r14d, -1200(%rbp)
 	call	malloc@PLT
 	movl	$32, %edi
-	movq	%rax, %r14
-	call	malloc@PLT
-	pushq	%rbx
-	movq	-1208(%rbp), %r9
-	movq	%r14, %rdx
-	pushq	%rbx
-	movq	-1120(%rbp), %rsi
-	movq	%rax, %rcx
 	movq	%rax, %r13
-	movq	-1128(%rbp), %rdi
+	call	malloc@PLT
+	pushq	%r14
 	movl	$32, %r8d
+	movq	%r13, %rdx
+	pushq	%r14
+	movq	-1208(%rbp), %r9
+	movq	%rax, %rcx
+	movq	%rax, %r12
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
 	call	CPXgetcolname@PLT
 	lock addq	$1, 328+__gcov0.runILP(%rip)
 	leaq	.LC2(%rip), %rsi
-	movq	(%r14), %r8
+	movq	0(%r13), %r8
 	movq	-1192(%rbp), %rcx
 	movq	-1216(%rbp), %rdx
 	movq	%r8, %rdi
 	movl	%eax, -1140(%rbp)
 	xorl	%eax, %eax
-	movq	%r8, -1176(%rbp)
+	movq	%r8, -1168(%rbp)
 	call	__isoc99_sscanf@PLT
 	popq	%rcx
-	movq	-1176(%rbp), %r8
+	movq	-1168(%rbp), %r8
 	cmpl	$2, %eax
 	popq	%rsi
-	jne	.L482
+	jne	.L480
 	lock addq	$1, 8+__gcov0.parse_var_name(%rip)
 	movslq	-1104(%rbp), %rax
 	movq	-1160(%rbp), %rsi
 	movq	%rax, %rcx
 	movq	(%rsi,%rax,8), %rax
 	movq	-1184(%rbp), %rsi
-	movsd	(%rsi,%rbx,8), %xmm0
+	movsd	(%rsi,%r14,8), %xmm0
 	comisd	.LC50(%rip), %xmm0
 	jb	.L464
 	movl	-1132(%rbp), %edx
@@ -4248,14 +4215,14 @@ runILP:
 	movb	$1, 32(%rax)
 	lock addq	$1, 344+__gcov0.runILP(%rip)
 	movslq	-1132(%rbp), %rdx
-	addl	$1, (%r12,%rdx,4)
+	addl	$1, (%rbx,%rdx,4)
 	movl	%edx, 36(%rax)
 	movl	%ecx, 44(%rax)
 	movb	$1, (%r15,%rdx)
 .L432:
 	movq	-1160(%rbp), %rsi
 	xorl	%ecx, %ecx
-	movq	%rax, (%rsi,%rbx,8)
+	movq	%rax, (%rsi,%r14,8)
 	movl	-1196(%rbp), %eax
 	leal	-1(%rax), %edx
 	testl	%eax, %eax
@@ -4269,9 +4236,9 @@ runILP:
 	cmpb	$0, (%r15,%rcx)
 	je	.L436
 	lock addq	$1, 352+__gcov0.runILP(%rip)
-	movl	(%r12,%rcx,4), %eax
+	movl	(%rbx,%rcx,4), %eax
 	testl	%eax, %eax
-	je	.L483
+	je	.L481
 .L436:
 	lock addq	$1, 376+__gcov0.runILP(%rip)
 	leaq	1(%rcx), %rax
@@ -4281,22 +4248,62 @@ runILP:
 	lock addq	$1, 384+__gcov0.runILP(%rip)
 	movl	-1140(%rbp), %edx
 	testl	%edx, %edx
-	jne	.L484
+	jne	.L482
 .L465:
-	movq	%r14, %rdi
-	call	free@PLT
 	movq	%r13, %rdi
 	call	free@PLT
-	leaq	1(%rbx), %rax
-	cmpq	-1224(%rbp), %rbx
+	movq	%r12, %rdi
+	call	free@PLT
+	leaq	1(%r14), %rax
+	cmpq	-1224(%rbp), %r14
 	je	.L468
-	movq	%rax, %rbx
+	movq	%rax, %r14
 	jmp	.L441
+.L472:
+	orq	$0, -8(%rsp,%rdx)
+	jmp	.L412
+	.p2align 4,,10
+	.p2align 3
+.L481:
+	lock addq	$1, 360+__gcov0.runILP(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC51(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 368+__gcov0.runILP(%rip)
+.L424:
+	movq	-56(%rbp), %rax
+	xorq	%fs:40, %rax
+	jne	.L483
+	movq	-1176(%rbp), %rax
+	leaq	-40(%rbp), %rsp
+	popq	%rbx
+	popq	%r12
+	popq	%r13
+	popq	%r14
+	popq	%r15
+	popq	%rbp
+	.cfi_remember_state
+	.cfi_def_cfa 7, 8
+	ret
 	.p2align 4,,10
 	.p2align 3
 .L464:
+	.cfi_restore_state
 	movb	$0, 32(%rax)
 	jmp	.L432
+	.p2align 4,,10
+	.p2align 3
+.L475:
+	lock addq	$1, 192+__gcov0.runILP(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC40(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 200+__gcov0.runILP(%rip)
+	jmp	.L419
 	.p2align 4,,10
 	.p2align 3
 .L477:
@@ -4321,18 +4328,7 @@ runILP:
 	jmp	.L422
 	.p2align 4,,10
 	.p2align 3
-.L483:
-	lock addq	$1, 360+__gcov0.runILP(%rip)
-	movq	stderr(%rip), %rdi
-	leaq	.LC51(%rip), %rdx
-	xorl	%eax, %eax
-	movl	$1, %esi
-	call	__fprintf_chk@PLT
-	lock addq	$1, 368+__gcov0.runILP(%rip)
-	jmp	.L424
-	.p2align 4,,10
-	.p2align 3
-.L484:
+.L482:
 	lock addq	$1, 392+__gcov0.runILP(%rip)
 	movq	stderr(%rip), %rdi
 	leaq	.LC52(%rip), %rdx
@@ -4344,7 +4340,7 @@ runILP:
 	jmp	.L465
 	.p2align 4,,10
 	.p2align 3
-.L480:
+.L478:
 	lock addq	$1, 312+__gcov0.runILP(%rip)
 	movq	stderr(%rip), %rdi
 	leaq	.LC47(%rip), %rdx
@@ -4358,17 +4354,17 @@ runILP:
 	jmp	.L415
 .L468:
 	movq	-1160(%rbp), %r12
-	movl	-1196(%rbp), %r13d
-	movl	-1228(%rbp), %r14d
+	movl	-1196(%rbp), %ebx
+	movl	-1228(%rbp), %r13d
 .L440:
 	lock addq	$1, 408+__gcov0.runILP(%rip)
 	movq	-1184(%rbp), %rdi
 	call	free@PLT
-	movl	%r14d, %edx
-	movl	%r13d, %esi
+	movl	%r13d, %edx
+	movl	%ebx, %esi
 	movq	%r12, %rdi
 	call	create_initial_clusters
-	movq	%rax, -1168(%rbp)
+	movq	%rax, -1176(%rbp)
 	lock addq	$1, 416+__gcov0.runILP(%rip)
 	leaq	.LC48(%rip), %rsi
 	movl	$1, %edi
@@ -4397,7 +4393,7 @@ runILP:
 	call	CPXfreeprob@PLT
 	movl	%eax, -1140(%rbp)
 	testl	%eax, %eax
-	jne	.L485
+	jne	.L484
 	lock addq	$1, 464+__gcov0.runILP(%rip)
 	leaq	-1128(%rbp), %rdi
 	call	CPXcloseCPLEX@PLT
@@ -4416,19 +4412,10 @@ runILP:
 	call	exit@PLT
 	.p2align 4,,10
 	.p2align 3
-.L481:
+.L479:
 	leaq	-1104(%rbp), %rax
 	movq	%rax, -1192(%rbp)
 	jmp	.L440
-.L470:
-	lock addq	$1, 40+__gcov0.runILP(%rip)
-	movq	stderr(%rip), %rdi
-	movl	$1, %esi
-	leaq	.LC37(%rip), %rdx
-	call	__fprintf_chk@PLT
-	lock addq	$1, 48+__gcov0.runILP(%rip)
-	movl	$1, %edi
-	call	exit@PLT
 .L469:
 	lock addq	$1, 16+__gcov0.runILP(%rip)
 	movq	stderr(%rip), %rdi
@@ -4439,19 +4426,18 @@ runILP:
 	lock addq	$1, 24+__gcov0.runILP(%rip)
 	movl	$1, %edi
 	call	exit@PLT
-.L479:
+.L483:
 	call	__stack_chk_fail@PLT
-.L416:
-	lock addq	$1, 64+__gcov0.runILP(%rip)
+.L470:
+	lock addq	$1, 32+__gcov0.runILP(%rip)
 	movq	stderr(%rip), %rdi
-	leaq	.LC39(%rip), %rdx
-	xorl	%eax, %eax
 	movl	$1, %esi
+	leaq	.LC37(%rip), %rdx
 	call	__fprintf_chk@PLT
-	lock addq	$1, 72+__gcov0.runILP(%rip)
+	lock addq	$1, 48+__gcov0.runILP(%rip)
 	movl	$1, %edi
 	call	exit@PLT
-.L482:
+.L480:
 	lock addq	$1, __gcov0.parse_var_name(%rip)
 	movq	stderr(%rip), %rdi
 	leaq	.LC32(%rip), %rdx
@@ -4462,7 +4448,17 @@ runILP:
 	lock addq	$1, 16+__gcov0.parse_var_name(%rip)
 	movl	$1, %edi
 	call	exit@PLT
-.L485:
+.L416:
+	lock addq	$1, 64+__gcov0.runILP(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC39(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 72+__gcov0.runILP(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L484:
 	lock addq	$1, 456+__gcov0.runILP(%rip)
 	movq	stderr(%rip), %rdi
 	leaq	.LC53(%rip), %rdx
@@ -4475,17 +4471,488 @@ runILP:
 	.cfi_endproc
 .LFE64:
 	.size	runILP, .-runILP
+	.p2align 4
+	.globl	runILP_only
+	.type	runILP_only, @function
+runILP_only:
+.LFB65:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	pushq	%r15
+	pushq	%r14
+	pushq	%r13
+	pushq	%r12
+	pushq	%rbx
+	subq	$1128, %rsp
+	.cfi_offset 15, -24
+	.cfi_offset 14, -32
+	.cfi_offset 13, -40
+	.cfi_offset 12, -48
+	.cfi_offset 3, -56
+1:	call	*mcount@GOTPCREL(%rip)
+	movl	%r8d, -1160(%rbp)
+	movq	%rdi, %r15
+	movl	%esi, %r13d
+	movl	%edx, %r12d
+	movq	%fs:40, %rax
+	movq	%rax, -56(%rbp)
+	xorl	%eax, %eax
+	lock addq	$1, __gcov0.runILP_only(%rip)
+	leaq	-1140(%rbp), %r14
+	movq	$0, -1128(%rbp)
+	movq	$0, -1120(%rbp)
+	movq	%r14, %rdi
+	call	CPXopenCPLEX@PLT
+	movq	%rax, %rdi
+	lock addq	$1, 8+__gcov0.runILP_only(%rip)
+	movq	%rax, -1128(%rbp)
+	testq	%rax, %rax
+	je	.L528
+	leaq	.LC36(%rip), %rdx
+	movq	%r14, %rsi
+	call	CPXcreateprob@PLT
+	movq	%rax, -1120(%rbp)
+	testq	%rax, %rax
+	je	.L529
+	lock addq	$1, 40+__gcov0.runILP_only(%rip)
+	movq	-1128(%rbp), %rdi
+	leaq	-1112(%rbp), %rsi
+	call	CPXgettime@PLT
+	lock addq	$1, 56+__gcov0.runILP_only(%rip)
+	movslq	%r12d, %rax
+	movq	%rsp, %rbx
+	imulq	%rax, %rax
+	leaq	15(,%rax,4), %rax
+	movq	%rax, %rcx
+	movq	%rax, %rdx
+	andq	$-4096, %rcx
+	andq	$-16, %rdx
+	subq	%rcx, %rbx
+	movq	%rbx, %rcx
+	cmpq	%rcx, %rsp
+	je	.L489
+.L530:
+	subq	$4096, %rsp
+	orq	$0, 4088(%rsp)
+	cmpq	%rcx, %rsp
+	jne	.L530
+.L489:
+	andl	$4095, %edx
+	subq	%rdx, %rsp
+	testq	%rdx, %rdx
+	jne	.L531
+.L490:
+	movq	%rax, %rdx
+	movq	%rsp, %rbx
+	andq	$-4096, %rax
+	movq	%rsp, %r14
+	subq	%rax, %rbx
+	andq	$-16, %rdx
+	movq	%rbx, %rax
+	cmpq	%rax, %rsp
+	je	.L492
+.L532:
+	subq	$4096, %rsp
+	orq	$0, 4088(%rsp)
+	cmpq	%rax, %rsp
+	jne	.L532
+.L492:
+	andl	$4095, %edx
+	subq	%rdx, %rsp
+	testq	%rdx, %rdx
+	jne	.L533
+.L493:
+	movsd	.LC55(%rip), %xmm0
+	movq	-1128(%rbp), %rdi
+	movl	$1039, %esi
+	movq	%rsp, -1168(%rbp)
+	call	CPXsetdblparam@PLT
+	movl	%eax, -1140(%rbp)
+	movl	%eax, %ebx
+	testl	%eax, %eax
+	jne	.L494
+	leal	-1(%r12), %ecx
+	xorl	%eax, %eax
+	testl	%r12d, %r12d
+	jle	.L496
+	.p2align 4,,10
+	.p2align 3
+.L497:
+	movq	(%r15,%rax,8), %rdx
+	movl	%eax, 44(%rdx)
+	lock addq	$1, 80+__gcov0.runILP_only(%rip)
+	movq	%rax, %rdx
+	addq	$1, %rax
+	cmpq	%rdx, %rcx
+	jne	.L497
+.L496:
+	lock addq	$1, 88+__gcov0.runILP_only(%rip)
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	create_neighbor_index
+	lock addq	$1, 96+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %r8
+	movq	-1128(%rbp), %rcx
+	movl	%r12d, %edx
+	movl	%r13d, %esi
+	movq	%r15, %rdi
+	call	create_decision_variables
+	movl	%eax, -1156(%rbp)
+	lock addq	$1, 104+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %r8
+	movq	-1128(%rbp), %rcx
+	movl	%r13d, %edx
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	create_c_variables
+	lock addq	$1, 112+__gcov0.runILP_only(%rip)
+	movq	%r14, %rdx
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	init_adjMatrix
+	lock addq	$1, 120+__gcov0.runILP_only(%rip)
+	movq	-1168(%rbp), %rdx
+	movq	%r14, %rsi
+	movl	%r12d, %edi
+	call	floydWarshall
+	lock addq	$1, 128+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	movl	%r13d, %ecx
+	movl	%r12d, %edx
+	call	add_basic_constraints
+	lock addq	$1, 136+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	movl	%r13d, %ecx
+	movl	%r12d, %edx
+	call	add_at_least_one_unit_per_cluster_constraints
+	lock addq	$1, 144+__gcov0.runILP_only(%rip)
+	movl	-1160(%rbp), %r9d
+	movq	-1120(%rbp), %r8
+	movq	-1128(%rbp), %rcx
+	movl	%r13d, %edx
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	add_population_constraints
+	lock addq	$1, 152+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %r9
+	movq	-1128(%rbp), %r8
+	movq	-1168(%rbp), %rcx
+	movl	%r12d, %edx
+	movl	%r13d, %esi
+	movq	%r15, %rdi
+	call	add_contiguity_constraints2
+	lock addq	$1, 160+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %r8
+	movq	-1128(%rbp), %rcx
+	movl	%r13d, %edx
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	add_c_constraints
+	lock addq	$1, 168+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %r8
+	movq	-1128(%rbp), %rcx
+	movl	%r13d, %edx
+	movl	%r12d, %esi
+	movq	%r15, %rdi
+	call	add_objective_function
+	lock addq	$1, 176+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	call	CPXmipopt@PLT
+	lock addq	$1, 184+__gcov0.runILP_only(%rip)
+	movl	%eax, -1140(%rbp)
+	testl	%eax, %eax
+	jne	.L534
+.L498:
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	xorl	%ecx, %ecx
+	leaq	.LC41(%rip), %rdx
+	call	CPXwriteprob@PLT
+	lock addq	$1, 208+__gcov0.runILP_only(%rip)
+	movl	%eax, -1140(%rbp)
+	testl	%eax, %eax
+	jne	.L535
+.L499:
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	call	CPXgetstat@PLT
+	movl	%eax, %r12d
+	lock addq	$1, 232+__gcov0.runILP_only(%rip)
+	leaq	.LC43(%rip), %rsi
+	movl	$1, %edi
+	movl	%eax, %edx
+	xorl	%eax, %eax
+	call	__printf_chk@PLT
+	lock addq	$1, 240+__gcov0.runILP_only(%rip)
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	leaq	-1096(%rbp), %rdx
+	call	CPXgetobjval@PLT
+	lock addq	$1, 248+__gcov0.runILP_only(%rip)
+	movq	-1128(%rbp), %rdi
+	leaq	-1088(%rbp), %r13
+	movl	%r12d, %esi
+	movl	%eax, -1140(%rbp)
+	movq	%r13, %rdx
+	call	CPXgetstatstring@PLT
+	lock addq	$1, 256+__gcov0.runILP_only(%rip)
+	leaq	.LC44(%rip), %rsi
+	movl	$1, %edi
+	xorl	%eax, %eax
+	movq	%r13, %rdx
+	call	__printf_chk@PLT
+	lock addq	$1, 264+__gcov0.runILP_only(%rip)
+	movl	-1140(%rbp), %edi
+	testl	%edi, %edi
+	jne	.L536
+.L500:
+	movsd	-1096(%rbp), %xmm0
+	movl	$1, %edi
+	movl	$1, %eax
+	leaq	.LC46(%rip), %rsi
+	call	__printf_chk@PLT
+	lock addq	$1, 288+__gcov0.runILP_only(%rip)
+	movslq	-1156(%rbp), %rdi
+	movq	%rdi, %r14
+	salq	$3, %rdi
+	call	malloc@PLT
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	xorl	%ecx, %ecx
+	leal	-1(%r14), %r8d
+	movq	%rax, %rdx
+	movq	%rax, -1168(%rbp)
+	call	CPXgetx@PLT
+	movl	%eax, -1140(%rbp)
+	testl	%eax, %eax
+	jne	.L537
+.L501:
+	lock addq	$1, 312+__gcov0.runILP_only(%rip)
+	movl	-1156(%rbp), %esi
+	leaq	-1104(%rbp), %r13
+	testl	%esi, %esi
+	jle	.L502
+	leaq	-1136(%rbp), %r15
+	leaq	-1104(%rbp), %r13
+	leaq	-1132(%rbp), %r14
+	.p2align 4,,10
+	.p2align 3
+.L504:
+	lock addq	$1, 328+__gcov0.runILP_only(%rip)
+	movl	$8, %edi
+	call	malloc@PLT
+	movl	$32, %edi
+	movq	%rax, %r12
+	call	malloc@PLT
+	pushq	%rbx
+	movq	-1120(%rbp), %rsi
+	movq	%r15, %r9
+	pushq	%rbx
+	movq	-1128(%rbp), %rdi
+	movq	%rax, %rcx
+	movq	%r12, %rdx
+	movl	$32, %r8d
+	call	CPXgetcolname@PLT
+	lock addq	$1, 320+__gcov0.runILP_only(%rip)
+	leaq	.LC2(%rip), %rsi
+	movq	(%r12), %r12
+	movq	%r12, %rdi
+	movl	%eax, -1140(%rbp)
+	movq	%r13, %rcx
+	movq	%r14, %rdx
+	xorl	%eax, %eax
+	call	__isoc99_sscanf@PLT
+	popq	%rdx
+	popq	%rcx
+	cmpl	$2, %eax
+	jne	.L538
+	lock addq	$1, 8+__gcov0.parse_var_name(%rip)
+	addl	$1, %ebx
+	cmpl	%ebx, -1156(%rbp)
+	jne	.L504
+.L502:
+	lock addq	$1, 336+__gcov0.runILP_only(%rip)
+	movq	-1168(%rbp), %rdi
+	call	free@PLT
+	movq	-1120(%rbp), %rsi
+	movq	-1128(%rbp), %rdi
+	call	CPXmipopt@PLT
+	lock addq	$1, 344+__gcov0.runILP_only(%rip)
+	movq	-1128(%rbp), %rdi
+	movq	%r13, %rsi
+	movl	%eax, -1140(%rbp)
+	call	CPXgettime@PLT
+	lock addq	$1, 352+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	movl	$1, %eax
+	leaq	.LC49(%rip), %rsi
+	movsd	-1104(%rbp), %xmm0
+	subsd	-1112(%rbp), %xmm0
+	call	__printf_chk@PLT
+	lock addq	$1, 360+__gcov0.runILP_only(%rip)
+	movq	-1128(%rbp), %rdi
+	leaq	-1120(%rbp), %rsi
+	call	CPXfreeprob@PLT
+	movl	%eax, -1140(%rbp)
+	testl	%eax, %eax
+	jne	.L539
+	lock addq	$1, 376+__gcov0.runILP_only(%rip)
+	leaq	-1128(%rbp), %rdi
+	call	CPXcloseCPLEX@PLT
+	movl	%eax, -1140(%rbp)
+	testl	%eax, %eax
+	jne	.L540
+	lock addq	$1, 400+__gcov0.runILP_only(%rip)
+	movq	-56(%rbp), %rax
+	xorq	%fs:40, %rax
+	jne	.L541
+	leaq	-40(%rbp), %rsp
+	popq	%rbx
+	popq	%r12
+	popq	%r13
+	popq	%r14
+	popq	%r15
+	popq	%rbp
+	.cfi_remember_state
+	.cfi_def_cfa 7, 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L531:
+	.cfi_restore_state
+	orq	$0, -8(%rsp,%rdx)
+	jmp	.L490
+	.p2align 4,,10
+	.p2align 3
+.L537:
+	lock addq	$1, 296+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC47(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 304+__gcov0.runILP_only(%rip)
+	jmp	.L501
+	.p2align 4,,10
+	.p2align 3
+.L536:
+	lock addq	$1, 272+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC45(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 280+__gcov0.runILP_only(%rip)
+	jmp	.L500
+	.p2align 4,,10
+	.p2align 3
+.L535:
+	lock addq	$1, 216+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC42(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 224+__gcov0.runILP_only(%rip)
+	jmp	.L499
+	.p2align 4,,10
+	.p2align 3
+.L534:
+	lock addq	$1, 192+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC40(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 200+__gcov0.runILP_only(%rip)
+	jmp	.L498
+.L533:
+	orq	$0, -8(%rsp,%rdx)
+	jmp	.L493
+.L538:
+	lock addq	$1, __gcov0.parse_var_name(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC32(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	movq	%r12, %rcx
+	call	__fprintf_chk@PLT
+	lock addq	$1, 16+__gcov0.parse_var_name(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L528:
+	lock addq	$1, 16+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC35(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 24+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L541:
+	call	__stack_chk_fail@PLT
+.L529:
+	lock addq	$1, 32+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	movl	$1, %esi
+	leaq	.LC37(%rip), %rdx
+	call	__fprintf_chk@PLT
+	lock addq	$1, 48+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L494:
+	lock addq	$1, 64+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC39(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 72+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L540:
+	lock addq	$1, 392+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC54(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 408+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+.L539:
+	lock addq	$1, 368+__gcov0.runILP_only(%rip)
+	movq	stderr(%rip), %rdi
+	leaq	.LC53(%rip), %rdx
+	xorl	%eax, %eax
+	movl	$1, %esi
+	call	__fprintf_chk@PLT
+	lock addq	$1, 384+__gcov0.runILP_only(%rip)
+	movl	$1, %edi
+	call	exit@PLT
+	.cfi_endproc
+.LFE65:
+	.size	runILP_only, .-runILP_only
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
 	.type	_sub_I_00100_0, @function
 _sub_I_00100_0:
-.LFB65:
+.LFB66:
 	.cfi_startproc
 	endbr64
 	leaq	.LPBX0(%rip), %rdi
 	jmp	__gcov_init@PLT
 	.cfi_endproc
-.LFE65:
+.LFE66:
 	.size	_sub_I_00100_0, .-_sub_I_00100_0
 	.section	.init_array.00100,"aw"
 	.align 8
@@ -4494,12 +4961,12 @@ _sub_I_00100_0:
 	.p2align 4
 	.type	_sub_D_00100_1, @function
 _sub_D_00100_1:
-.LFB66:
+.LFB67:
 	.cfi_startproc
 	endbr64
 	jmp	__gcov_exit@PLT
 	.cfi_endproc
-.LFE66:
+.LFE67:
 	.size	_sub_D_00100_1, .-_sub_D_00100_1
 	.section	.fini_array.00100,"aw"
 	.align 8
@@ -4507,8 +4974,9 @@ _sub_D_00100_1:
 	.section	.data.rel.local,"aw"
 	.align 32
 	.type	.LPBX1, @object
-	.size	.LPBX1, 200
+	.size	.LPBX1, 208
 .LPBX1:
+	.quad	__gcov_.runILP_only
 	.quad	__gcov_.runILP
 	.quad	__gcov_.add_fixed_cluster_constraints
 	.quad	__gcov_.create_initial_clusters
@@ -4624,7 +5092,7 @@ __gcov_.init_adjMatrix:
 __gcov_.floydWarshall:
 	.quad	.LPBX0
 	.long	1619445596
-	.long	626895206
+	.long	489224833
 	.long	1766618349
 	.zero	4
 	.long	11
@@ -4636,7 +5104,7 @@ __gcov_.floydWarshall:
 __gcov_.add_population_constraints:
 	.quad	.LPBX0
 	.long	702817591
-	.long	-1455234614
+	.long	604027099
 	.long	-96893021
 	.zero	4
 	.long	12
@@ -4648,7 +5116,7 @@ __gcov_.add_population_constraints:
 __gcov_.create_decision_variables:
 	.quad	.LPBX0
 	.long	2142087775
-	.long	1688945030
+	.long	-200855771
 	.long	-481103779
 	.zero	4
 	.long	15
@@ -4660,7 +5128,7 @@ __gcov_.create_decision_variables:
 __gcov_.create_b_vars:
 	.quad	.LPBX0
 	.long	117917681
-	.long	-169337272
+	.long	626044314
 	.long	18160359
 	.zero	4
 	.long	7
@@ -4672,7 +5140,7 @@ __gcov_.create_b_vars:
 __gcov_.create_c_variables:
 	.quad	.LPBX0
 	.long	2065153371
-	.long	642975672
+	.long	-1270403700
 	.long	18160359
 	.zero	4
 	.long	7
@@ -4684,7 +5152,7 @@ __gcov_.create_c_variables:
 __gcov_.add_c_constraints:
 	.quad	.LPBX0
 	.long	1602021458
-	.long	2030573189
+	.long	535783645
 	.long	454137352
 	.zero	4
 	.long	28
@@ -4696,7 +5164,7 @@ __gcov_.add_c_constraints:
 __gcov_.add_objective_function:
 	.quad	.LPBX0
 	.long	1626351793
-	.long	260091711
+	.long	-415340593
 	.long	-1688317092
 	.zero	4
 	.long	12
@@ -4708,7 +5176,7 @@ __gcov_.add_objective_function:
 __gcov_.add_force_assignment_constraint:
 	.quad	.LPBX0
 	.long	1701116253
-	.long	1954542259
+	.long	-1108639975
 	.long	-963089625
 	.zero	4
 	.long	9
@@ -4720,7 +5188,7 @@ __gcov_.add_force_assignment_constraint:
 __gcov_.add_basic_constraints:
 	.quad	.LPBX0
 	.long	1969971809
-	.long	-538265463
+	.long	-1548298620
 	.long	-963089625
 	.zero	4
 	.long	9
@@ -4732,7 +5200,7 @@ __gcov_.add_basic_constraints:
 __gcov_.add_at_least_one_unit_per_cluster_constraints:
 	.quad	.LPBX0
 	.long	5109884
-	.long	-11413424
+	.long	-1409843064
 	.long	-963089625
 	.zero	4
 	.long	9
@@ -4744,7 +5212,7 @@ __gcov_.add_at_least_one_unit_per_cluster_constraints:
 __gcov_.create_contiguity_constraints:
 	.quad	.LPBX0
 	.long	684503925
-	.long	-46120842
+	.long	-1777863621
 	.long	-459810207
 	.zero	4
 	.long	21
@@ -4756,7 +5224,7 @@ __gcov_.create_contiguity_constraints:
 __gcov_.print_adjMatrix:
 	.quad	.LPBX0
 	.long	447796258
-	.long	-1427960402
+	.long	1316014195
 	.long	-463403999
 	.zero	4
 	.long	6
@@ -4768,7 +5236,7 @@ __gcov_.print_adjMatrix:
 __gcov_.print_distMatrix:
 	.quad	.LPBX0
 	.long	1019270111
-	.long	519548426
+	.long	-678261619
 	.long	-463403999
 	.zero	4
 	.long	6
@@ -4780,7 +5248,7 @@ __gcov_.print_distMatrix:
 __gcov_.add_contiguity_constraints2:
 	.quad	.LPBX0
 	.long	1995737415
-	.long	-828385767
+	.long	696125141
 	.long	1111602792
 	.zero	4
 	.long	27
@@ -4792,7 +5260,7 @@ __gcov_.add_contiguity_constraints2:
 __gcov_.parse_var_name:
 	.quad	.LPBX0
 	.long	1484996106
-	.long	-502461410
+	.long	-1199554367
 	.long	-1687120130
 	.zero	4
 	.long	3
@@ -4804,7 +5272,7 @@ __gcov_.parse_var_name:
 __gcov_.create_initial_clusters:
 	.quad	.LPBX0
 	.long	1957558579
-	.long	-1202483483
+	.long	738040112
 	.long	-2065149567
 	.zero	4
 	.long	3
@@ -4816,15 +5284,27 @@ __gcov_.create_initial_clusters:
 __gcov_.add_fixed_cluster_constraints:
 	.quad	.LPBX0
 	.long	68369494
-	.long	1200578497
+	.long	-1303607121
 	.long	-556843850
 	.zero	4
 	.long	11
 	.zero	4
 	.quad	__gcov0.add_fixed_cluster_constraints
+	.align 32
+	.type	__gcov_.runILP, @object
+	.size	__gcov_.runILP, 40
+__gcov_.runILP:
+	.quad	.LPBX0
+	.long	1910087633
+	.long	-1836370620
+	.long	-1260344159
+	.zero	4
+	.long	63
+	.zero	4
+	.quad	__gcov0.runILP
 	.section	.rodata.str1.8
 	.align 8
-.LC55:
+.LC56:
 	.string	"/mnt/c/Users/maria/OneDrive/Ambiente de Trabalho/SA_COPY/SA_copy/SA/ILP.gcda"
 	.section	.data.rel,"aw"
 	.align 32
@@ -4834,9 +5314,9 @@ __gcov_.add_fixed_cluster_constraints:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	49642305
+	.long	215549301
 	.zero	4
-	.quad	.LC55
+	.quad	.LC56
 	.quad	__gcov_merge_add
 	.quad	0
 	.quad	0
@@ -4846,22 +5326,22 @@ __gcov_.add_fixed_cluster_constraints:
 	.quad	0
 	.quad	0
 	.quad	0
-	.long	25
+	.long	26
 	.zero	4
 	.quad	.LPBX1
 	.section	.data.rel.local
 	.align 32
-	.type	__gcov_.runILP, @object
-	.size	__gcov_.runILP, 40
-__gcov_.runILP:
+	.type	__gcov_.runILP_only, @object
+	.size	__gcov_.runILP_only, 40
+__gcov_.runILP_only:
 	.quad	.LPBX0
-	.long	1910087633
-	.long	73542869
-	.long	-1260344159
+	.long	1073487663
+	.long	1950132977
+	.long	-770606791
 	.zero	4
-	.long	63
+	.long	52
 	.zero	4
-	.quad	__gcov0.runILP
+	.quad	__gcov0.runILP_only
 	.local	__gcov0.create_code_index
 	.comm	__gcov0.create_code_index,16,16
 	.local	__gcov0.find_id_by_code
@@ -4912,6 +5392,8 @@ __gcov_.runILP:
 	.comm	__gcov0.add_fixed_cluster_constraints,88,32
 	.local	__gcov0.runILP
 	.comm	__gcov0.runILP,504,32
+	.local	__gcov0.runILP_only
+	.comm	__gcov0.runILP_only,416,32
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
 .LC5:
@@ -4953,6 +5435,10 @@ __gcov_.runILP:
 .LC50:
 	.long	0
 	.long	1071644672
+	.align 8
+.LC55:
+	.long	0
+	.long	1087476736
 	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"
