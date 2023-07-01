@@ -1065,13 +1065,18 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     return clusters;
 }
 
-void runILP_only(TU **units, int k, int n, int m, int ideal_pop)
+Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 {
     CPXENVptr env = NULL;
     CPXLPptr lp = NULL;
     int status;
     double start_time, end_time;
-
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+    for (int i = 0; i < k; i++)
+    {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
     env = CPXopenCPLEX(&status);
     if (env == NULL)
     {
@@ -1164,8 +1169,6 @@ void runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     //     printf("Conflict written to conflict.lp.\n");
     // }int
     // num_vars = CPXgetnumcols(env, lp);
-
-    // Print the optimal solution
     int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
     bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
 
@@ -1183,32 +1186,75 @@ void runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 
         // Create a new unit and set its properties
         // TU* unit = (TU*)malloc(sizeof(TU));
+        TU *unit = units[unit_id];
         // printf("hi unit id %d, and pop %d\n", unit->unit_id, unit->voters);
+
+        if (solution[i] >= 0.5)
+        {
+            unit->assigned = true;
+            unit->cluster_id = cluster_id;
+            // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
+        }
+        else
+        {
+            unit->assigned = false;
+        }
+        unit->assigned = solution[i] >= 0.5 ? true : false; //
+
+        if (unit->assigned)
+        { // Only add the unit to the cluster if it is assigned
+
+            // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
+            // printf("unit %d cluster %d\n", unit->code, unit->cluster_id);
+            unit->cluster_id = cluster_id;
+            unit->unit_id = unit_id;
+            cluster_unit_counts[cluster_id]++;
+            processed_clusters[cluster_id] = true;
+        }
+        units[i] = unit;
+        for (int i = 0; i < k; i++)
+        {
+            // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
+            if (processed_clusters[i] && (cluster_unit_counts[i] == 0))
+            { // replace is_valid_cluster with your own validity check function
+                // Handle this case as per your needs
+                fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
+                return clusters; // or some other error handling / default return
+            }
+        }
+
+        if (status)
+        {
+            fprintf(stderr, "Failed to get variable name for column %d.\n", i);
+            // exit(1);
+        }
+        // printf("%s: %.2f\n", *colname, solution[i]);
+        free(colname);
+        free(namestore);
     }
 
-    
-    // printf("%s: %.2f\n", *colname, solution[i]);
+    free(solution);
+    clusters = create_initial_clusters(units, k, n);
+    // printf("22AHYO\n");
+    printf("..Cluster 0 with size %d: ", clusters[1].size);
+    status = CPXmipopt(env, lp);
+    CPXgettime(env, &end_time);
+    // printf("end = == = %f\n", end_time);
+    double time_taken = end_time - start_time;
+    printf("Time taken: %f seconds\n", time_taken);
+    status = CPXfreeprob(env, &lp);
+    if (status != 0)
+    {
+        fprintf(stderr, "Failed to free the problem.\n");
+        exit(1);
+    }
+    status = CPXcloseCPLEX(&env);
+    if (status != 0)
+    {
+        fprintf(stderr, "Failed to close CPLEX environment.\n");
+        exit(1);
+    }
 
+    return clusters;
 
-free(solution);
-
-status = CPXmipopt(env, lp);
-CPXgettime(env, &end_time);
-// printf("end = == = %f\n", end_time);
-double time_taken = end_time - start_time;
-printf("Time taken: %f seconds\n", time_taken);
-status = CPXfreeprob(env, &lp);
-if (status != 0)
-{
-    fprintf(stderr, "Failed to free the problem.\n");
-    exit(1);
-}
-status = CPXcloseCPLEX(&env);
-if (status != 0)
-{
-    fprintf(stderr, "Failed to close CPLEX environment.\n");
-    exit(1);
-}
-
-return;
 }

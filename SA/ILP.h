@@ -25,6 +25,6 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Clust
 
 Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters);
 
-void runILP_only(TU **units, int k, int n, int m, int ideal_pop);
+Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop);
 
 #endif /* _STATE_H */

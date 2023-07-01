@@ -114,22 +114,25 @@ int runSA(double Tstart, /* [in] starting temperature */
   double alpha = pow(ratio, exponent);
 
   double a_it = 1.0;
+  FILE *output_file = fopen("output.txt", "w");
+  char filename[50];  // adjust size as needed
+  sprintf(filename, "SA_graph_%d.csv", d);
+  FILE *sa_graph_file = fopen(filename, "w");
+  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
 
   int perfect_score = 0;
   int not_as_great_score = 0;
   popul_test1(units, n, k, ideal_pop);
 
   // Uncomment to run only ILP
-  runILP_only(units, k, n, m, ideal_pop);
-
+  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  
   return;
 
   srand(time(NULL));
-  FILE *output_file = fopen("output.txt", "w");
-  char filename[50];  // adjust size as needed
-  sprintf(filename, "SA_graph_%d.csv", d);
-  FILE *sa_graph_file = fopen(filename, "w");
-  fprintf(output_file, "%d;%d;%d\n", k, n, steps);
+  
+
 
   Cluster *clusters = first_cluster(units, k, n);
   Cluster *best_clusters = NULL;
