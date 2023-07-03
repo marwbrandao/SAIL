@@ -834,7 +834,7 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Clust
         {
             cluster_population += cluster->units[i]->voters;
         }
-         printf("cluster %d population %d\n", c, cluster_population);
+        // printf("cluster %d population %d\n", c, cluster_population);
         if (cluster_population <= max_population)
         {
             for (int i = 0; i < cluster->size; i++)
@@ -850,7 +850,7 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Clust
                     exit(1);
                 }
 
-                 printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
+                // printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
 
                 double rhs[1] = {1.0};
                 char sense[1] = {'E'};
@@ -896,7 +896,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 10; // Time limit in seconds
+    double time_limit = 60.0 * 4; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -919,7 +919,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
 
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
-    add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
+    // add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
 
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 

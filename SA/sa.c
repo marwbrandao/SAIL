@@ -125,10 +125,10 @@ int runSA(double Tstart, /* [in] starting temperature */
   popul_test1(units, n, k, ideal_pop);
 
   // Uncomment to run only ILP
-  // Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
-  // print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
   
-  // return;
+  return;
 
   srand(time(NULL));
   
@@ -139,7 +139,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   double startingValue = 1.0;
   double endingValue = 0.000001;
-  int numIterations = 10000000;
+  int numIterations = 100000;
 
   double increment = (endingValue - startingValue) / (numIterations - 1);
 
@@ -179,10 +179,9 @@ int runSA(double Tstart, /* [in] starting temperature */
     if (energy__compactness >= best_energy_compactness && energy__population == 0)
     {
       accept_prob = 1.0;
-      fprintf(sa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
       if(energy__compactness > best_energy_compactness)
         perfect_score++;
-      
+      fprintf(sa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
     }
     else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
     {
@@ -207,8 +206,8 @@ int runSA(double Tstart, /* [in] starting temperature */
     {
 
       printf("----->iteration: %d, perfect: %d, not_perfect: %d\n", s, perfect_score, not_as_great_score);
-      //accept_prob = startingValue + (increment * (s - 1));
-      for (int i = 0; i < k; i++) 
+      accept_prob = startingValue + (increment * (s - 1));
+      for (int i = 0; i < k; i++)
       {
         int pop_cluster = 0;
         // fprintf(output_file, "0,%d:", i);
@@ -319,7 +318,15 @@ int runSA(double Tstart, /* [in] starting temperature */
     }
     if (s % (numIterations / 5) == 0)
     {
-      
+      if (best_clusters == NULL)
+          {
+            best_clusters = malloc(k * sizeof(Cluster));
+            for (int i = 0; i < k; i++)
+            {
+              best_clusters[i].units = malloc(n * sizeof(TU *));
+              best_clusters[i].size = 0;
+            }
+          }
       if (perfect_score == 0)
       {
         clusters = runILP(units, k, n, m, ideal_pop, clusters);
@@ -343,18 +350,9 @@ int runSA(double Tstart, /* [in] starting temperature */
         
         
         if (energy_population(units, clusters, m, k, n, ideal_pop) == 0){
-          if (best_clusters == NULL)
-          {
-            best_clusters = malloc(k * sizeof(Cluster));
-            for (int i = 0; i < k; i++)
-            {
-              best_clusters[i].units = malloc(n * sizeof(TU *));
-              best_clusters[i].size = 0;
-            }
-          }
           energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
           energy__compactness = energy_compactness(clusters, k);
-          printf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
+        fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
         //printf("HERE____ %d\n",best_clusters[0].size);
             for (int i = 0; i < k; i++)
           {
