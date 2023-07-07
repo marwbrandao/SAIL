@@ -4,6 +4,7 @@
 "files.associations": {
       "qq": "c",
       "system_error": "c",
-      "stack": "c"
+      "stack": "c",
+      "xlocale": "c"
 }
 }

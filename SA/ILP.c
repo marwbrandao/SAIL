@@ -869,6 +869,68 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Clust
     }
 }
 
+void add_fixed_cluster_constraints_random(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population)
+{
+    srand(time(0));  // Seed the random number generator
+
+    for (int c = 0; c < num_clusters; c++) {
+        Cluster *cluster = &clusters[c];
+
+        int num_to_fix = cluster->size / 3; // Number of units to fix
+        int cluster_population = 0;
+        int *assigned = calloc(cluster->size, sizeof(int)); // Track assigned units
+        
+        while (num_to_fix > 0) {
+            int unit_idx_random;
+            do {
+                unit_idx_random = rand() % cluster->size;
+            } while (assigned[unit_idx_random]); // If unit is assigned, try another
+
+            cluster_population += cluster->units[unit_idx_random]->voters;
+            
+            if(cluster_population > max_population)
+                break;
+            
+            //printf("Assigning unit %d to cluster %d, cluster population %d\n", unit_idx_random, c, cluster_population);
+            cluster->units[unit_idx_random]->assigned = true;
+            assigned[unit_idx_random] = 1;
+            
+            num_to_fix--;
+        }
+
+        free(assigned);
+
+        // Now, add constraints for all assigned units
+        for (int i = 0; i < cluster->size; i++) {
+            TU *unit = cluster->units[i];
+
+            if (!unit->assigned) // Only fix assigned units
+                continue;
+            
+            char var_name[32];
+            sprintf(var_name, "x_%d_%d", c, unit->unit_id);
+            int idx;
+            int status = CPXgetcolindex(env, lp, var_name, &idx);
+            if (status) {
+                fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
+                exit(1);
+            }
+
+            double rhs[1] = {1.0};
+            char sense[1] = {'E'};
+            int rmatbeg[1] = {0};
+            int rmatind[1] = {idx};
+            double rmatval[1] = {1.0};
+
+            status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, NULL, NULL);
+            if (status) {
+                fprintf(stderr, "Failed to add fixed cluster constraint for unit %d.\n", i);
+                exit(1);
+            }
+        }
+    }
+}
+
 // lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
 // quiarta as 16
 
@@ -920,6 +982,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
     add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
+    //add_fixed_cluster_constraints_random(env, lp, units, clusters, n, k, ideal_pop);
 
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
@@ -1094,8 +1157,8 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
-    status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
+    //double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
+    //status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
         fprintf(stderr, "Failed to set time limit parameter.\n");
