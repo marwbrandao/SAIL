@@ -6919,7 +6919,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
 
         }
 
-        double rhs_upper = 1.15 * ideal_population;
+        double rhs_upper = 1.05 * ideal_population;
         char sense_upper = 'L';
         int matbeg = 0;
         int status_upper = CPXaddrows(env, lp, 0, 1, n, &rhs_upper, &sense_upper, &matbeg, indices, values, 
@@ -6941,7 +6941,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             exit(1);
         }
 
-        double rhs_lower = 0.85 * ideal_population;
+        double rhs_lower = 0.95 * ideal_population;
         char sense_lower = 'G';
         int status_lower = CPXaddrows(env, lp, 0, 1, n, &rhs_lower, &sense_lower, &matbeg, indices, values, 
 # 197 "ILP.c" 3 4

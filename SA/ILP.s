@@ -5717,7 +5717,7 @@ __gcov_.runILP:
 	.long	1094267690
 	.zero	4
 	.quad	0
-	.long	716845370
+	.long	822051816
 	.zero	4
 	.quad	.LC57
 	.quad	__gcov_merge_add
@@ -5802,12 +5802,12 @@ __gcov_.runILP_only:
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
 .LC5:
-	.long	1717986918
-	.long	1072850534
+	.long	3435973837
+	.long	1072745676
 	.align 8
 .LC7:
-	.long	858993459
-	.long	1072378675
+	.long	1717986918
+	.long	1072588390
 	.align 8
 .LC10:
 	.long	0
