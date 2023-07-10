@@ -182,7 +182,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             // printf("id = %d, values = %f\n",indices[unit], values[unit]);
         }
 
-        double rhs_upper = 1.10 * ideal_population; // upper bound (115% of ideal population)
+        double rhs_upper = 1.15 * ideal_population; // upper bound (115% of ideal population)
         char sense_upper = 'L';                     // Use 'L' for "less than or equal to".
         int matbeg = 0;
         int status_upper = CPXaddrows(env, lp, 0, 1, n, &rhs_upper, &sense_upper, &matbeg, indices, values, NULL, NULL);
@@ -192,7 +192,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             exit(1);
         }
 
-        double rhs_lower = 0.90 * ideal_population; // lower bound (85% of ideal population)
+        double rhs_lower = 0.85 * ideal_population; // lower bound (85% of ideal population)
         char sense_lower = 'G';                     // Use 'G' for "greater than or equal to".
         int status_lower = CPXaddrows(env, lp, 0, 1, n, &rhs_lower, &sense_lower, &matbeg, indices, values, NULL, NULL);
         if (status_lower)
@@ -868,68 +868,73 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Clust
         }
     }
 }
-
-void add_fixed_cluster_constraints_random(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population)
+void add_impossible_pairs_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp, int distMatrix[n][n], int upper_limit)
 {
-    srand(time(0));  // Seed the random number generator
-
-    for (int c = 0; c < num_clusters; c++) {
-        Cluster *cluster = &clusters[c];
-
-        int num_to_fix = cluster->size / 3; // Number of units to fix
-        int cluster_population = 0;
-        int *assigned = calloc(cluster->size, sizeof(int)); // Track assigned units
+    //printf("Entering add_impossible_pairs_constraints function.\n");
+    
+    for (int unit1 = 0; unit1 < n; unit1++)
+    {
+        //printf("Outer loop iteration, unit1: %d.\n", unit1);
         
-        while (num_to_fix > 0) {
-            int unit_idx_random;
-            do {
-                unit_idx_random = rand() % cluster->size;
-            } while (assigned[unit_idx_random]); // If unit is assigned, try another
-
-            cluster_population += cluster->units[unit_idx_random]->voters;
+        for (int unit2 = 0; unit2 < n; unit2++)
+        {
+            // print_distMatrix(n, distMatrix);
+            // printf("Inner loop iteration, unit2: %d.\n", unit2);
+            // printf("unit1: %d, unit2: %d\n", unit1, unit2);
+            // printf("units[unit1] address: %p\n", (void *)units[unit1]);
+            // printf("distMatrix[unit1] address: %p\n", (void *)distMatrix[unit1]);
             
-            if(cluster_population > max_population)
-                break;
-            
-            //printf("Assigning unit %d to cluster %d, cluster population %d\n", unit_idx_random, c, cluster_population);
-            cluster->units[unit_idx_random]->assigned = true;
-            assigned[unit_idx_random] = 1;
-            
-            num_to_fix--;
-        }
+            if (unit1 != unit2 && units[unit1]->voters + distMatrix[unit1][unit2] > (upper_limit*1.15))
+            {
+                //printf("Voters of unit1 plus shortest distance to unit2 exceeds upper_limit.\n");
+                
+                for (int cluster = 0; cluster < k; cluster++)
+                {
+                    //printf("Cluster iteration, cluster: %d.\n", cluster);
 
-        free(assigned);
+                    char var_name1[32];
+                    snprintf(var_name1, sizeof(var_name1), "x_%d_%d", cluster, unit1);
 
-        // Now, add constraints for all assigned units
-        for (int i = 0; i < cluster->size; i++) {
-            TU *unit = cluster->units[i];
+                    int col_index1;
+                    int status1 = CPXgetcolindex(env, lp, var_name1, &col_index1);
+                    if (status1)
+                    {
+                        fprintf(stderr, "Failed to get column index for %s.\n", var_name1);
+                        exit(1);
+                    }
 
-            if (!unit->assigned) // Only fix assigned units
-                continue;
-            
-            char var_name[32];
-            sprintf(var_name, "x_%d_%d", c, unit->unit_id);
-            int idx;
-            int status = CPXgetcolindex(env, lp, var_name, &idx);
-            if (status) {
-                fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
-                exit(1);
-            }
+                    char var_name2[32];
+                    snprintf(var_name2, sizeof(var_name2), "x_%d_%d", cluster, unit2);
 
-            double rhs[1] = {1.0};
-            char sense[1] = {'E'};
-            int rmatbeg[1] = {0};
-            int rmatind[1] = {idx};
-            double rmatval[1] = {1.0};
+                    int col_index2;
+                    int status2 = CPXgetcolindex(env, lp, var_name2, &col_index2);
+                    if (status2)
+                    {
+                        fprintf(stderr, "Failed to get column index for %s.\n", var_name2);
+                        exit(1);
+                    }
 
-            status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, NULL, NULL);
-            if (status) {
-                fprintf(stderr, "Failed to add fixed cluster constraint for unit %d.\n", i);
-                exit(1);
+                    printf("Adding constraint for unit1: %d and unit2: %d in cluster: %d.\n", unit1, unit2, cluster);
+
+                    int indices[2] = {col_index1, col_index2};
+                    double values[2] = {1.0, 1.0};
+                    double rhs = 1.0; // Only one of these two units can be in the cluster
+                    char sense = 'L'; // Use 'L' for "less than or equal to".
+                    int matbeg = 0;
+                    int status = CPXaddrows(env, lp, 0, 1, 2, &rhs, &sense, &matbeg, indices, values, NULL, NULL);
+                    if (status)
+                    {
+                        fprintf(stderr, "Failed to add impossible pair constraint for units %d and %d in cluster %d.\n", unit1, unit2, cluster);
+                        exit(1);
+                    }
+                }
             }
         }
     }
+
+    //printf("Exiting add_impossible_pairs_constraints function.\n");
 }
+
 
 // lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
 // quiarta as 16
@@ -982,12 +987,12 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
     add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
-    //add_fixed_cluster_constraints_random(env, lp, units, clusters, n, k, ideal_pop);
 
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
     add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
     add_c_constraints(units, n, k, env, lp);
+    //add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
     add_objective_function(units, n, k, env, lp);
 
     status = CPXmipopt(env, lp);
@@ -1157,8 +1162,8 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    //double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
-    //status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
+    double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
+    status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
         fprintf(stderr, "Failed to set time limit parameter.\n");
@@ -1181,7 +1186,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
     // add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
-
+    add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
     add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
