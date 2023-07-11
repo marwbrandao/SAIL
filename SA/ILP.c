@@ -1229,12 +1229,16 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
 
+    //status = CPXgetx(env, lp, solution, 0, num_vars - 1);
+    printf("Before CPXgetx.\n");
     status = CPXgetx(env, lp, solution, 0, num_vars - 1);
+    printf("After CPXgetx.\n");
     if (status)
     {
-        fprintf(stderr, "Failed to get optimal solution.\n");
-        // exit(1);
+        // fprintf(stderr, "Failed to get optimal solution.\n");
     }
+    printf("After if statement.\n");
+
     printf("3 ");
     //     printf("Conflict written to conflict.lp.\n");
     // }int
