@@ -1163,7 +1163,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 60.0 * 1.0; // Time limit in seconds
+    double time_limit = 60.0 *60.0 *10.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -1239,12 +1239,15 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     }
     printf("After if statement.\n");
 
-    printf("3 ");
+    printf("\n 3 ");
+
     //     printf("Conflict written to conflict.lp.\n");
     // }int
     // num_vars = CPXgetnumcols(env, lp);
     int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
     bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
+
+    printf("hi1\n");
 
     for (int i = 0; i < num_vars; i++)
     {
@@ -1256,8 +1259,10 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         int surplus;
         status = CPXgetcolname(env, lp, colname, namestore, storespace, &surplus, i, i);
         int cluster_id, unit_id;
-        parse_var_name(*colname, &cluster_id, &unit_id);
 
+        parse_var_name(*colname, &cluster_id, &unit_id);
+        if (i == num_vars-1)
+        printf("hi2\n");
         // Create a new unit and set its properties
         // TU* unit = (TU*)malloc(sizeof(TU));
         TU *unit = units[unit_id];
@@ -1265,7 +1270,8 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 
         if (solution[i] >= 0.5)
         {
-            printf("4 ");
+            if (i == num_vars-1)
+                printf("4 ");
             unit->assigned = true;
             unit->cluster_id = cluster_id;
             // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
@@ -1274,8 +1280,11 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         {
             unit->assigned = false;
         }
+        if (i == num_vars-1)
+        printf("hi3\n");
         unit->assigned = solution[i] >= 0.5 ? true : false; //
-
+        if (i == num_vars-1)
+        printf("hi4\n");
         if (unit->assigned)
         { // Only add the unit to the cluster if it is assigned
 
@@ -1285,34 +1294,43 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
             unit->unit_id = unit_id;
             cluster_unit_counts[cluster_id]++;
             processed_clusters[cluster_id] = true;
+            if (i == num_vars-1)
+                printf("hi5\n");
         }
+        if (i == num_vars-1)
+        printf("hi7\n");
         units[i] = unit;
-        for (int i = 0; i < k; i++)
-        {
-            // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
-            if (processed_clusters[i] && (cluster_unit_counts[i] == 0))
-            { // replace is_valid_cluster with your own validity check function
-                // Handle this case as per your needs
-                fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
-                return clusters; // or some other error handling / default return
-            }
-        }
-
+        // for (int j = 0; j < k; j++)
+        // {
+        //     if (i == num_vars-1)
+        //         printf("4.3 ");
+        //     // If a cluster has zero units or it's not a valid cluster, return the clusters as they are
+        //     if (processed_clusters[i] && (cluster_unit_counts[j] == 0))
+        //     { // replace is_valid_cluster with your own validity check function
+        //         // Handle this case as per your needs
+        //         fprintf(stderr, "Cluster %d is empty or invalid.\n", i);
+        //         return clusters; // or some other error handling / default return
+        //     }
+        // }
+        if (i == num_vars-1)
+        printf("hi6\n");
         if (status)
         {
             fprintf(stderr, "Failed to get variable name for column %d.\n", i);
             // exit(1);
         }
+        if (i == num_vars-1)
+            printf("4.2 ");
         // printf("%s: %.2f\n", *colname, solution[i]);
         free(colname);
         free(namestore);
     }
     //
-    printf("5 ");
+    printf("5 \n");
     free(solution);
     clusters = create_initial_clusters(units, k, n);
     // printf("22AHYO\n");
-    printf("..Cluster 0 with size %d: ", clusters[1].size);
+    printf("..Cluster 0 with size %d: \n", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
     // printf("end = == = %f\n", end_time);
@@ -1330,7 +1348,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to close CPLEX environment.\n");
         exit(1);
     }
-    printf("6 ");
+    printf("6 \n");
     return clusters;
 
 }
