@@ -1303,6 +1303,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         free(colname);
         free(namestore);
     }
+    //
     printf("5 ");
     free(solution);
     clusters = create_initial_clusters(units, k, n);
