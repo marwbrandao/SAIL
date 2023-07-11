@@ -1162,7 +1162,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
+    double time_limit = 60.0 * 60.0 * 1.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -1217,7 +1217,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     char statstring[CPXMESSAGEBUFSIZE];
     CPXgetstatstring(env, solstat, statstring);
     printf("%s\n", statstring);
-
+    printf(" 1");
     if (status)
     {
         fprintf(stderr, "Failed to get objective value.\n");
@@ -1226,7 +1226,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     printf("Objective value: %.2f\n", objval);
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
-
+    printf(" 2");
     status = CPXgetx(env, lp, solution, 0, num_vars - 1);
     if (status)
     {
@@ -1239,7 +1239,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // num_vars = CPXgetnumcols(env, lp);
     int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
     bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
-
+    printf(" 3");
     for (int i = 0; i < num_vars; i++)
     {
 
@@ -1259,6 +1259,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 
         if (solution[i] >= 0.5)
         {
+            printf(" 4");
             unit->assigned = true;
             unit->cluster_id = cluster_id;
             // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
@@ -1300,10 +1301,12 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         free(colname);
         free(namestore);
     }
-
+    //printf(" 1");
     free(solution);
+    printf(" 5");
     clusters = create_initial_clusters(units, k, n);
     // printf("22AHYO\n");
+    printf(" 6");
     printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
