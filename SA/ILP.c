@@ -1158,11 +1158,12 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Could not create LP problem.\n");
         exit(1);
     }
+    printf("1 ");
     CPXgettime(env, &start_time);
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 60.0 * 5.0; // Time limit in seconds
+    double time_limit = 60.0 * 60.0 * 1.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -1223,6 +1224,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to get objective value.\n");
         // exit(1);
     }
+    printf("2 ");
     printf("Objective value: %.2f\n", objval);
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
@@ -1233,7 +1235,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to get optimal solution.\n");
         // exit(1);
     }
-
+    printf("3 ");
     //     printf("Conflict written to conflict.lp.\n");
     // }int
     // num_vars = CPXgetnumcols(env, lp);
@@ -1259,6 +1261,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
 
         if (solution[i] >= 0.5)
         {
+            printf("4 ");
             unit->assigned = true;
             unit->cluster_id = cluster_id;
             // printf("%d %d %d \n", unit->cluster_id, unit->unit_id, unit->assigned);
@@ -1300,7 +1303,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         free(colname);
         free(namestore);
     }
-
+    printf("5 ");
     free(solution);
     clusters = create_initial_clusters(units, k, n);
     // printf("22AHYO\n");
@@ -1322,7 +1325,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to close CPLEX environment.\n");
         exit(1);
     }
-
+    printf("6 ");
     return clusters;
 
 }
