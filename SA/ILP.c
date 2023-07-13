@@ -759,7 +759,7 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
         }
     }
 }
-
+//
 void parse_var_name(char *var_name, int *cluster_id, int *unit_id)
 {
     // Scan the variable name
