@@ -133,7 +133,7 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, in
             //min_diff = 0;
             continue;
         }
-
+        //
         int lower_diff = abs(pop_cluster - lower_bound);
         int upper_diff = abs(pop_cluster - upper_bound);
 
