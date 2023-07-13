@@ -850,7 +850,7 @@ void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU **units, Clust
                     exit(1);
                 }
 
-                 printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
+                 //printf("Fixing unit %d to cluster %d\n", unit->unit_id, c); // print which units are going to be fixed
 
                 double rhs[1] = {1.0};
                 char sense[1] = {'E'};
