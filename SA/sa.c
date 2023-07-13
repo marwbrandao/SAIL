@@ -151,7 +151,7 @@ int runSA(double Tstart, /* [in] starting temperature */
   double accept_prob = 0.0;
   for (int i = 0; i < k; i++)
   {
-    //
+    // //
     int pop_cluster = 0;
     fprintf(output_file, "0,%d:", i);
     printf("Cluster %d with size %d: ", i, clusters[i].size);

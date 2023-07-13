@@ -144,7 +144,7 @@ int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, in
     }
   
     return total_difference;
-}
+} //
 
 
 int energy_compactness(Cluster *clusters, int k) {
