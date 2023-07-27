@@ -37,6 +37,7 @@ TU** graph(char* filename, int* d, int* k, int* n, int* m) {
         char* next_field = strstr(line, ",") + strlen(",")+ 1;
         
         unit->num_neighbors = count - 2;
+        unit->neighbor_ids = malloc(unit->num_neighbors * sizeof(int)); 
         unit->neighbor_codes = malloc(unit->num_neighbors * sizeof(int));
         unit->border_sizes = malloc(unit->num_neighbors * sizeof(int));
         unit->assigned = false;
