@@ -1486,7 +1486,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
 
     int rand_num = rand() % 100;
 
-    if (rand_num < 50)
+    if (rand_num < 80)
     {
         int max_deviation = -1;
         for (int i = 0; i < k; i++)
@@ -1634,7 +1634,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
         }
 
         neighboring_cluster_idx = neighboring_clusters[rand_neighbor_index];
-       // printf("Random number %d and the selected neighbor: %d\n", rand_num, neighboring_cluster_idx);
+       //printf("Random number %d and the selected neighbor: %d\n", rand_num, neighboring_cluster_idx);
     }
 
     // do
@@ -1645,7 +1645,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
     //         } while (clusters[neighboring_cluster_idx].size <= 1 || max_dev_cluster->id == clusters[neighboring_cluster_idx].id);
 
     neighboring_cluster_ = &clusters[neighboring_cluster_idx];
-    // printf("cluster neighbor %d with population %d with size %d\n", neighboring_cluster_->id, neighboring_cluster_->population, neighboring_cluster_->size);
+    //printf("cluster neighbor %d with population %d with size %d\n", neighboring_cluster_->id, neighboring_cluster_->population, neighboring_cluster_->size);
     //  if (neighboring_cluster_idx >= k || neighboring_cluster_idx < 0)
     //  {
     //      return;
@@ -1655,7 +1655,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
     int *contiguous_movements = NULL;
 
    // printf("cluster one: %d and cluster two: %d\n", max_dev_cluster->id, neighboring_cluster_->id);
-    if (is_cluster_overpopulated(*max_dev_cluster, ideal_population))
+    if (max_dev_cluster->population > neighboring_cluster_->population)
     {
         find_border_units(clusters, k, max_dev_cluster->id, neighboring_cluster_->id);
         int border_unit_count = max_dev_cluster->num_border_units;
@@ -1729,7 +1729,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
                     break;
                 }
             }
-           // printf("Moving unit %d from cluster %d to cluster %d\n", chosen_border_unit->unit_id, max_dev_cluster->id, neighboring_cluster_->id);
+           //printf("Moving unit %d from cluster %d to cluster %d\n", chosen_border_unit->code, max_dev_cluster->id, neighboring_cluster_->id);
             
             move_unit(max_dev_cluster, neighboring_cluster_, unit_index);
         }
@@ -1815,7 +1815,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
                     break;
                 }
             }
-           // printf("Moving unit %d from cluster %d to cluster %d\n", chosen_border_unit->unit_id, max_dev_cluster->id, neighboring_cluster_->id);
+            //printf("Moving unit %d from cluster %d to cluster %d\n", chosen_border_unit->code, max_dev_cluster->id, neighboring_cluster_->id);
 
             move_unit(neighboring_cluster_, max_dev_cluster, unit_index);
         }
@@ -1832,6 +1832,10 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
             free(contiguous_movements);
         }
     }
+    free(neighboring_clusters);
+    // free(neighboring_cluster_);
+    // neighboring_cluster_ = NULL;
+    neighboring_clusters = NULL;
    // printf("??\n");
 }
 

@@ -963,7 +963,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 10; // Time limit in seconds
+    double time_limit = 60.0 * 5.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -971,8 +971,8 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         exit(1);
     }
 
-    create_code_index(units, n);
-    create_neighbor_index(units, n);
+    //create_code_index(units, n);
+    //create_neighbor_index(units, n);
     int num_vars = create_decision_variables(units, k, n, env, lp);
 
     // create_b_vars(units, k, n, env, lp);
