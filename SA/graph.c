@@ -28,7 +28,7 @@ TU** graph(char* filename, int* d, int* k, int* n, int* m) {
         for (int i = 0; i < strlen(line); i++) {
             if (line[i] == ':') {
                 count++;
-            }
+            }//
         }
 
         sscanf(line, "'%d':", &unit->code);

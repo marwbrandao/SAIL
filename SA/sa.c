@@ -147,13 +147,13 @@ int runSA(double Tstart, /* [in] starting temperature */
   int not_as_great_score = 0;
   popul_test1(units, n, k, ideal_pop);
 
-  // Uncomment to run only ILP
+  // Uncomment to run only ILP//
   // printf("0 ");
-  // Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
-  // print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
-  // print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
+  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
 
-  // return;
+  return;
 
   srand(time(NULL));
 
@@ -191,8 +191,16 @@ int runSA(double Tstart, /* [in] starting temperature */
     FILE *fp_out = fopen("cluster_info.txt", "w");
 //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);// 
 
- 
+  if (s % (numIterations / 5) == 0  || s == 2)
+    {
 
+      if (perfect_score == 0)
+      {
+        if (best_clusters != NULL)
+          clusters = runILP(units, k, n, m, ideal_pop, best_clusters);
+        else
+          clusters = runILP(units, k, n, m, ideal_pop, clusters);
+      }}
 
 //printf("%d \n", s);
      if (s % 50000 == 0)
@@ -233,15 +241,15 @@ int runSA(double Tstart, /* [in] starting temperature */
     int energy__compactness = energy_compactness(clusters, k);
     accept_prob = 0.0;
 
-    if (s % (numIterations / 5) == 0)
+    if (s % (numIterations / 5) == 0  || s == 2)
     {
 
       if (perfect_score == 0)
       {
-        if (best_clusters != NULL)
-          clusters = runILP(units, k, n, m, ideal_pop, best_clusters);
-        else
-          clusters = runILP(units, k, n, m, ideal_pop, clusters);
+        // if (best_clusters != NULL)
+        //   clusters = runILP(units, k, n, m, ideal_pop, best_clusters);
+        // else
+        //   clusters = runILP(units, k, n, m, ideal_pop, clusters);
         //printf("HI!!\n");
         // for (int i = 0; i < k; i++)
         // {
@@ -298,7 +306,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     if (energy__compactness >= best_energy_compactness && energy__population == 0)
     {
       accept_prob = 1.0;
-      print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+      //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
       fprintf(saa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
       if (energy__compactness > best_energy_compactness)
         perfect_score++;
