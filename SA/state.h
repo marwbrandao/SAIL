@@ -10,6 +10,7 @@ typedef struct
     TU **border_units;  // The indices of the border units
     int num_border_units; // The number of border units 
     int id;
+    bool blocked;
 } Cluster;
 
 
@@ -22,6 +23,8 @@ int
 energy(TU** units, Cluster* clusters, int margin, int k, int n);
 Cluster** first_cluster(TU **units, int k, int n);
 
+Cluster **refined_first_cluster(TU **units, int k, int n, int ideal_population);
+void redistribute_units_to_clusters(TU **units, Cluster *clusters, int k, int n, int ideal_population);
 void change_unit1(Cluster *clusters, TU **units, int k, int n);
 void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_pop);
 /* Execute a random transition

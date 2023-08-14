@@ -347,26 +347,272 @@ Cluster **first_cluster(TU **units, int k, int n)
     return clusters;
 }
 
-void dfs_contiguity_exclude(int index, int exclude_index, Cluster *cluster, int *visited)
+Cluster **refined_first_cluster(TU **units, int k, int n, int ideal_population)
 {
-    visited[index] = 1;
-    //printf("first Visited unit: %d\n", cluster->units[index]->code); // add debug print
-
-    if (cluster->size - 1 == 1)
+    srand(time(NULL));
+    Cluster *clusters = malloc(k * sizeof(Cluster));
+    create_code_index1(units, n);
+    
+    for (int i = 0; i < k; i++)
     {
+        clusters[i].units = malloc(n * sizeof(TU *));
+        clusters[i].size = 0;
+    }
+    
+    int l = 0;
+    int unit_num;
+
+    // Initialize clusters with random units
+    for (int i = 0; i < k; i++)
+    {
+        do
+        {
+            unit_num = rand() % n;
+            if (!units[unit_num]->assigned)
+            {
+                units[unit_num]->assigned = true;
+                units[unit_num]->cluster_id = i;
+                clusters[i].units[0] = units[unit_num];
+                clusters[i].size = 1;
+                clusters[i].id = i;
+                l++;
+            }
+            else
+            {
+                clusters[i].size = 0;
+            }
+        } while (units[unit_num]->assigned == false || clusters[i].size == 0);
+    }
+
+    // Assign units to clusters based on contiguity
+    for (int i = k; i < n; i++)
+    {
+        unit_num = rand() % n;
+        
+        while (units[unit_num]->assigned)
+        {
+            unit_num = rand() % n;
+        }
+
+        units[unit_num]->assigned = true;
+        int cluster_id = rand() % k;
+        
+        int j = 0;
+        while (j < clusters[cluster_id].size)
+        {
+            TU *unit = clusters[cluster_id].units[j];
+            if (is_neighbor(units[unit_num], unit))
+            {
+                clusters[cluster_id].units[clusters[cluster_id].size] = units[unit_num];
+                clusters[cluster_id].size++;
+                units[unit_num]->cluster_id = cluster_id;
+                break;
+            }
+            j++;
+        }
+
+        if (j == clusters[cluster_id].size)
+        {
+            units[unit_num]->assigned = false;
+            i--;
+        }
+    }
+
+     // Calculate population for each cluster and block clusters with population <= ideal_population
+    for (int i = 0; i < k; i++) {
+        calculate_population(&clusters[i]);
+        
+        if (clusters[i].population <= ideal_population) {
+            clusters[i].blocked = true;
+        }
+    }
+
+    // Assign unassigned units to clusters. Blocked clusters will only accept adjacent units.
+    for (int i = 0; i < n; i++) {
+        if (!units[i]->assigned) {
+            for (int j = 0; j < k; j++) {
+                if (clusters[j].blocked) {
+                    // Only add a unit to a blocked cluster if the unit is adjacent
+                    int adjacent_found = 0;
+                    for (int m = 0; m < clusters[j].size; m++) {
+                        if (is_neighbor(units[i], clusters[j].units[m])) {
+                            clusters[j].units[clusters[j].size++] = units[i];
+                            units[i]->assigned = true;
+                            units[i]->cluster_id = j;
+                            adjacent_found = 1;
+                            break;
+                        }
+                    }
+                    if (adjacent_found) {
+                        break;
+                    }
+                } else {
+                    // Add to non-blocked clusters without any adjacency constraint
+                    clusters[j].units[clusters[j].size++] = units[i];
+                    units[i]->assigned = true;
+                    units[i]->cluster_id = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    return clusters;
+
+}
+
+void redistribute_units_to_clusters(TU **units, Cluster *clusters, int k, int n, int ideal_population) {
+    // Mark clusters which shouldn't receive more units
+    bool *blocked_clusters = malloc(k * sizeof(bool));
+    for (int i = 0; i < k; i++) {
+        if (clusters[i].population <= ideal_population) {
+            blocked_clusters[i] = true;
+        } else {
+            blocked_clusters[i] = false;
+        }
+    }
+
+    // Assign unassigned units to clusters that can receive more units
+    for (int i = 0; i < n; i++) {
+        if (!units[i]->assigned) {
+            int cluster_id;
+            do {
+                cluster_id = rand() % k;
+            } while (blocked_clusters[cluster_id]);
+
+            // Try to find a neighbor in the chosen cluster to attach the unit
+            int j = 0;
+            while (j < clusters[cluster_id].size) {
+                TU *unit = clusters[cluster_id].units[j];
+                if (is_neighbor(units[i], unit)) {
+                    clusters[cluster_id].units[clusters[cluster_id].size] = units[i];
+                    clusters[cluster_id].size++;
+                    units[i]->cluster_id = cluster_id;
+                    units[i]->assigned = true;
+                    break;
+                }
+                j++;
+            }
+        }
+    }
+
+    // Recalculate population for each cluster after redistribution
+    for (int i = 0; i < k; i++) {
+        calculate_population(&clusters[i]);
+    }
+
+    free(blocked_clusters);
+}
+
+
+void dfs_contiguity_exclude(int index, int exclude_code, Cluster *cluster, int *visited) {
+    //printf("Visiting unit at index %d with code %d\n", index, cluster->units[index]->code);
+    visited[index] = 1;
+
+    if (cluster->size - 1 == 1) {
         //printf("Only one unit remaining. It's technically contiguous (to itself).\n");
         return;
     }
 
-    for (int i = 0; i < cluster->size; i++)
-    {
-        // printf("unit %d checking to see if its differernt that %d\n", cluster->units[index]->code, cluster->units[i]->code);
-        if (cluster->units[i]->unit_id != exclude_index && !visited[i] && is_neighbor(cluster->units[index], cluster->units[i]) == 1)
-        {
-            dfs_contiguity_exclude(i, exclude_index, cluster, visited);
+    for (int i = 0; i < cluster->size; i++) {
+        //printf("Checking if unit at index %d with code %d is a neighbor and not visited...\n", i, cluster->units[i]->code);
+
+        if (cluster->units[i]->code != exclude_code && !visited[i] && is_neighbor(cluster->units[index], cluster->units[i]) == 1) {
+            //printf("Unit at index %d with code %d is a neighbor and not visited. Exploring...\n", i, cluster->units[i]->code);
+            dfs_contiguity_exclude(i, exclude_code, cluster, visited);
+        } else {
+            //printf("Unit at index %d with code %d is either already visited, or not a neighbor, or has the excluded code.\n", i, cluster->units[i]->code);
         }
     }
 }
+
+
+//TODO
+
+typedef struct Queue {
+    int* data;
+    int front;
+    int rear;
+    int capacity;
+} Queue;
+
+Queue* create_queue(int capacity) {
+    Queue* q = (Queue*)malloc(sizeof(Queue));
+    q->data = (int*)malloc(capacity * sizeof(int));
+    q->front = 0;
+    q->rear = -1;
+    q->capacity = capacity;
+    return q;
+}
+
+void enqueue(Queue* q, int value) {
+    if (q->rear == q->capacity - 1) return; // Queue full
+    q->data[++q->rear] = value;
+}
+
+int dequeue(Queue* q) {
+    if (q->front > q->rear) return -1; // Queue empty
+    return q->data[q->front++];
+}
+
+bool is_empty(Queue* q) {
+    return q->front > q->rear;
+}
+
+void free_queue(Queue* q) {
+    free(q->data);
+    free(q);
+}
+
+int find_unit_index_by_code(Cluster* cluster, int code) {
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i]->code == code) {
+            return i;
+        }
+    }
+    return -1; // Not found
+}
+
+
+bool bfs_contiguity_exclude(int start_code, int exclude_code, Cluster *cluster) {
+    int start_index = find_unit_index_by_code(cluster, start_code);
+    if (start_index == -1) return false;
+
+    int* visited = (int*)calloc(cluster->size, sizeof(int));
+    Queue* queue = create_queue(cluster->size);
+
+    enqueue(queue, start_index);
+    visited[start_index] = 1;
+
+    while (!is_empty(queue)) {
+        int curr_index = dequeue(queue);
+        TU* curr_unit = cluster->units[curr_index];
+
+        for (int i = 0; i < curr_unit->num_neighbors; i++) {
+            int neighbor_index = find_unit_index_by_code(cluster, curr_unit->neighbor_codes[i]);
+
+            if (neighbor_index != -1 && !visited[neighbor_index] && curr_unit->neighbor_codes[i] != exclude_code) {
+                enqueue(queue, neighbor_index);
+                visited[neighbor_index] = 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (!visited[i] && cluster->units[i]->code != exclude_code) {
+            free(visited);
+            free_queue(queue);
+            return false; // There exists a non-visited unit that's not the excluded one.
+        }
+    }
+
+    free(visited);
+    free_queue(queue);
+    return true;
+}
+
+
+//TODO
 
 int are_remaining_units_contiguous(Cluster *cluster, int exclude_index)
 {
@@ -860,13 +1106,21 @@ void find_border_units(Cluster *clusters, int num_clusters, int current_cluster_
     }
 }
 // Function to move a unit from one cluster to another
-void move_unit(Cluster *from_cluster, Cluster *to_cluster, int unit_index)
+void move_unit(Cluster *from_cluster, Cluster *to_cluster, int unit_code)
 {
-    // Check if unit_index is valid
-    if (unit_index < 0 || unit_index >= from_cluster->size)
+    int unit_index = -1;
+    for (int i = 0; i < from_cluster->size; i++)
     {
-        // printf("Invalid unit_index: %d\n", unit_index);
-        return; // Return early if unit_index is not valid
+        if (from_cluster->units[i]->code == unit_code)
+        {
+            unit_index = i;
+            break;
+        }
+    }
+
+    if (unit_index == -1)
+    {
+        return;  // Unit with given code not found.
     }
 
     TU *unit_to_move = from_cluster->units[unit_index];
@@ -885,26 +1139,31 @@ void move_unit(Cluster *from_cluster, Cluster *to_cluster, int unit_index)
 
     // Update the unit's cluster_id
     unit_to_move->cluster_id = to_cluster->id;
+    
+    //printf("Moved unit with Code %d from cluster ID %d to cluster ID %d\n", unit_to_move->code, from_cluster->id, to_cluster->id);
 }
 
-bool is_cluster_contiguous(Cluster *cluster, int exclude_index)
-{
-    if (cluster->size < 1) return false;
 
-    int *visited = calloc(cluster->size, sizeof(int));
-    int num_visited = 0;
-    int start_index = (exclude_index == 0) ? 1 : 0;
-
-    dfs_contiguity_exclude(start_index, exclude_index, cluster, visited);
-
-    for (int i = 0; i < cluster->size; i++)
-    {
-        if (cluster->units[i]->unit_id != exclude_index && visited[i]) num_visited++;
+bool is_cluster_contiguous(Cluster *cluster, int exclude_code) {
+    if (cluster->size < 1) {
+        return false;
     }
 
-    free(visited);
-    return num_visited == cluster->size - 1;
+    int start_code;
+    if (cluster->units[0]->code == exclude_code) {
+        if (cluster->size > 1) {
+            start_code = cluster->units[1]->code;
+        } else {
+            // Only one unit in the cluster and it's the one we want to exclude
+            return true;
+        }
+    } else {
+        start_code = cluster->units[0]->code;
+    }
+
+    return bfs_contiguity_exclude(start_code, exclude_code, cluster);
 }
+
 
 void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_population) {
     identify_border_units(units, clusters, n, k);
@@ -997,24 +1256,24 @@ void process_cluster(Cluster *source_cluster, Cluster *target_cluster, Cluster *
     int contiguous_movement_count = 0;
     for (int i = 0; i < border_unit_count; i++) {
         TU *border_unit = source_cluster->border_units[i];
+        
         if (!border_unit) {
             continue;
         }
+        
+        
+        
+        //printf("Evaluating unit with Code %d from source cluster ID %d for movement\n", border_unit->code, source_cluster->id);
+        
+        int moved_unit_code = border_unit->code;    
+        move_unit(source_cluster, target_cluster, border_unit->code);
 
-        int unit_index = find_unit_index_in_cluster(source_cluster, border_unit->unit_id);
-        if (unit_index == -1) {
-            continue;
-        }
-
-        int moved_unit_index_in_target = target_cluster->size;
-        move_unit(source_cluster, target_cluster, unit_index);
-
-        if (is_cluster_contiguous(source_cluster, border_unit->unit_id)) {
+        if (is_cluster_contiguous(source_cluster, border_unit->code)) {  // Adjusted to use code
             contiguous_movements = realloc(contiguous_movements, (contiguous_movement_count + 1) * sizeof(int));
             contiguous_movements[contiguous_movement_count++] = i;
         }
 
-        move_unit(target_cluster, source_cluster, moved_unit_index_in_target);
+        move_unit(target_cluster, source_cluster, moved_unit_code);
     }
 
     if (contiguous_movement_count > 0) {
@@ -1022,8 +1281,9 @@ void process_cluster(Cluster *source_cluster, Cluster *target_cluster, Cluster *
         int chosen_unit_index = contiguous_movements[random_index];
         TU *chosen_border_unit = source_cluster->border_units[chosen_unit_index];
 
-        int unit_index = find_unit_index_in_cluster(source_cluster, chosen_border_unit->unit_id);
-        move_unit(source_cluster, target_cluster, unit_index);
+        int unit_index = find_unit_index_in_cluster(source_cluster, chosen_border_unit->code);  // Adjusted to use code
+        move_unit(source_cluster, target_cluster, chosen_border_unit->code);
+        //printf("Chose unit with Code %d from source cluster ID %d for movement\n", chosen_border_unit->code, source_cluster->id);
     }
 
     free(source_cluster->border_units);

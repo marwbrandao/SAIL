@@ -12,7 +12,7 @@
 
 struct TU;
 
-// Reads the files, d -> is the number of the district, k -> is the number of clusters, n -> number of TUs, m -> margin of population 
+// Reads the files, d -> is the number of the district, k -> is the number of clusters, n -> number of TUs, m -> margin of population 2
 TU** graph(char* filename, int* d, int* k, int* n, int* m) {
 
     char line[256];

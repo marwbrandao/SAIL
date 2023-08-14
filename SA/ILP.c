@@ -971,7 +971,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         exit(1);
     }
 
-    //create_code_index(units, n);
+    //create_code_index(units, n);0
     //create_neighbor_index(units, n);
     int num_vars = create_decision_variables(units, k, n, env, lp);
 
