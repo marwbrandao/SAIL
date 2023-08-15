@@ -1163,7 +1163,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 *60.0 *10.0; // Time limit in seconds
+    double time_limit = 60.0 *60.0 *20.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
