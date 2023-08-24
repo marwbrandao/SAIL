@@ -7,11 +7,11 @@
 
 
 typedef struct TU{
-    int code;
+    char* code;
     int num_code;
     int voters;
     int num_neighbors;
-    int* neighbor_codes;
+    char** neighbor_codes;
     int* border_sizes;
     bool assigned; 
     int cluster_id;

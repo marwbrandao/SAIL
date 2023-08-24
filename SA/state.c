@@ -89,7 +89,7 @@ void create_neighbor_index1(TU **units, int n)
 
         for (int j = 0; j < num_neighbors; j++)
         {
-            int neighbor_code = units[i]->neighbor_codes[j];
+            char** neighbor_code = units[i]->neighbor_codes[j];
             // printf("here\n");
             units[i]->neighbor_ids[j] = find_id_by_code(units, n, neighbor_code);
         }
@@ -131,11 +131,16 @@ int compactness(Cluster *cluster)
         {
             for (int k = 0; k < cluster->size; k++)
             {
-                if (unit->neighbor_codes[j] == cluster->units[k]->code)
+                
+                if (strcmp(unit->neighbor_codes[j], cluster->units[k]->code) == 0) 
                 {
-
-                    if (unit->code < unit->neighbor_codes[j])
+                    
+                    //if (unit->code < unit->neighbor_codes[j])
+                    long value_code = strtol(unit->code, NULL, 16);
+            long value_neighbor = strtol(unit->neighbor_codes[j], NULL, 16);
+                    if (value_code < value_neighbor) 
                     {
+                        //printf("%ld %ld\n",value_code, value_neighbor);
                         shared_borders += unit->border_sizes[j];
                     }
                     break;
@@ -190,7 +195,7 @@ int energy_compactness(Cluster *clusters, int k)
         // printf("cluster %d\n", i);
         total_shared_borders += compactness(&clusters[i]);
     }
-    // rintf("shared borders = %d\n", total_shared_borders);
+   //printf("shared borders = %d\n", total_shared_borders);
 
     return total_shared_borders;
 }
@@ -220,10 +225,10 @@ int is_neighbor(TU *unit1, TU *unit2)
 {
     for (int i = 0; i < unit1->num_neighbors; i++)
     {
-        //printf("Checking %d if unit %d is neighbor with unit %d\n", unit1->code, unit1->neighbor_codes[i], unit2->code);
-        if (unit1->neighbor_codes[i] == unit2->code)
+        //printf("Checking if unit %s is neighbor with unit %s\n", unit1->neighbor_codes[i], unit2->code);
+        if (strcmp(unit1->neighbor_codes[i], unit2->code) == 0) 
         {
-            //printf("Unit %d is a neighbor of unit %d\n", unit2->code, unit1->code); // add debug print
+            //printf("Unit %s is a neighbor of unit %s\n", unit2->code, unit1->code); // add debug print
             return 1;
         }
     }
@@ -253,7 +258,7 @@ void calculate_border_units(TU **units, Cluster *cluster, int n)
         {
             printf("3cluster border units: %d, %d\n", cluster->num_border_units, unit->neighbor_codes[j]);
             TU *neighbor = malloc(n * sizeof(Cluster));
-            neighbor = units[unit->neighbor_codes[j]];
+            neighbor = unit->neighbor_codes[j];
             printf("4cluster border units: %d\n", cluster->num_border_units);
             if (neighbor->cluster_id != cluster->id)
             {
@@ -273,7 +278,9 @@ Cluster **first_cluster(TU **units, int k, int n)
 {
     srand(time(NULL));
     Cluster *clusters = malloc(k * sizeof(Cluster));
+    //printf("1\n");
     create_code_index1(units, n);
+    //printf("2\n");
     for (int i = 0; i < k; i++)
     {
         clusters[i].units = malloc(n * sizeof(TU *));
@@ -305,7 +312,7 @@ Cluster **first_cluster(TU **units, int k, int n)
             }
         } while (units[unit_num]->assigned == false || clusters[i].size == 0);
     }
-
+    //printf("3\n");
     for (int i = k; i < n; i++)
     {
         unit_num = rand() % n;
@@ -313,7 +320,7 @@ Cluster **first_cluster(TU **units, int k, int n)
         {
             unit_num = rand() % n;
         }
-
+        //printf("3.1\n");
         units[unit_num]->assigned = true;
         int cluster_id = rand() % k;
         int j = 0;
@@ -335,6 +342,7 @@ Cluster **first_cluster(TU **units, int k, int n)
             i--;
         }
     }
+    //printf("4\n");
     for (int i = 0; i < k; i++)
     {
 
@@ -342,7 +350,7 @@ Cluster **first_cluster(TU **units, int k, int n)
         // calculate_border_units(units, &clusters[i], n);
     }
 
-    create_neighbor_index1(units, n);
+    //create_neighbor_index1(units, n);
     printf("unit %d\n", units[1]->num_neighbors);
     return clusters;
 }
@@ -505,7 +513,7 @@ void redistribute_units_to_clusters(TU **units, Cluster *clusters, int k, int n,
 }
 
 
-void dfs_contiguity_exclude(int index, int exclude_code, Cluster *cluster, int *visited) {
+void dfs_contiguity_exclude(int index, char* exclude_code, Cluster *cluster, int *visited) {
     //printf("Visiting unit at index %d with code %d\n", index, cluster->units[index]->code);
     visited[index] = 1;
 
@@ -564,9 +572,11 @@ void free_queue(Queue* q) {
     free(q);
 }
 
-int find_unit_index_by_code(Cluster* cluster, int code) {
+int find_unit_index_by_code(Cluster* cluster, char* code) {
     for (int i = 0; i < cluster->size; i++) {
-        if (cluster->units[i]->code == code) {
+        //if (cluster->units[i]->code == code)
+        if (strcmp(cluster->units[i]->code, code) == 0) 
+        {
             return i;
         }
     }
@@ -574,7 +584,7 @@ int find_unit_index_by_code(Cluster* cluster, int code) {
 }
 
 
-bool bfs_contiguity_exclude(int start_code, int exclude_code, Cluster *cluster) {
+bool bfs_contiguity_exclude(char* start_code, char* exclude_code, Cluster *cluster) {
     int start_index = find_unit_index_by_code(cluster, start_code);
     if (start_index == -1) return false;
 
@@ -841,7 +851,8 @@ void change_unit1(Cluster *clusters, TU **units, int k, int n)
             TU *neighbor = NULL;
             for (int k = 0; k < n; k++)
             {
-                if (units[k]->code == current_unit->neighbor_codes[j])
+                //if (units[k]->code == current_unit->neighbor_codes[j])
+                if (strcmp(units[k]->code, current_unit->neighbor_codes[j]) == 0)
                 {
                     neighbor = units[k];
                     break;
@@ -925,10 +936,11 @@ void change_unit1(Cluster *clusters, TU **units, int k, int n)
 
     for (int i = 0; i < selected_unit->num_neighbors; i++)
     {
-        int neighbor_code = selected_unit->neighbor_codes[i];
+        char* neighbor_code = selected_unit->neighbor_codes[i];
         for (int j = 0; j < n; j++)
         {
-            if (units[j]->code == neighbor_code)
+            //if (units[j]->code == neighbor_code)
+            if (strcmp(units[j]->code, neighbor_code) == 0) 
             {
                 int neighbor_cluster_id = units[j]->cluster_id;
                 if (neighbor_cluster_id != cluster_idx && !contains(neighboring_clusters, num_neighboring_clusters, neighbor_cluster_id))
@@ -1010,6 +1022,8 @@ void identify_border_units(TU **units, Cluster *clusters, int num_units, int k)
 {
     for (int c = 0; c < k; c++)
     {
+
+        //printf("Ayy\n");
         Cluster *cluster = &clusters[c];
         TU **border_units = (TU **)malloc(num_units * sizeof(TU *));
         int num_border_units = 0;
@@ -1033,10 +1047,10 @@ void identify_border_units(TU **units, Cluster *clusters, int num_units, int k)
         cluster->num_border_units = num_border_units;
 
         // printf("Cluster %d has %d border units:\n", cluster->id, cluster->num_border_units);
-        for (int i = 0; i < num_border_units; i++)
-        {
-            // printf("Unit index: %d (Unit code: %d)\n", cluster->border_units[i]->unit_id, cluster->border_units[i]->code);
-        }
+        // for (int i = 0; i < num_border_units; i++)
+        // {
+        //     // printf("Unit index: %d (Unit code: %d)\n", cluster->border_units[i]->unit_id, cluster->border_units[i]->code);
+        // }
         // printf("\n");
     }
 }
@@ -1087,7 +1101,8 @@ void find_border_units(Cluster *clusters, int num_clusters, int current_cluster_
            
             for (int k = 0; k < neighbor_cluster->size; k++)
             {
-                if (current_cluster->units[i]->neighbor_codes[j] == neighbor_cluster->units[k]->code)
+               //if (current_cluster->units[i]->neighbor_codes[j] == neighbor_cluster->units[k]->code)
+                 if (strcmp(current_cluster->units[i]->neighbor_codes[j], neighbor_cluster->units[k]->code) == 0) 
                 {
                     if (!is_border_unit)
                     {
@@ -1106,12 +1121,13 @@ void find_border_units(Cluster *clusters, int num_clusters, int current_cluster_
     }
 }
 // Function to move a unit from one cluster to another
-void move_unit(Cluster *from_cluster, Cluster *to_cluster, int unit_code)
+void move_unit(Cluster *from_cluster, Cluster *to_cluster, char* unit_code)
 {
     int unit_index = -1;
     for (int i = 0; i < from_cluster->size; i++)
     {
-        if (from_cluster->units[i]->code == unit_code)
+        //if (from_cluster->units[i]->code == unit_code)
+        if (strcmp(from_cluster->units[i]->code, unit_code) == 0) 
         {
             unit_index = i;
             break;
@@ -1144,13 +1160,14 @@ void move_unit(Cluster *from_cluster, Cluster *to_cluster, int unit_code)
 }
 
 
-bool is_cluster_contiguous(Cluster *cluster, int exclude_code) {
+bool is_cluster_contiguous(Cluster *cluster, char* exclude_code) {
     if (cluster->size < 1) {
         return false;
     }
 
-    int start_code;
-    if (cluster->units[0]->code == exclude_code) {
+    char* start_code;
+    //if (cluster->units[0]->code == exclude_code)
+    if (strcmp(cluster->units[0]->code, exclude_code) == 0) {
         if (cluster->size > 1) {
             start_code = cluster->units[1]->code;
         } else {
@@ -1194,7 +1211,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
 }
 
 int select_cluster_with_max_deviation(Cluster *clusters, int k, int ideal_population) {
-    if (rand() % 100 < 80) {
+    if (rand() % 100 < 95) {
         int max_deviation = -1;
         int max_deviation_cluster_idx = -1;
         for (int i = 0; i < k; i++) {
@@ -1265,7 +1282,7 @@ void process_cluster(Cluster *source_cluster, Cluster *target_cluster, Cluster *
         
         //printf("Evaluating unit with Code %d from source cluster ID %d for movement\n", border_unit->code, source_cluster->id);
         
-        int moved_unit_code = border_unit->code;    
+        char* moved_unit_code = border_unit->code;    
         move_unit(source_cluster, target_cluster, border_unit->code);
 
         if (is_cluster_contiguous(source_cluster, border_unit->code)) {  // Adjusted to use code

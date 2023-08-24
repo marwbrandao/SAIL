@@ -16,6 +16,11 @@ typedef struct {
 
 void create_code_index(TU **units, int n);
 
+int find_id_by_code(TU **units, int n, char* code);
+
+void create_neighbor_index(TU **units, int n);
+
+
 // int find_index_by_code(int code, CodeIndexMapping *code_index_mappings, int n);
 void create_flow_decision_variables(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp);
 

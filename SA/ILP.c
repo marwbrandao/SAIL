@@ -21,7 +21,7 @@ void create_code_index(TU **units, int n)
     }
 }
 
-int find_id_by_code(TU **units, int n, int code)
+int find_id_by_code(TU **units, int n, char* code)
 {
     for (int i = 0; i < n; i++)
     {
@@ -936,6 +936,86 @@ void add_impossible_pairs_constraints(TU **units, int n, int k, CPXENVptr env, C
 }
 
 
+
+// Define a struct to store cluster info temporarily
+typedef struct {
+    int cluster_id;
+    int population;
+} ClusterInfo;
+
+// Compare function for sorting ClusterInfo by population
+int compare_by_population(const void *a, const void *b) {
+    return ((ClusterInfo *)a)->population - ((ClusterInfo *)b)->population;
+}
+
+void add_fixed_cluster_constraints_trial(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population, int trial)
+{
+    ClusterInfo below_pop_clusters[num_clusters];
+    int below_count = 0;
+
+    // Identify clusters below ideal population and store them in below_pop_clusters
+    for (int c = 0; c < num_clusters; c++) {
+        Cluster *cluster = &clusters[c];
+        int cluster_population = 0;
+        for (int i = 0; i < cluster->size; i++) {
+            cluster_population += cluster->units[i]->voters;
+        }
+
+        if (cluster_population <= max_population) {
+            below_pop_clusters[below_count].cluster_id = c;
+            below_pop_clusters[below_count].population = cluster_population;
+            printf("Identified cluster %d with population %d as below the max_population.\n", c, cluster_population);
+            below_count++;
+        }
+
+    }
+
+    // Sort below_pop_clusters by population
+    qsort(below_pop_clusters, below_count, sizeof(ClusterInfo), compare_by_population);
+
+    // After the qsort line
+    printf("Sorted clusters based on population:\n");
+    for (int i = 0; i < below_count; i++) {
+        printf("Cluster %d with population %d\n", below_pop_clusters[i].cluster_id, below_pop_clusters[i].population);
+    }
+
+
+   // Fix clusters based on trial number
+    for (int b = 0; b < below_count && b < trial; b++) {
+        int c = below_pop_clusters[b].cluster_id;
+        Cluster *cluster = &clusters[c];
+        // Just before the inner for-loop in the fixing clusters section
+        printf("Fixing cluster %d with population %d based on trial number %d.\n", c, below_pop_clusters[b].population, b);
+
+        for (int i = 0; i < cluster->size; i++) {
+            TU *unit = cluster->units[i];
+            char var_name[32];
+            sprintf(var_name, "x_%d_%d", c, unit->unit_id);
+            int idx;
+            int status = CPXgetcolindex(env, lp, var_name, &idx);
+            if (status) {
+                fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
+                exit(1);
+            }
+
+        // Print the fixed units
+            printf("Fixing unit %d (with population %d) to cluster %d\n", unit->unit_id, unit->voters, c);
+
+            double rhs[1] = {1.0};
+            char sense[1] = {'E'};
+            int rmatbeg[1] = {0};
+            int rmatind[1] = {idx};
+            double rmatval[1] = {1.0};
+
+            status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, NULL, NULL);
+            if (status) {
+                fprintf(stderr, "Failed to add fixed cluster constraint for unit %d.\n", i);
+                exit(1);
+            }
+        }
+    }
+}
+
 // lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
 // quiarta as 16
 
@@ -970,29 +1050,22 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         fprintf(stderr, "Failed to set time limit parameter.\n");
         exit(1);
     }
-
-    //create_code_index(units, n);0
-    //create_neighbor_index(units, n);
     int num_vars = create_decision_variables(units, k, n, env, lp);
-
-    // create_b_vars(units, k, n, env, lp);
+    int trial = 1;
     create_c_variables(units, n, k, env, lp);
 
     init_adjMatrix(units, n, adjMatrix);
     floydWarshall(n, adjMatrix, distMatrix);
 
-    // print_adjMatrix(n, adjMatrix);
-    // print_distMatrix(n, distMatrix);
-
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
-    add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
-
+    //add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
+    add_fixed_cluster_constraints_trial(env, lp, units, clusters, n, k, ideal_pop, trial);
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
     add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
     add_c_constraints(units, n, k, env, lp);
-    //add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
+    add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
     add_objective_function(units, n, k, env, lp);
 
     status = CPXmipopt(env, lp);
