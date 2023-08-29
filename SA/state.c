@@ -131,9 +131,10 @@ int compactness(Cluster *cluster)
         {
             for (int k = 0; k < cluster->size; k++)
             {
-                
+                //printf("%s, %s\n", unit->neighbor_codes[j], cluster->units[k]->code);
                 if (strcmp(unit->neighbor_codes[j], cluster->units[k]->code) == 0) 
                 {
+                    
                     
                     //if (unit->code < unit->neighbor_codes[j])
                     long value_code = strtol(unit->code, NULL, 16);

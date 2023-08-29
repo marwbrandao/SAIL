@@ -51,7 +51,8 @@ TU** graph(char* filename, int* d, int* k, int* n, int* m) {
         char* end = strchr(next_field, '}');
         for (int i = 0; i < unit->num_neighbors; i++) {       
              
-            sscanf(next_field, "'%[^']':", unit->neighbor_codes[i]);      
+            sscanf(next_field, "'%[^']':", unit->neighbor_codes[i]);     
+            //printf("N_code: %s\n", unit->neighbor_codes[i]);
             next_field = strchr(next_field, ':') + 1;
             sscanf(next_field, "%d", &unit->border_sizes[i]);
             if (i == unit->num_neighbors-1) {

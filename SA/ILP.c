@@ -25,7 +25,9 @@ int find_id_by_code(TU **units, int n, char* code)
 {
     for (int i = 0; i < n; i++)
     {
-        if (units[i]->code == code)
+        //printf("%S and %s\n", units[i]->code, code);
+        //if (units[i]->code == code)
+        if(strcmp(units[i]->code, code)== 0)
         {
             return i;
         }
@@ -44,8 +46,9 @@ void create_neighbor_index(TU **units, int n)
 
         for (int j = 0; j < num_neighbors; j++)
         {
-            int neighbor_code = units[i]->neighbor_codes[j];
-            // printf("here\n");
+            char* neighbor_code = units[i]->neighbor_codes[j];
+            //printf("ay?\n");
+             //printf("here %s\n", neighbor_code);
             units[i]->neighbor_ids[j] = find_id_by_code(units, n, neighbor_code);
         }
     }
@@ -1050,6 +1053,9 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         fprintf(stderr, "Failed to set time limit parameter.\n");
         exit(1);
     }
+
+    create_code_index(units, n);
+    create_neighbor_index(units, n);
     int num_vars = create_decision_variables(units, k, n, env, lp);
     int trial = 1;
     create_c_variables(units, n, k, env, lp);
@@ -1060,12 +1066,13 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     add_basic_constraints(env, lp, n, k);
     add_at_least_one_unit_per_cluster_constraints(env, lp, n, k);
     //add_fixed_cluster_constraints(env, lp, units, clusters, n, k, ideal_pop);
-    add_fixed_cluster_constraints_trial(env, lp, units, clusters, n, k, ideal_pop, trial);
+    
     add_population_constraints(units, n, k, env, lp, ideal_pop);
 
     add_contiguity_constraints2(units, k, n, distMatrix, env, lp);
     add_c_constraints(units, n, k, env, lp);
     add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
+    add_fixed_cluster_constraints_trial(env, lp, units, clusters, n, k, ideal_pop, trial);
     add_objective_function(units, n, k, env, lp);
 
     status = CPXmipopt(env, lp);
@@ -1184,7 +1191,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     free(solution);
     clusters = create_initial_clusters(units, k, n);
     // printf("22AHYO\n");
-    printf("..Cluster 0 with size %d: ", clusters[1].size);
+    //printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
     // printf("end = == = %f\n", end_time);
