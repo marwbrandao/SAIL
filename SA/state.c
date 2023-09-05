@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <float.h>
+#include <errno.h> // for errn
+#include <string.h>
 
 #include "state.h"
 #include "graph.h"
@@ -121,27 +123,71 @@ void population_bounds(TU **units, int margin, int *lower_bound, int *upper_boun
     *upper_bound = (ideal_population + bound);
 }
 
+int hex_to_int(const char *hex) {
+    if (hex == NULL || *hex == '\0') {
+        //printf("Debug: Received NULL or empty string in hex_to_int.\n");
+        return -1;
+    }
+
+    int result = 0;
+    while (*hex) {
+        int byte = *hex++;
+        if (byte >= '0' && byte <= '9') byte = byte - '0';
+        else if (byte >= 'a' && byte <= 'h') byte = byte - 'a' + 10;
+        else if (byte >= 'A' && byte <= 'H') byte = byte - 'A' + 10;
+        else return -1;
+        
+        result = (result << 4) | (byte & 0xF);
+    }
+    //printf("%d\n", result);
+    return result;
+}
+
+
 int compactness(Cluster *cluster)
 {
+    if (cluster == NULL) {
+        //printf("Debug: Cluster is NULL.\n");
+        return -1;
+    }
+
     int shared_borders = 0;
-    for (int i = 0; i < cluster->size; i++)
-    {
+
+    for (int i = 0; i < cluster->size; i++) {
+        if (cluster->units[i] == NULL) {
+            //printf("Debug: Unit at index %d is NULL.\n", i);
+            continue;
+        }
+
         TU *unit = cluster->units[i];
-        for (int j = 0; j < unit->num_neighbors; j++)
-        {
-            for (int k = 0; k < cluster->size; k++)
-            {
-                //printf("%s, %s\n", unit->neighbor_codes[j], cluster->units[k]->code);
-                if (strcmp(unit->neighbor_codes[j], cluster->units[k]->code) == 0) 
-                {
-                    
-                    
-                    //if (unit->code < unit->neighbor_codes[j])
-                    long value_code = strtol(unit->code, NULL, 16);
-            long value_neighbor = strtol(unit->neighbor_codes[j], NULL, 16);
-                    if (value_code < value_neighbor) 
-                    {
-                        //printf("%ld %ld\n",value_code, value_neighbor);
+        
+        int value_code = hex_to_int(unit->code);
+        if (value_code == -1) {
+            //printf("Debug: Conversion to integer failed for unit->code.\n");
+            continue;
+        }
+
+        for (int j = 0; j < unit->num_neighbors; j++) {
+            if (unit->neighbor_codes[j] == NULL) {
+                //printf("Debug: Neighbor code at index %d is NULL.\n", j);
+                continue;
+            }
+            //printf("code %s\n", unit->neighbor_codes[j]);
+            int value_neighbor = hex_to_int(unit->neighbor_codes[j]);
+            //printf("value %d\n", value_neighbor);
+            if (value_neighbor == -1) {
+                //printf("Debug: Conversion to integer failed for unit->neighbor_codes[j].\n");
+                continue;
+            }
+
+            for (int k = 0; k < cluster->size; k++) {
+                if (cluster->units[k] == NULL || cluster->units[k]->code == NULL) {
+                    //printf("Debug: Unit or unit code at index %d is NULL.\n", k);
+                    continue;
+                }
+
+                if (value_neighbor == hex_to_int(cluster->units[k]->code)) {
+                    if (value_code < value_neighbor) {
                         shared_borders += unit->border_sizes[j];
                     }
                     break;
@@ -151,6 +197,7 @@ int compactness(Cluster *cluster)
     }
     return shared_borders;
 }
+
 
 // dif entre as frnteiras de populaçao
 int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_population)
@@ -1021,21 +1068,38 @@ Cluster **storeState(Cluster *clusters, int k, int n)
 // TODO
 void identify_border_units(TU **units, Cluster *clusters, int num_units, int k)
 {
-    for (int c = 0; c < k; c++)
-    {
+    if (units == NULL || clusters == NULL) {
+        printf("Error: Null pointer passed to function.\n");
+        return;
+    }
+    
+    for (int c = 0; c < k; c++) {
+        Cluster *cluster = &clusters[c];
+        if (cluster == NULL) {
+            printf("Error: Null cluster at index %d\n", c);
+            continue;
+        }
 
         //printf("Ayy\n");
-        Cluster *cluster = &clusters[c];
+        // Cluster *cluster = &clusters[c];
         TU **border_units = (TU **)malloc(num_units * sizeof(TU *));
         int num_border_units = 0;
 
-        for (int i = 0; i < cluster->size; i++)
-        {
+        for (int i = 0; i < cluster->size; i++) {
             TU *current_unit = cluster->units[i];
-            for (int j = 0; j < current_unit->num_neighbors; j++)
-            {
-                // Get the neighbor using the neighbor_ids directly
-                TU *neighbor = units[current_unit->neighbor_ids[j]];
+            if (current_unit == NULL || current_unit->neighbor_ids == NULL) {
+                printf("Error: Null unit or neighbor_ids at index %d\n", i);
+                continue;
+            }
+            
+            for (int j = 0; j < current_unit->num_neighbors; j++) {
+                int neighbor_id = current_unit->neighbor_ids[j];
+                if (neighbor_id < 0 || neighbor_id >= num_units) {
+                    printf("Error: neighbor_id (%d) out of bounds. num_units: %d\n", neighbor_id, num_units);
+                    continue;
+                }
+                
+                TU *neighbor = units[neighbor_id];
                 if (neighbor->cluster_id != cluster->id)
                 {
                     border_units[num_border_units++] = current_unit;
@@ -1233,18 +1297,48 @@ int select_cluster_with_max_deviation(Cluster *clusters, int k, int ideal_popula
 }
 
 void populate_neighboring_clusters(int *neighboring_clusters, Cluster *max_dev_cluster, TU **units, int k) {
+    if (neighboring_clusters == NULL || max_dev_cluster == NULL || units == NULL) {
+        //printf("Error1: One or more null pointers passed to function.\n");
+        return;
+    }
+    
     for (int i = 0; i < max_dev_cluster->num_border_units; i++) {
+        if (max_dev_cluster->border_units[i] == NULL) {
+            //printf("Error2: Null border unit at index %d\n", i);
+            continue;  // Skip to the next iteration
+        }
+
         int unit_id = max_dev_cluster->border_units[i]->unit_id;
+        
+        if (unit_id < 0) {
+            //printf("Error3: Invalid unit_id %d\n", unit_id);
+            continue;
+        }
+
         TU *unit = units[unit_id];
+        
         for (int j = 0; j < unit->num_neighbors; j++) {
-            int neighbor_cluster_idx = units[unit->neighbor_ids[j]]->cluster_id;
+            int neighbor_unit_id = unit->neighbor_ids[j];
+            
+            if (neighbor_unit_id < 0) {
+                //printf("Error4: Invalid neighbor_unit_id %d\n", neighbor_unit_id);
+                continue;
+            }
+
+            int neighbor_cluster_idx = units[neighbor_unit_id]->cluster_id;
+            
+            if (neighbor_cluster_idx < 0 || neighbor_cluster_idx >= k) {
+               //printf("unit_id: %d, neighbor_unit_id: %d, k: %d\n", unit_id, neighbor_unit_id, k);
+                //printf("Error5: Invalid neighbor_cluster_idx %d\n", neighbor_cluster_idx);
+                continue;
+            }
+
             if (neighbor_cluster_idx != max_dev_cluster->id && neighboring_clusters[neighbor_cluster_idx] == 0) {
                 neighboring_clusters[neighbor_cluster_idx] = 1;
             }
         }
     }
 }
-
 int count_non_zero(int *array, int length) {
     int count = 0;
     for (int i = 0; i < length; i++) {

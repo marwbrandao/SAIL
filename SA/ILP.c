@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <ilcplex/cplex.h>
+#include <time.h>
 
 #include "state.h"
 #include "graph.h"
@@ -951,69 +952,39 @@ int compare_by_population(const void *a, const void *b) {
     return ((ClusterInfo *)a)->population - ((ClusterInfo *)b)->population;
 }
 
-void add_fixed_cluster_constraints_trial(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population, int trial)
-{
-    ClusterInfo below_pop_clusters[num_clusters];
-    int below_count = 0;
-
-    // Identify clusters below ideal population and store them in below_pop_clusters
-    for (int c = 0; c < num_clusters; c++) {
+void add_fixed_cluster_constraints_trial(CPXENVptr env, CPXLPptr lp, TU **units, Cluster *clusters, int num_units, int num_clusters, int max_population, int trial){
+ for (int c = 0; c < num_clusters; c++) {
         Cluster *cluster = &clusters[c];
         int cluster_population = 0;
+        
+        // Calculate the population of the cluster
         for (int i = 0; i < cluster->size; i++) {
             cluster_population += cluster->units[i]->voters;
         }
 
+        // If cluster_population is below max_population, fix units to this cluster
         if (cluster_population <= max_population) {
-            below_pop_clusters[below_count].cluster_id = c;
-            below_pop_clusters[below_count].population = cluster_population;
-            printf("Identified cluster %d with population %d as below the max_population.\n", c, cluster_population);
-            below_count++;
-        }
+            for (int i = 0; i < cluster->size; i++) {
+                TU *unit = cluster->units[i];
+                char var_name[32];
+                sprintf(var_name, "x_%d_%d", c, unit->unit_id);
+                
+                int idx;
+                int status = CPXgetcolindex(env, lp, var_name, &idx);
+                if (status) {
+                    fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
+                    exit(1);
+                }
 
-    }
-
-    // Sort below_pop_clusters by population
-    qsort(below_pop_clusters, below_count, sizeof(ClusterInfo), compare_by_population);
-
-    // After the qsort line
-    printf("Sorted clusters based on population:\n");
-    for (int i = 0; i < below_count; i++) {
-        printf("Cluster %d with population %d\n", below_pop_clusters[i].cluster_id, below_pop_clusters[i].population);
-    }
-
-
-   // Fix clusters based on trial number
-    for (int b = 0; b < below_count && b < trial; b++) {
-        int c = below_pop_clusters[b].cluster_id;
-        Cluster *cluster = &clusters[c];
-        // Just before the inner for-loop in the fixing clusters section
-        printf("Fixing cluster %d with population %d based on trial number %d.\n", c, below_pop_clusters[b].population, b);
-
-        for (int i = 0; i < cluster->size; i++) {
-            TU *unit = cluster->units[i];
-            char var_name[32];
-            sprintf(var_name, "x_%d_%d", c, unit->unit_id);
-            int idx;
-            int status = CPXgetcolindex(env, lp, var_name, &idx);
-            if (status) {
-                fprintf(stderr, "Failed to get index for variable %s.\n", var_name);
-                exit(1);
-            }
-
-        // Print the fixed units
-            printf("Fixing unit %d (with population %d) to cluster %d\n", unit->unit_id, unit->voters, c);
-
-            double rhs[1] = {1.0};
-            char sense[1] = {'E'};
-            int rmatbeg[1] = {0};
-            int rmatind[1] = {idx};
-            double rmatval[1] = {1.0};
-
-            status = CPXaddrows(env, lp, 0, 1, 1, rhs, sense, rmatbeg, rmatind, rmatval, NULL, NULL);
-            if (status) {
-                fprintf(stderr, "Failed to add fixed cluster constraint for unit %d.\n", i);
-                exit(1);
+                // Fix this unit to this cluster by setting the variable to 1
+                double lb = 1.0; // Lower bound
+                double ub = 1.0; // Upper bound
+                
+                status = CPXchgcoef(env, lp, idx, lb, ub);
+                if (status) {
+                    fprintf(stderr, "Failed to change coefficient for variable %s.\n", var_name);
+                    exit(1);
+                }
             }
         }
     }
@@ -1028,6 +999,12 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     CPXLPptr lp = NULL;
     int status;
     double start_time, end_time;
+    clock_t start, end;
+    double cpu_time_used;
+
+    start = clock();
+
+    
 
     env = CPXopenCPLEX(&status);
     if (env == NULL)
@@ -1042,6 +1019,16 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         fprintf(stderr, "Could not create LP problem.\n");
         exit(1);
     }
+
+
+    // Set the number of threads to 1
+    status = CPXsetintparam(env, CPX_PARAM_THREADS, 1);
+    if (status) {
+        fprintf(stderr, "Failed to set the number of threads.\n");
+        exit(1);
+    }
+
+
     CPXgettime(env, &start_time);
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
@@ -1073,6 +1060,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     add_c_constraints(units, n, k, env, lp);
     add_impossible_pairs_constraints(units, n, k,  env, lp, distMatrix, ideal_pop);
     add_fixed_cluster_constraints_trial(env, lp, units, clusters, n, k, ideal_pop, trial);
+    
     add_objective_function(units, n, k, env, lp);
 
     status = CPXmipopt(env, lp);
@@ -1112,20 +1100,33 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
 
+    if (!solution) {
+        fprintf(stderr, "Memory allocation failed for solution.\n");
+        exit(1);
+    }
+
+    // Get the optimal solution
     status = CPXgetx(env, lp, solution, 0, num_vars - 1);
     if (status)
     {
         fprintf(stderr, "Failed to get optimal solution.\n");
-        // exit(1);
+        exit(1);
     }
 
+    int *cluster_unit_counts = calloc(k, sizeof(int));  
+    bool *processed_clusters = calloc(k, sizeof(bool));
+
+    if (!cluster_unit_counts || !processed_clusters) {
+        fprintf(stderr, "Memory allocation failed for counts or processed flags.\n");
+        exit(1);
+    }
     //     printf("Conflict written to conflict.lp.\n");
     // }int
     // num_vars = CPXgetnumcols(env, lp);
 
     // Print the optimal solution
-    int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
-    bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
+    // int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
+    // bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
 
     for (int i = 0; i < num_vars; i++)
     {
@@ -1194,6 +1195,8 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     //printf("..Cluster 0 with size %d: ", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+printf("CPU time used: %f\n", cpu_time_used);
     // printf("end = == = %f\n", end_time);
     double time_taken = end_time - start_time;
     printf("Time taken: %f seconds\n", time_taken);
@@ -1209,6 +1212,10 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
         fprintf(stderr, "Failed to close CPLEX environment.\n");
         exit(1);
     }
+
+    //free(solution);
+    free(cluster_unit_counts);
+    free(processed_clusters);
 
     return clusters;
 }
@@ -1304,7 +1311,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to get objective value.\n");
         // exit(1);
     }
-    printf("2 ");
+    //printf("2 ");
     printf("Objective value: %.2f\n", objval);
 
     double *solution = (double *)malloc(num_vars * sizeof(double));
@@ -1327,7 +1334,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     int *cluster_unit_counts = calloc(k, sizeof(int));  // Assuming k is the number of clusters
     bool *processed_clusters = calloc(k, sizeof(bool)); // This tracks which clusters have been processed
 
-    printf("hi1\n");
+    //printf("hi1\n");
 
     for (int i = 0; i < num_vars; i++)
     {
@@ -1378,7 +1385,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
                 printf("hi5\n");
         }
         if (i == num_vars-1)
-        printf("hi7\n");
+        //printf("hi7\n");
         units[i] = unit;
         // for (int j = 0; j < k; j++)
         // {
@@ -1393,7 +1400,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         //     }
         // }
         if (i == num_vars-1)
-        printf("hi6\n");
+        //printf("hi6\n");
         if (status)
         {
             fprintf(stderr, "Failed to get variable name for column %d.\n", i);
@@ -1406,11 +1413,11 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         free(namestore);
     }
     //
-    printf("5 \n");
+    //printf("5 \n");
     free(solution);
     clusters = create_initial_clusters(units, k, n);
     // printf("22AHYO\n");
-    printf("..Cluster 0 with size %d: \n", clusters[1].size);
+    //printf("..Cluster 0 with size %d: \n", clusters[1].size);
     status = CPXmipopt(env, lp);
     CPXgettime(env, &end_time);
     // printf("end = == = %f\n", end_time);
@@ -1428,7 +1435,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         fprintf(stderr, "Failed to close CPLEX environment.\n");
         exit(1);
     }
-    printf("6 \n");
+    //printf("6 \n");
     return clusters;
 
 }
