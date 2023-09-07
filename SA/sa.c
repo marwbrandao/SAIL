@@ -170,7 +170,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
   double startingValue = 0.2;
   double endingValue = 0.000001;
-  int numIterations = 2000000;
+  int numIterations = 1000000;
   double increment = (endingValue - startingValue) / (numIterations - 1);
 
   int iteration;
