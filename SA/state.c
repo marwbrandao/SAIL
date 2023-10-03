@@ -143,7 +143,6 @@ int hex_to_int(const char *hex) {
     return result;
 }
 
-
 int compactness(Cluster *cluster)
 {
     if (cluster == NULL) {
@@ -198,7 +197,6 @@ int compactness(Cluster *cluster)
     return shared_borders;
 }
 
-
 // dif entre as frnteiras de populaçao
 int energy_population(TU **units, Cluster *cluster, int margin, int k, int n, int ideal_population)
 {
@@ -247,7 +245,6 @@ int energy_compactness(Cluster *clusters, int k)
 
     return total_shared_borders;
 }
-
 
 void reset_visited(Cluster *cluster)
 {
@@ -403,16 +400,30 @@ Cluster **first_cluster(TU **units, int k, int n)
     return clusters;
 }
 
+int compare_population(const void *a, const void *b) {
+    TU *unit_a = *(TU **)a;
+    TU *unit_b = *(TU **)b;
+    return unit_b->voters - unit_a->voters;
+}
+
 Cluster **refined_first_cluster(TU **units, int k, int n, int ideal_population)
 {
     srand(time(NULL));
     Cluster *clusters = malloc(k * sizeof(Cluster));
     create_code_index1(units, n);
-    
-    for (int i = 0; i < k; i++)
-    {
+      qsort(units, n, sizeof(TU *), compare_population);
+       printf("Sorted units based on population\n");
+    for (int i = 0; i < k; i++) {
         clusters[i].units = malloc(n * sizeof(TU *));
-        clusters[i].size = 0;
+        clusters[i].size = 1;
+        clusters[i].id = i;
+        
+        units[i]->assigned = true;
+        units[i]->cluster_id = i;
+        clusters[i].units[0] = units[i];
+        clusters[i].population = units[i]->voters;
+        printf("Initialized cluster %d with unit %d having %d voters\n", i, i, units[i]->voters);
+   
     }
     
     int l = 0;
@@ -439,7 +450,7 @@ Cluster **refined_first_cluster(TU **units, int k, int n, int ideal_population)
             }
         } while (units[unit_num]->assigned == false || clusters[i].size == 0);
     }
-
+ int fail_count = 0;
     // Assign units to clusters based on contiguity
     for (int i = k; i < n; i++)
     {
@@ -452,25 +463,34 @@ Cluster **refined_first_cluster(TU **units, int k, int n, int ideal_population)
 
         units[unit_num]->assigned = true;
         int cluster_id = rand() % k;
+         //printf("Attempting to assign unit %d to cluster %d\n", unit_num, cluster_id);
         
         int j = 0;
-        while (j < clusters[cluster_id].size)
-        {
+       
+        while (j < clusters[cluster_id].size) {
             TU *unit = clusters[cluster_id].units[j];
-            if (is_neighbor(units[unit_num], unit))
-            {
+            if (is_neighbor(units[unit_num], unit)) {
                 clusters[cluster_id].units[clusters[cluster_id].size] = units[unit_num];
                 clusters[cluster_id].size++;
+                units[unit_num]->assigned = true;
                 units[unit_num]->cluster_id = cluster_id;
+                printf("Assigned unit %d to cluster %d based on contiguity\n", unit_num, cluster_id);
                 break;
             }
             j++;
         }
-
+        
         if (j == clusters[cluster_id].size)
         {
             units[unit_num]->assigned = false;
             i--;
+             printf("Failed to assign unit %d to any cluster. Rolling back.\n", unit_num);
+             fail_count++;
+        if(fail_count > 10) {
+            printf("Exiting because of multiple failed attempts.\n");
+            exit(1); // Or handle it more gracefully
+        }
+      
         }
     }
 
@@ -1339,6 +1359,7 @@ void populate_neighboring_clusters(int *neighboring_clusters, Cluster *max_dev_c
         }
     }
 }
+
 int count_non_zero(int *array, int length) {
     int count = 0;
     for (int i = 0; i < length; i++) {
