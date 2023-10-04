@@ -154,14 +154,14 @@ int runSA(double Tstart, /* [in] starting temperature */
   int perfect_score = 0;
   int not_as_great_score = 0;
   popul_test1(units, n, k, ideal_pop);
-
+  //return;
   // Uncomment to run only ILP//
-  // printf("0 ");
-  // Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
-  // print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
-  // print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
+  printf("0 ");
+  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
 
-  // return;
+  return;
 
   srand(time(NULL));
 
