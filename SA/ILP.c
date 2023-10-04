@@ -1239,6 +1239,12 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
         exit(1);
     }
 
+     status = CPXsetintparam(env, CPX_PARAM_THREADS, 1);
+    if (status) {
+        fprintf(stderr, "Failed to set the number of threads.\n");
+        exit(1);
+    }
+
     lp = CPXcreateprob(env, &status, "districting");
     if (lp == NULL)
     {
@@ -1250,7 +1256,7 @@ Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop)
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 60.0 * 40.0; // Time limit in seconds
+    double time_limit = 60.0 * 60.0 * 10.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
