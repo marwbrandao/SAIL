@@ -126,7 +126,7 @@ int runSA(double Tstart, /* [in] starting temperature */
   double a_it = 1.0;
   //FILE *output_file = fopen("output.txt", "w");
   char filename4[50]; // adjust size as needed
-  sprintf(filename4, "output_%d_%d.txt", d, n);
+  sprintf(filename4, "output_%d_%d_1.txt", d, n);
   FILE *output_file = fopen(filename4, "w");
   
   //FILE *print_file = fopen("path_to_clusters_file.txt", "w");
@@ -135,12 +135,12 @@ int runSA(double Tstart, /* [in] starting temperature */
   FILE *print_file = fopen(filename3, "w");
 
   char filename1[50]; // adjust size as needed
-  sprintf(filename1, "SA_graph_%d_%d_comp-pop.csv", d, n);
+  sprintf(filename1, "SA_graph_%d_%d_comp-pop_1.csv", d, n);
   FILE *sa_graph_file = fopen(filename1, "w");
   //
 
   char filename2[50]; // adjust size as needed
-  sprintf(filename2, "SA_graph_%d__2.csv", d);
+  sprintf(filename2, "SA_graph_%d__2_1.csv", d);
   FILE *saa_graph_file = fopen(filename2, "w");
   printf("About to open file.\n");
 
@@ -150,18 +150,18 @@ int runSA(double Tstart, /* [in] starting temperature */
     exit(EXIT_FAILURE);
   }
   fprintf(output_file, "%d;%d;%d\n", k, n, steps);
-
+  
   int perfect_score = 0;
   int not_as_great_score = 0;
   popul_test1(units, n, k, ideal_pop);
   //return;
   // Uncomment to run only ILP//
-  printf("0 ");
-  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
-  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
-  print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
+  // printf("0 ");
+  // Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  // print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  // print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
 
-  return;
+  // return;
 
   srand(time(NULL));
 
@@ -223,10 +223,10 @@ int runSA(double Tstart, /* [in] starting temperature */
 //printf("%d \n", s);
      //if (s % 50000 == 0)
     //   clusters = first_cluster(units, k, n);
-    change_unit1(clusters, units, k, n);
+    //change_unit1(clusters, units, k, n);
     
     //else {
-    //change_unit(clusters, units, k, n, ideal_pop);
+    change_unit(clusters, units, k, n, ideal_pop);
     //}
 //
     
@@ -261,89 +261,89 @@ int runSA(double Tstart, /* [in] starting temperature */
 
     //printf("pops = %d, and comp = %d\n", energy__population, energy__compactness);
 
-//     if (s % (numIterations / 100) == 0 )
-//     {
+    if (s % (numIterations / 10) == 0 )
+    {
 
-//       //if (perfect_score == 0)
-//       //{
+      //if (perfect_score == 0)
+      //{
         
-//         printf("HEREEEE!\n");
+        printf("HEREEEE!\n");
         
-//         // if (best_clusters != NULL){
-//         //   print_best_clusters(best_clusters, units,  k,  n, output_file, ideal_pop);
-//         //   clusters = runILP(units, k, n, m, ideal_pop, best_clusters);
-//         //   //redistribute_units_to_clusters(units, best_clusters, k, n, ideal_pop);
-//         // }
-//         // else{
-//           //redistribute_units_to_clusters(units, best_clusters, k, n, ideal_pop);
+        // if (best_clusters != NULL){
+        //   print_best_clusters(best_clusters, units,  k,  n, output_file, ideal_pop);
+        //   clusters = runILP(units, k, n, m, ideal_pop, best_clusters);
+        //   //redistribute_units_to_clusters(units, best_clusters, k, n, ideal_pop);
+        // }
+        // else{
+          //redistribute_units_to_clusters(units, best_clusters, k, n, ideal_pop);
 
-//           //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
-//           clusters = runILP(units, k, n, m, ideal_pop, clusters);
-//         //}
-//         //printf("HI!!\n");
-//          //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
-//         // for (int i = 0; i < k; i++)
-//         // {
-//         //   int pop_cluster = 0;
-//         //   //printf("2HI!!\n");
-//         //   for (int j = 0; j < clusters[i].size; j++)
-//         //   {
+          //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+          clusters = runILP(units, k, n, m, ideal_pop, clusters);
+        //}
+        //printf("HI!!\n");
+         print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+        // for (int i = 0; i < k; i++)
+        // {
+        //   int pop_cluster = 0;
+        //   //printf("2HI!!\n");
+        //   for (int j = 0; j < clusters[i].size; j++)
+        //   {
 
-//         //     pop_cluster = pop_cluster + clusters[i].units[j]->voters;
-//         //     int unit_code = clusters[i].units[j]->code / 1;
-//         //   }
-//         //   printf(" --> população: %d", pop_cluster);
-//         //   printf("\n");
-//         // }
+        //     pop_cluster = pop_cluster + clusters[i].units[j]->voters;
+        //     int unit_code = clusters[i].units[j]->code / 1;
+        //   }
+        //   printf(" --> população: %d", pop_cluster);
+        //   printf("\n");
+        // }
         
-//         energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
-//         //printf("3HI!! %d\n", energy__population);
+        energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
+        //printf("3HI!! %d\n", energy__population);
 
-//         energy__compactness = energy_compactness(clusters, k);
+        energy__compactness = energy_compactness(clusters, k);
 
-//         //printf("4HI!! %d\n", energy__compactness);
-// //  print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
-// //       fprintf(saa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
-//         // if (energy_population(units, clusters, m, k, n, ideal_pop) == 0){
+        //printf("4HI!! %d\n", energy__compactness);
+//  print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+//       fprintf(saa_graph_file, "%d,%d,1.0\n", s, energy__compactness);
+        // if (energy_population(units, clusters, m, k, n, ideal_pop) == 0){
 
-//         //   if (best_clusters == NULL)
-//         //   {
-//         //     best_clusters = malloc(k * sizeof(Cluster));
-//         //     for (int i = 0; i < k; i++)
-//         //     {
-//         //       best_clusters[i].units = malloc(n * sizeof(TU *));
-//         //       best_clusters[i].size = 0;
-//         //     }
-//         //   }
+        //   if (best_clusters == NULL)
+        //   {
+        //     best_clusters = malloc(k * sizeof(Cluster));
+        //     for (int i = 0; i < k; i++)
+        //     {
+        //       best_clusters[i].units = malloc(n * sizeof(TU *));
+        //       best_clusters[i].size = 0;
+        //     }
+        //   }
 
-//         //   energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
-//         //   energy__compactness = energy_compactness(clusters, k);
-//         //   printf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
-//         // //printf("HERE____ %d\n",best_clusters[0].size);
-//         //     for (int i = 0; i < k; i++)
-//         //   {
+        //   energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
+        //   energy__compactness = energy_compactness(clusters, k);
+           fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
+        // //printf("HERE____ %d\n",best_clusters[0].size);
+        //     for (int i = 0; i < k; i++)
+        //   {
 
-//         //       best_clusters[i].size = clusters[i].size;
+        //       best_clusters[i].size = clusters[i].size;
 
-//         //       memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
-//         //   }
-//         //   printf("3HI!!\n");
-//         //   print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
-//         //   if (best_energy_compactness < energy__compactness){
-//         //   best_energy_compactness = energy__compactness;
-//         //   best_energy_population = energy__population;
-//         //   }
-//         // }
-//         //printf("HERE!\n");
-//         //stored_state = storeState(clusters, k, n);
-//       //}
+        //       memcpy(best_clusters[i].units, clusters[i].units, clusters[i].size * sizeof(TU *));
+        //   }
+        //   printf("3HI!!\n");
+        //   print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+        //   if (best_energy_compactness < energy__compactness){
+        //   best_energy_compactness = energy__compactness;
+        //   best_energy_population = energy__population;
+        //   }
+        // }
+        //printf("HERE!\n");
+        //stored_state = storeState(clusters, k, n);
+      //}
      
-//     }
+    }
 
     if (energy__compactness >= best_energy_compactness && energy__population == 0)
     {
       accept_prob = 1.0;
-      print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+      //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
 
       
       if (energy__compactness > best_energy_compactness)
@@ -401,8 +401,11 @@ int runSA(double Tstart, /* [in] starting temperature */
       { //&& accept_prob == 1.0
 
         // retirei accept prob
-        if (energy__compactness < best_energy_compactness)
+        if (energy__compactness < best_energy_compactness){
           Final_energy_compactness = energy__compactness;
+          print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+           printf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
+        }
         Final_energy_population = energy__population;
         // printf("AYOOOO\n");
         // if(Final_energy_population == 0){
@@ -423,7 +426,7 @@ int runSA(double Tstart, /* [in] starting temperature */
         }
         best_energy_compactness = energy__compactness;
         best_energy_population = energy__population;
-        // print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+        
         // }
 
         
@@ -479,6 +482,7 @@ int runSA(double Tstart, /* [in] starting temperature */
       }
       deviation_percentage = ((double)max_deviation / ideal_pop) * 100.0;
       //fprintf(sa_graph_file, "%f,%d,1.0\n", deviation_percentage, energy__compactness);
+      fprintf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
       fprintf(saa_graph_file, "%d,%lf,5.0\n", s, deviation_percentage);
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
       fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
