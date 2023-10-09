@@ -360,7 +360,7 @@ void add_c_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPptr lp)
                     int x_index_j, x_index_j_prime, c_index;
                     if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, c_name, &c_index))
                     {
-                        fprintf(stderr, "Failed to get variable index.\n");
+                        fprintf(stderr, "Failed to get variable index.3\n");
                         exit(1);
                     }
                     // printf("%d,\n", c_index);
@@ -614,7 +614,7 @@ void create_contiguity_constraints(TU **units, int k, int n, CPXENVptr env, CPXL
                     int x_index_j, x_index_j_prime, b_index;
                     if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime) || CPXgetcolindex(env, lp, b_name, &b_index))
                     {
-                        fprintf(stderr, "Failed to get variable index.\n");
+                        fprintf(stderr, "Failed to get variable index.4\n");
                         exit(1);
                     }
 
@@ -712,7 +712,7 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
 
                             if (CPXgetcolindex(env, lp, x_name_j_double_prime, &x_index_j_prime_prime[num_j_prime_prime]))
                             {
-                                fprintf(stderr, "Failed to get variable index.\n");
+                                fprintf(stderr, "Failed to get variable index.1\n");
                                 exit(1);
                             }
 
@@ -730,7 +730,7 @@ void add_contiguity_constraints2(TU **units, int k, int n, int distMatrix[n][n],
                         int x_index_j, x_index_j_prime;
                         if (CPXgetcolindex(env, lp, x_name_j, &x_index_j) || CPXgetcolindex(env, lp, x_name_j_prime, &x_index_j_prime))
                         {
-                            fprintf(stderr, "Failed to get variable index.\n");
+                            fprintf(stderr, "Failed to get variable index.2\n");
                             exit(1);
                         }
 
