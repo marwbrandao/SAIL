@@ -1296,7 +1296,7 @@ void change_unit(Cluster *clusters, TU **units, int k, int n, int ideal_populati
 }
 
 int select_cluster_with_max_deviation(Cluster *clusters, int k, int ideal_population) {
-    if (rand() % 100 < 95) {
+    if (rand() % 100 < 50) {
         int max_deviation = -1;
         int max_deviation_cluster_idx = -1;
         for (int i = 0; i < k; i++) {

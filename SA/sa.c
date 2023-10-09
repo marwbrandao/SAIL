@@ -1,6 +1,9 @@
 #include <time.h>
 #include <math.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 // #include <bsd/stdlib.h>
 
 #include <limits.h>
@@ -102,6 +105,67 @@ void print_clusters_to_show(Cluster *best_clusters, TU **units, int k, int n, FI
   }
 }
 
+
+TU* findUnitByCode(TU **allUnits, int totalUnits, const char* code) {
+    for(int i = 0; i < totalUnits; i++) {
+        if(strcmp(allUnits[i]->code, code) == 0) {
+            return allUnits[i];
+        }
+    }
+    return NULL;
+}
+
+void populateClustersFromFile(const char *filename, Cluster *clusters, TU **allUnits, int totalUnits, int k) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Could not open file.\n");
+        return;
+    }
+
+    char line[1024];
+    char *token;
+    char *subtoken;
+    int s, cluster_id, pop_cluster;
+    while (fgets(line, sizeof(line), file)) {
+        // Skip lines that are not related to clusters
+        if (strstr(line, "prob:") != NULL || strstr(line, "fronteiras internas:") != NULL) {
+            continue;
+        }
+
+        // Parse 's' and cluster_id
+        sscanf(line, "%d,%d:", &s, &cluster_id);
+        Cluster *current_cluster = &clusters[cluster_id];
+
+        // Split string to get unit codes and population
+        token = strtok(line, ":");
+        token = strtok(NULL, ":");
+        subtoken = strtok(token, ",");
+        
+        // Populate units in the current cluster
+        int unit_index = 0;
+        while (subtoken != NULL) {
+            if (strstr(subtoken, "--> população") != NULL) {
+                sscanf(subtoken, "--> população: %d", &pop_cluster);
+                break;
+            }
+
+            TU *unit = findUnitByCode(allUnits, totalUnits, subtoken);
+            if (unit != NULL) {
+                current_cluster->units[unit_index] = unit;
+                unit->cluster_id = cluster_id;
+                unit_index++;
+            }
+
+            subtoken = strtok(NULL, ",");
+        }
+        current_cluster->population = pop_cluster;
+        current_cluster->size = unit_index;
+    }
+    fclose(file);
+}
+
+
+
 int runSA(double Tstart, /* [in] starting temperature */
           double Tstop,  /* [in] stopping temperature */
           int batch,     /* [in] number of iterations in a batch */
@@ -126,17 +190,17 @@ int runSA(double Tstart, /* [in] starting temperature */
   double a_it = 1.0;
   //FILE *output_file = fopen("output.txt", "w");
   char filename4[50]; // adjust size as needed
-  sprintf(filename4, "output_%d_%d_1.txt", d, n);
+  sprintf(filename4, "output_%d_%d_12.txt", d, n);
   FILE *output_file = fopen(filename4, "w");
   
   //FILE *print_file = fopen("path_to_clusters_file.txt", "w");
   char filename3[50]; // adjust size as needed
-  sprintf(filename3, "path_to_clusters_file_%d_%d.txt", d, n);
+  sprintf(filename3, "path_to_clusters_file_%d_%d2.txt", d, n);
   FILE *print_file = fopen(filename3, "w");
 
   char filename1[50]; // adjust size as needed
-  sprintf(filename1, "SA_graph_%d_%d_comp-pop_1.csv", d, n);
-  FILE *sa_graph_file = fopen(filename1, "w");
+  //sprintf(filename1, "SA_graph_%d_%d_comp-pop_1.csv", d, n);
+  //FILE *sa_graph_file = fopen(filename1, "w");
   //
 
   char filename2[50]; // adjust size as needed
@@ -144,24 +208,29 @@ int runSA(double Tstart, /* [in] starting temperature */
   FILE *saa_graph_file = fopen(filename2, "w");
   printf("About to open file.\n");
 
-  if (!sa_graph_file)
-  {
-    perror("fopen");
-    exit(EXIT_FAILURE);
-  }
+   FILE *fp1 = fopen("cplex_variables1.txt", "w");
+    if (fp1 == NULL) {
+        fprintf(stderr, "Couldn't open file for writing.\n");
+        exit(1);
+    }
+  // if (!sa_graph_file)
+  // {
+  //   perror("fopen");
+  //   exit(EXIT_FAILURE);
+  // }
   fprintf(output_file, "%d;%d;%d\n", k, n, steps);
   
   int perfect_score = 0;
   int not_as_great_score = 0;
   popul_test1(units, n, k, ideal_pop);
   //return;
-  // Uncomment to run only ILP//
-  // printf("0 ");
-  // Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
-  // print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
-  // print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
+  //Uncomment to run only ILP//
+  printf("0 ");
+  Cluster *clusters_ilp = runILP_only(units, k, n, m, ideal_pop);
+  print_best_clusters(clusters_ilp, units, k, n, output_file, ideal_pop);
+  print_clusters_to_show(clusters_ilp, units, k, n, print_file, ideal_pop);
 
-  // return;
+  return;
 
   srand(time(NULL));
 
@@ -182,6 +251,14 @@ int runSA(double Tstart, /* [in] starting temperature */
   int iteration;
   double value;
   double accept_prob = 0.0;
+
+  // populateClustersFromFile("your_file.txt", clusters,units, n, k);
+  // print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+  // clusters = runILP(units, k, n, m, ideal_pop, clusters, fp1);
+       
+  // print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
+       
+  // return;
   for (int i = 0; i < k; i++)
   {
     // //
@@ -278,7 +355,7 @@ int runSA(double Tstart, /* [in] starting temperature */
           //redistribute_units_to_clusters(units, best_clusters, k, n, ideal_pop);
 
           //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
-          clusters = runILP(units, k, n, m, ideal_pop, clusters);
+          clusters = runILP(units, k, n, m, ideal_pop, clusters, fp1);
         //}
         //printf("HI!!\n");
          print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
@@ -318,7 +395,7 @@ int runSA(double Tstart, /* [in] starting temperature */
 
         //   energy__population = energy_population(units, clusters, m, k, n, ideal_pop);
         //   energy__compactness = energy_compactness(clusters, k);
-           fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
+           //fprintf(sa_graph_file, "%d,%d,2.0\n", s, energy__compactness);
         // //printf("HERE____ %d\n",best_clusters[0].size);
         //     for (int i = 0; i < k; i++)
         //   {
@@ -346,8 +423,11 @@ int runSA(double Tstart, /* [in] starting temperature */
       //print_best_clusters(clusters, units,  k,  n, output_file, ideal_pop);
 
       
-      if (energy__compactness > best_energy_compactness)
+      if (energy__compactness > best_energy_compactness){
         perfect_score++;
+        print_best_clusters(clusters, units, k, n, output_file, ideal_pop);
+      }
+        
     }
     else if (energy__compactness > best_energy_compactness && energy__population > best_energy_population)
     {
@@ -399,12 +479,13 @@ int runSA(double Tstart, /* [in] starting temperature */
     {
       if (energy__population == 0)
       { //&& accept_prob == 1.0
-
+        print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+        //printf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
         // retirei accept prob
         if (energy__compactness < best_energy_compactness){
           Final_energy_compactness = energy__compactness;
-          print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
-           printf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
+          // print_best_clusters(best_clusters, units, k, n, output_file, ideal_pop);
+          //  printf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
         }
         Final_energy_population = energy__population;
         // printf("AYOOOO\n");
@@ -482,10 +563,10 @@ int runSA(double Tstart, /* [in] starting temperature */
       }
       deviation_percentage = ((double)max_deviation / ideal_pop) * 100.0;
       //fprintf(sa_graph_file, "%f,%d,1.0\n", deviation_percentage, energy__compactness);
-      fprintf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
+      //fprintf(sa_graph_file, "%d,%d,4.0\n", s, energy__compactness);
       fprintf(saa_graph_file, "%d,%lf,5.0\n", s, deviation_percentage);
       fprintf(output_file, "prob: %f and random: %f\n", accept_prob, random_number);
-      fprintf(output_file, "fronteiras internas: %d\n\n", best_energy_compactness);
+      fprintf(output_file, "fronteiras internas: %d\n\n", energy__compactness);
 
       stored_state = storeState(clusters, k, n);
     }
@@ -508,6 +589,7 @@ int runSA(double Tstart, /* [in] starting temperature */
     print_best_clusters(clusters, units, k, n, output_file, ideal_pop);
   }
   fclose(output_file);
+  fclose(fp1);
 
   printf("\n");
   printf("SA end!\n");

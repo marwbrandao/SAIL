@@ -993,7 +993,7 @@ void add_fixed_cluster_constraints_trial(CPXENVptr env, CPXLPptr lp, TU **units,
 // lisboa ao nivel de freguesias, simulated annealing time out 3 horas, baseline, com soluçao parcial, e restringir fixando determinadas , estabelecer um time out, e ver quanto temp, tempo fixo, verificar o status
 // quiarta as 16
 
-Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *clusters)
+Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *clusters, FILE *fp1)
 {
     CPXENVptr env = NULL;
     CPXLPptr lp = NULL;
@@ -1004,7 +1004,8 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
 
     start = clock();
 
-    
+   
+
 
     env = CPXopenCPLEX(&status);
     if (env == NULL)
@@ -1033,7 +1034,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
     // printf("star = == = %f\n", start_time);
     int adjMatrix[n][n];
     int distMatrix[n][n];
-    double time_limit = 60.0 * 5.0; // Time limit in seconds
+    double time_limit = 60.0 * 10.0; // Time limit in seconds
     status = CPXsetdblparam(env, CPX_PARAM_TILIM, time_limit);
     if (status)
     {
@@ -1156,7 +1157,7 @@ Cluster **runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster *cluste
             unit->assigned = false;
         }
         unit->assigned = solution[i] >= 0.5 ? true : false; //
-
+        fprintf(fp1, "Variable %s: Value %.2f\n", *colname, solution[i]);
         if (unit->assigned)
         { // Only add the unit to the cluster if it is assigned
 
@@ -1216,6 +1217,7 @@ printf("CPU time used: %f\n", cpu_time_used);
     //free(solution);
     free(cluster_unit_counts);
     free(processed_clusters);
+    //fclose(fp1);
 
     return clusters;
 }

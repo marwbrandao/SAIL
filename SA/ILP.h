@@ -28,7 +28,7 @@ int create_decision_variables(TU **units,int k, int n, CPXENVptr env, CPXLPptr l
 
 void add_fixed_cluster_constraints(CPXENVptr env, CPXLPptr lp, TU** units, Cluster* clusters, int num_units, int num_clusters, int ideal_pop);
 
-Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters);
+Cluster** runILP(TU **units, int k, int n, int m, int ideal_pop, Cluster* clusters, FILE *fp1);
 
 Cluster **runILP_only(TU **units, int k, int n, int m, int ideal_pop);
 
