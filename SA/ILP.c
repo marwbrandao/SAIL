@@ -186,7 +186,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             // printf("id = %d, values = %f\n",indices[unit], values[unit]);
         }
 
-        double rhs_upper = 1.15 * ideal_population; // upper bound (115% of ideal population)
+        double rhs_upper = 1.175 * ideal_population; // upper bound (115% of ideal population)
         char sense_upper = 'L';                     // Use 'L' for "less than or equal to".
         int matbeg = 0;
         int status_upper = CPXaddrows(env, lp, 0, 1, n, &rhs_upper, &sense_upper, &matbeg, indices, values, NULL, NULL);
@@ -196,7 +196,7 @@ void add_population_constraints(TU **units, int n, int k, CPXENVptr env, CPXLPpt
             exit(1);
         }
 
-        double rhs_lower = 0.85 * ideal_population; // lower bound (85% of ideal population)
+        double rhs_lower = 0.825 * ideal_population; // lower bound (85% of ideal population)
         char sense_lower = 'G';                     // Use 'G' for "greater than or equal to".
         int status_lower = CPXaddrows(env, lp, 0, 1, n, &rhs_lower, &sense_lower, &matbeg, indices, values, NULL, NULL);
         if (status_lower)
